@@ -4,4 +4,5 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_test">Test</string>
+    <string name="floating_search">floating_search</string>
 </resources>
