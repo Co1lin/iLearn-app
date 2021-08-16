@@ -1,6 +1,11 @@
 package com.tea.ilearn;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.SearchView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -15,6 +20,7 @@ import com.tea.ilearn.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +43,28 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = findViewById(R.id.search_view);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setVisibility(View.INVISIBLE);
+
+        int searchCloseButtonId = searchView.getContext().getResources()
+                .getIdentifier("android:id/search_close_btn", null, null);
+        ImageView closeButton = (ImageView) this.searchView.findViewById(searchCloseButtonId);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.setQuery("",false);
+                searchView.setVisibility(View.INVISIBLE);
+
+            }
+        });
+        // TODO : keyboard close event listener
     }
 
+    public void doSearch(View v) {
+        searchView.setVisibility(View.VISIBLE);
+        searchView.setIconified(false);
+    }
 }
