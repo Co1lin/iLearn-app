@@ -4,8 +4,11 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
+import android.widget.Spinner;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -21,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private SearchView searchView;
+    private LinearLayout searchBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +48,18 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.search_kinds, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+//        spinner.setOnItemClickListener(); // TODO https://developer.android.com/guide/topics/ui/controls/spinner
+
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = findViewById(R.id.search_view);
+        searchBox = findViewById(R.id.search_box);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setVisibility(View.INVISIBLE);
+        searchBox.setVisibility(View.INVISIBLE);
 
         int searchCloseButtonId = searchView.getContext().getResources()
                 .getIdentifier("android:id/search_close_btn", null, null);
@@ -56,15 +68,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 searchView.setQuery("",false);
-                searchView.setVisibility(View.INVISIBLE);
-
+                searchBox.setVisibility(View.INVISIBLE);
             }
         });
-        // TODO : keyboard close event listener
     }
 
     public void doSearch(View v) {
-        searchView.setVisibility(View.VISIBLE);
+        searchBox.setVisibility(View.VISIBLE);
         searchView.setIconified(false);
     }
 }
