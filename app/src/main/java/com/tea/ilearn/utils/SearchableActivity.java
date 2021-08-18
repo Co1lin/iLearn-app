@@ -1,18 +1,13 @@
-package com.tea.ilearn;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.tea.ilearn.utils;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.SearchRecentSuggestionsProvider;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
+
+import com.tea.ilearn.R;
 
 public class SearchableActivity extends ListActivity {
 
@@ -26,8 +21,8 @@ public class SearchableActivity extends ListActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(
-                    this, MySuggestionProvider.AUTHORITY,
-                    MySuggestionProvider.MODE
+                    this, SearchSuggestionProvider.AUTHORITY,
+                    SearchSuggestionProvider.MODE
             );
             suggestions.saveRecentQuery(query, null);
             // TODO: clear history for privacy
