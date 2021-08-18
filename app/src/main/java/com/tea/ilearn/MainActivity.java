@@ -2,11 +2,17 @@ package com.tea.ilearn;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.Spinner;
 
@@ -25,10 +31,16 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private SearchView searchView;
     private LinearLayout searchBox;
+    private RadioButton searchButton;
+    private RadioGroup searchGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getSupportActionBar().hide();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -48,18 +60,43 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.search_kinds, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-//        spinner.setOnItemClickListener(); // TODO https://developer.android.com/guide/topics/ui/controls/spinner
-
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = findViewById(R.id.search_view);
         searchBox = findViewById(R.id.search_box);
+        searchButton = findViewById(R.id.search_entity);
+        searchGroup = findViewById(R.id.search_group);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        MainActivity that = this;
+        searchGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
+                Log.v("MYDEBUG", "inside");
+                RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
+                { // set new checked color
+                    int color = that.getResources().getColor(R.color.white);
+                    GradientDrawable drawable = (GradientDrawable)btn.getBackground();
+//                    drawable.setStroke(3, color);
+                    drawable.setColor(color);
+                }
+                { // unset old checked color
+                    int color = that.getResources().getColor(R.color.purple_200);
+                    GradientDrawable drawable = (GradientDrawable)searchButton.getBackground();
+//                    drawable.setStroke(3, color);
+                    drawable.setColor(color);
+                }
+                searchButton = btn;
+            }
+        });
         searchBox.setVisibility(View.INVISIBLE);
+        Log.v("MYDEBUG", "outside");
+        searchButton.setChecked(true);
+        { // set new checked color
+            int color = that.getResources().getColor(R.color.white);
+            GradientDrawable drawable = (GradientDrawable)searchButton.getBackground();
+//            drawable.setStroke(3, color);
+            drawable.setColor(color);
+        }
 
         int searchCloseButtonId = searchView.getContext().getResources()
                 .getIdentifier("android:id/search_close_btn", null, null);
@@ -69,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 searchView.setQuery("",false);
                 searchBox.setVisibility(View.INVISIBLE);
+                searchButton = findViewById(R.id.search_entity);
+                searchButton.setChecked(true);
             }
         });
     }

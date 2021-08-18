@@ -6,9 +6,7 @@
     <string name="title_test">我的</string>
     <string name="floating_search">搜索实体</string>
     <string name="search_hint">这是一个搜索hint</string>
-    <string-array name="search_kinds">
-        <item>搜实体</item>
-        <item>实体链接</item>
-        <item>搜题</item>
-    </string-array>
+    <string name="search_entity">搜实体</string>
+    <string name="search_linking">实体链接</string>
+    <string name="search_problem">搜题</string>
 </resources>

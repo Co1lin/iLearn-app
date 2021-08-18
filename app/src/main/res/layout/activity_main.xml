@@ -52,27 +52,57 @@
         android:id="@+id/search_box"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:orientation="horizontal">
+        android:padding="7dp"
+        android:orientation="vertical"
+        android:background="@drawable/bottom_corner"
+        >
 
-        <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="2" />
-
-        <androidx.constraintlayout.widget.Barrier
+        <RadioGroup
+            android:id="@+id/search_group"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            app:barrierDirection="left" />
+            android:orientation='horizontal'>
+            <RadioButton
+                android:id="@+id/search_entity"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/top_corner"
+                android:button="@null"
+                android:gravity="center"
+                android:text="@string/search_entity" />
+
+            <RadioButton
+                android:id="@+id/search_linking"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/top_corner"
+                android:button="@null"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/search_linking" />
+
+            <RadioButton
+                android:id="@+id/search_problem"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/top_corner"
+                android:button="@null"
+                android:gravity="center"
+                android:text="@string/search_problem" />
+        </RadioGroup>
 
         <SearchView
             android:id="@+id/search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:background="@color/white"
+            />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
