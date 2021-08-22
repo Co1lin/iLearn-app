@@ -30,21 +30,22 @@ android:layout_height="match_parent">
     android:background="#e0e0e0"
     app:layout_constraintBottom_toTopOf="@+id/layout_chat_chatbox" />
 
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/layout_chat_chatbox"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintStart_toStartOf="parent">
 
-
     <EditText
         android:id="@+id/edit_chat_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_marginStart="16dp"
-        android:layout_toStartOf="@+id/button_chat_send"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/button_chat_send"
         android:background="@android:color/transparent"
         android:hint="@string/input_hint"
         android:inputType="textMultiLine"
@@ -54,14 +55,19 @@ android:layout_height="match_parent">
 
     <Button
         android:id="@+id/button_chat_send"
-        android:layout_width="wrap_content"
+        android:layout_width="36dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:background="?attr/selectableItemBackground"
-        android:text="Send"
-        android:textColor="?colorPrimary" />
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:background="@drawable/ic_send_24"
+        android:backgroundTint="?colorSecondary"
+        android:scaleY="0.7"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

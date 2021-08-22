@@ -54,6 +54,11 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         mMessageList = messageList;
     }
 
+    public void add(Message m) {
+        mMessageList.add(m);
+        notifyItemInserted(mMessageList.size() - 1);
+    }
+
     @Override
     public int getItemCount() {
         return mMessageList.size();
