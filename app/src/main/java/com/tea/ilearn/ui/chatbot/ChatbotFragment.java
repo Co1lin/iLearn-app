@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -29,15 +30,14 @@ public class ChatbotFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mMessageRecycler = getView().findViewById(R.id.recycler_chat);
-        mMessageAdapter = new MessageListAdapter(getContext(), Arrays.asList(
-                new Message("text short", 0),
-                new Message("text short", 0),
-                new Message("text short", 1),
-                new Message("text short", 0),
-                new Message("text short", 1),
-                new Message("text short", 0)
-        ));
+        mMessageAdapter = new MessageListAdapter(getContext(), Arrays.asList());
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         mMessageRecycler.setAdapter(mMessageAdapter);
+
+        initListener();
+    }
+
+    private void initListener() {
+        final EditText editText = getView().findViewById(R.id.edit_chat_message);
     }
 }

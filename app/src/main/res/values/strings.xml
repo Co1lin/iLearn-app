@@ -5,4 +5,5 @@
     <string name="title_notifications">实体链接</string>
     <string name="title_test">我的</string>
     <string name="floating_search">搜索实体</string>
+    <string name="input_hint">请输入</string>
 </resources>
