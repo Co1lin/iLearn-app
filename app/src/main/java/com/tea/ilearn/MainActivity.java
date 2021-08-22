@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home,
-                R.id.navigation_dashboard,
+                R.id.navigation_chatbot,
                 R.id.navigation_notifications,
                 R.id.navigation_test
         ).build();
@@ -38,5 +38,4 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
-
 }
