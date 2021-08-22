@@ -28,6 +28,7 @@ public class SearchableActivity extends ListActivity {
             // TODO: clear history for privacy
             // suggestions.clearHistory();
             Log.v("QUERY", query);
+
         }
     }
 }
