@@ -9,5 +9,8 @@ public class Url {
 
     @Domain(name = "EduKGLogin")
     public static String eduKGLoginUrl = "http://open.edukg.cn/opedukg/api/typeAuth/user/login";
+
+    @Domain(name = "EduKGOpen")
+    public static String eduKGOpenUrl = "http://open.edukg.cn/opedukg/api/typeOpen/open";
 }
 
