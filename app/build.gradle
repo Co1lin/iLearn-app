@@ -50,4 +50,7 @@ dependencies {
     // define any required OkHttp artifacts without version
     implementation 'com.squareup.okhttp3:okhttp'
     implementation 'com.squareup.okhttp3:logging-interceptor'
+
+    // keyboard appear/hide event handler
+    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC3'
 }
