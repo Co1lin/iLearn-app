@@ -74,32 +74,11 @@ public class MainActivity extends AppCompatActivity {
         searchGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-                Log.v("MYDEBUG", "inside");
                 RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
-                { // set new checked color
-                    int color = that.getResources().getColor(R.color.white);
-                    GradientDrawable drawable = (GradientDrawable)btn.getBackground();
-//                    drawable.setStroke(3, color);
-                    drawable.setColor(color);
-                }
-                { // unset old checked color
-                    int color = that.getResources().getColor(R.color.purple_200);
-                    GradientDrawable drawable = (GradientDrawable)searchButton.getBackground();
-//                    drawable.setStroke(3, color);
-                    drawable.setColor(color);
-                }
-                searchButton = btn;
             }
         });
         searchBox.setVisibility(View.INVISIBLE);
-        Log.v("MYDEBUG", "outside");
         searchButton.setChecked(true);
-        { // set new checked color
-            int color = that.getResources().getColor(R.color.white);
-            GradientDrawable drawable = (GradientDrawable)searchButton.getBackground();
-//            drawable.setStroke(3, color);
-            drawable.setColor(color);
-        }
 
         int searchCloseButtonId = searchView.getContext().getResources()
                 .getIdentifier("android:id/search_close_btn", null, null);
@@ -109,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 searchView.setQuery("",false);
                 searchBox.setVisibility(View.INVISIBLE);
-                searchButton = findViewById(R.id.search_entity);
                 searchButton.setChecked(true);
             }
         });
