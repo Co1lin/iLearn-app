@@ -24,7 +24,7 @@ public class EduKG extends APIRequest {
         );
     }
     private static EduKG instance = new EduKG();
-    public static EduKG getInstance() {
+    public static EduKG getInst() {
         return instance;
     }
 
@@ -52,9 +52,8 @@ public class EduKG extends APIRequest {
                 put("course", course);
                 put("name", entityName);
             }},
-            p -> p.asString(),
+            p -> p.asEduKGResponse(EntityDetail.class),
             handler);
     }
-
 
 }

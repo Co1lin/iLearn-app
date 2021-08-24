@@ -63,7 +63,7 @@ public abstract class APIRequest {
     }
 
     /**
-     * Perform Request to API
+     * Generic Request to API
      * @param _p                Object returned by RxHttp.<request method>(url)
      * @param params            Map containing key-value pairs to add to GET params
      * @param responseDefiner   Object of ResponseDefiner interface to
@@ -114,7 +114,7 @@ public abstract class APIRequest {
     }
 
     /**
-     * Perform GET Request to API
+     * GET Request to API
      * @param path              Relative path to baseUrl
      * @param params            Map containing key-value pairs to add to GET params
      * @param responseDefiner   Object of ResponseDefiner interface to
@@ -133,7 +133,7 @@ public abstract class APIRequest {
     }
 
     /**
-     * Perform POST Request to API with x-www-from-urlencoded body
+     * POST Request to API with x-www-from-urlencoded body
      * @param path              Relative path to baseUrl
      * @param params            Map containing key-value pairs to add to GET params
      * @param responseDefiner   Object of ResponseDefiner interface to

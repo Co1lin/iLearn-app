@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 
 import com.tea.ilearn.R;
 import com.tea.ilearn.net.EduKG.EduKG;
+import com.tea.ilearn.net.EduKG.EntityDetail;
 
 public class SearchableActivity extends ListActivity {
 
@@ -33,7 +34,8 @@ public class SearchableActivity extends ListActivity {
             // TODO: clear history for privacy
             // suggestions.clearHistory();
             Log.i("SearchableActivity", "onCreate: got query:" + query);
-            EduKG.getInstance().fuzzySearchEntity("chinese", "文章", new StaticHandler());
+            //EduKG.getInst().fuzzySearchEntity("chinese", "文章", new StaticHandler());
+            EduKG.getInst().getEntityDetail("chinese", "杜甫", new StaticHandler());
         }
     }
 
@@ -42,6 +44,8 @@ public class SearchableActivity extends ListActivity {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             Log.e("search entities", msg.what + (msg.obj == null ? "" : msg.obj.toString()));
+            EntityDetail.Property re = ((EntityDetail) msg.obj).getProperties().get(0);
+            Log.e("search", re.toString());
         }
     }
 }
