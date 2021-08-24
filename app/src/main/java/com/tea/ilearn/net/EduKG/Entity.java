@@ -1,4 +1,4 @@
-package com.tea.ilearn.net;
+package com.tea.ilearn.net.EduKG;
 
 public class Entity {
     String label;

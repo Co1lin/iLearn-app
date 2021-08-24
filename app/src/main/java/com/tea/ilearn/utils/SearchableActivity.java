@@ -12,7 +12,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.tea.ilearn.R;
-import com.tea.ilearn.net.EduKG;
+import com.tea.ilearn.net.EduKG.EduKG;
 
 public class SearchableActivity extends ListActivity {
 
@@ -33,7 +33,7 @@ public class SearchableActivity extends ListActivity {
             // TODO: clear history for privacy
             // suggestions.clearHistory();
             Log.i("SearchableActivity", "onCreate: got query:" + query);
-            EduKG.entitySearch("chinese", "文章", new StaticHandler());
+            EduKG.getInstance().entitySearch("chinese", "文章", new StaticHandler());
         }
     }
 

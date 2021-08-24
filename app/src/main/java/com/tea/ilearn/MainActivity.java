@@ -23,7 +23,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.tea.ilearn.databinding.ActivityMainBinding;
-import com.tea.ilearn.net.EduKG;
 
 public class MainActivity extends AppCompatActivity {
 
