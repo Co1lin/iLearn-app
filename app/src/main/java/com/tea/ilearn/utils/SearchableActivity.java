@@ -33,7 +33,7 @@ public class SearchableActivity extends ListActivity {
             // TODO: clear history for privacy
             // suggestions.clearHistory();
             Log.i("SearchableActivity", "onCreate: got query:" + query);
-            EduKG.getInstance().entitySearch("chinese", "文章", new StaticHandler());
+            EduKG.getInstance().fuzzySearchEntity("chinese", "文章", new StaticHandler());
         }
     }
 

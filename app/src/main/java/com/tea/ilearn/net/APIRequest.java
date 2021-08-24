@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import rxhttp.wrapper.param.RxHttp;
+import rxhttp.wrapper.param.RxHttpFormParam;
 import rxhttp.wrapper.param.RxHttpNoBodyParam;
 
 public abstract class APIRequest {
@@ -36,6 +37,7 @@ public abstract class APIRequest {
         genericPath = _genericPath;
         loginParams = _loginParams;
         tokenName = _tokenName;
+        tokenValue = "123";
         loginFailedMessage = _loginFailedMessage;
         loginResponseClass = _loginResponseClass;
     }
@@ -61,53 +63,118 @@ public abstract class APIRequest {
     }
 
     /**
-     * Perform GET Request to API
+     * Perform Request to API
+     * @param _p                Object returned by RxHttp.<request method>(url)
+     * @param params            Map containing key-value pairs to add to GET params
      * @param responseDefiner   Object of ResponseDefiner interface to
      *                          define the type of "data" field in Response<T>
-     * @param path              Relative path to baseUrl
-     * @param params            Map containing key-value pairs to add to GET params
      * @param handler           Handler to be sent the object of responseClass
      */
-    public void GET(ResponseDefiner responseDefiner,
-                           String path,
-                           Map<String, ?> params,
-                           Handler handler) {
+    public void Request(
+            RxHttp _p,
+            Map<String, Object> params,
+            ResponseDefiner responseDefiner,
+            Handler handler) {
         new Thread(() -> {
             AtomicBoolean loginFailed = new AtomicBoolean(false);
             AtomicBoolean messageSent = new AtomicBoolean(false);
             int loopCounter = 0;
-            Log.i("APIRequest.GET", baseUrl + genericPath + path);
             do {
                 loopCounter++;
                 loginFailed.set(false);
-                RxHttpNoBodyParam p = RxHttp
-                        .get(baseUrl + genericPath + path)
-                        .setSync()
-                        .add(tokenName, tokenValue)
-                        .addAll(params);
+                // BUG: new a RxHTTP to avoid unfix bug of RxHttp
+                RxHttp p = getSyncRxHttp(_p).removeAllQuery();
+                params.put(tokenName, tokenValue);
+                paramAddAll(p, params);
+                Log.i("APIRequest.Request",
+                        p.getParam().getMethod().toString() + p.getParam().getUrl());
                 responseDefiner
-                        .define(p)
-                        .timeout(timeoutSeconds, TimeUnit.SECONDS)
-                        .retry(maxRetries, throwable -> {
-                            Log.i("APIRequest.GET", "retry: " + throwable.getMessage());
-                            if (throwable.getMessage().equals(loginFailedMessage)) {
-                                refresh();
-                                loginFailed.set(true);
-                                return false;
-                            }
-                            return true;
-                        })
-                        .subscribe(respObj -> {
-                            Message.obtain(handler, 0, respObj).sendToTarget();
-                            messageSent.set(true);
-                        }, throwable -> {
-                            if (!throwable.getMessage().equals(loginFailedMessage))
-                                Log.e("APIRequest.GET", "error: " + throwable.getMessage());
-                        });
+                    .define(p)
+                    .timeout(timeoutSeconds, TimeUnit.SECONDS)
+                    .retry(maxRetries, throwable -> {
+                        Log.i("APIRequest.Request", "retry: " + throwable.getMessage());
+                        if (throwable.getMessage().equals(loginFailedMessage)) {
+                            refresh();
+                            loginFailed.set(true);
+                            return false;
+                        }
+                        return true;
+                    })
+                    .subscribe(respObj -> {
+                        Message.obtain(handler, 0, respObj).sendToTarget();
+                        messageSent.set(true);
+                    }, throwable -> {
+                        if (!throwable.getMessage().equals(loginFailedMessage))
+                            Log.e("APIRequest.Request", "error: " + throwable.getMessage());
+                    });
             } while (loginFailed.get() && loopCounter < maxLoginRetries);
             if (!messageSent.get())
                 Message.obtain(handler, 1).sendToTarget();  // send failure message
         }).start();
     }
 
+    /**
+     * Perform GET Request to API
+     * @param path              Relative path to baseUrl
+     * @param params            Map containing key-value pairs to add to GET params
+     * @param responseDefiner   Object of ResponseDefiner interface to
+     *                          define the type of "data" field in Response<T>
+     * @param handler           Handler to be sent the object of responseClass
+     */
+    public void GET(
+            String path,
+            Map<String, Object> params,
+            ResponseDefiner responseDefiner,
+            Handler handler) {
+        Request(RxHttp.get(baseUrl + genericPath + path),
+                params,
+                responseDefiner,
+                handler);
+    }
+
+    /**
+     * Perform POST Request to API with x-www-from-urlencoded body
+     * @param path              Relative path to baseUrl
+     * @param params            Map containing key-value pairs to add to GET params
+     * @param responseDefiner   Object of ResponseDefiner interface to
+     *                          define the type of "data" field in Response<T>
+     * @param handler           Handler to be sent the object of responseClass
+     */
+    public void POST(
+            String path,
+            Map<String, Object> params,
+            ResponseDefiner responseDefiner,
+            Handler handler) {
+        Request(RxHttp.postForm(baseUrl + genericPath + path),
+                params,
+                responseDefiner,
+                handler);
+    }
+
+    private RxHttp getSyncRxHttp(RxHttp _p) {
+        if (_p instanceof RxHttpNoBodyParam)
+            return new RxHttpNoBodyParam( ((RxHttpNoBodyParam) _p).getParam() ).setSync();
+        else if (_p instanceof RxHttpFormParam) {
+            return new RxHttpFormParam( ((RxHttpFormParam) _p).getParam() ).setSync();
+        }
+        throw new IllegalArgumentException("_p is instance of " + _p.getClass() + " which is not supported");
+    }
+
+    private RxHttp paramAdd(RxHttp p, String key, String value) {
+        if (p instanceof RxHttpNoBodyParam)
+            return ((RxHttpNoBodyParam) p).add(key, value);
+        else if (p instanceof RxHttpFormParam) {
+            return ((RxHttpFormParam) p).add(key, value);
+        }
+        throw new IllegalArgumentException("p is instance of " + p.getClass() + " which is not supported");
+    }
+
+    private RxHttp paramAddAll(RxHttp p, Map<String, ?> params) {
+        if (p instanceof RxHttpNoBodyParam)
+            return ((RxHttpNoBodyParam) p).addAll(params);
+        else if (p instanceof RxHttpFormParam) {
+            return ((RxHttpFormParam) p).addAll(params);
+        }
+        throw new IllegalArgumentException("p is instance of " + p.getClass() + " which is not supported");
+    }
 }

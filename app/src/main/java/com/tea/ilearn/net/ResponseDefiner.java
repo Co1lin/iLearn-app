@@ -1,8 +1,8 @@
 package com.tea.ilearn.net;
 
 import io.reactivex.rxjava3.core.Observable;
-import rxhttp.wrapper.param.RxHttpNoBodyParam;
+import rxhttp.wrapper.param.RxHttp;
 
 public interface ResponseDefiner {
-    Observable<?> define(RxHttpNoBodyParam p);
+    Observable<?> define(RxHttp p);
 }

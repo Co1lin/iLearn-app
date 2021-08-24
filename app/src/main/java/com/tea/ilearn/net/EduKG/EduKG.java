@@ -35,17 +35,26 @@ public class EduKG extends APIRequest {
         tokenValue = ((LoginResponse) response).id;
     }
 
-    public void entitySearch(String course, String searchKey, Handler handler) {
+    public void fuzzySearchEntity(String course, String searchKey, Handler handler) {
         // TODO: cancel request to save resources
-        GET(p -> p.asEduKGResponseList(Entity.class),
-                "/instanceList",
-                new HashMap<String, Object>() {{
-                    put("course", course);
-                    put("searchKey", searchKey);
-                }},
-                handler);
+        GET("/instanceList",
+            new HashMap<String, Object>() {{
+                put("course", course);
+                put("searchKey", searchKey);
+            }},
+            p -> p.asEduKGResponseList(Entity.class),
+            handler);
     }
 
+    public void getEntityDetail(String course, String entityName, Handler handler) {
+        GET("/infoByInstanceName",
+            new HashMap<String, Object>() {{
+                put("course", course);
+                put("name", entityName);
+            }},
+            p -> p.asString(),
+            handler);
+    }
 
 
 }
