@@ -7,49 +7,35 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.abel533.echarts.Label;
-import com.github.abel533.echarts.code.Layout;
-import com.github.abel533.echarts.code.Position;
 import com.github.abel533.echarts.code.X;
 import com.github.abel533.echarts.series.Bar;
-import com.github.abel533.echarts.series.Graph;
-import com.github.abel533.echarts.series.force.Category;
-import com.github.abel533.echarts.series.force.Link;
-import com.github.abel533.echarts.series.force.Node;
-import com.github.abel533.echarts.series.other.Force;
-import com.github.abel533.echarts.style.ItemStyle;
-import com.github.abel533.echarts.style.itemstyle.Emphasis;
 import com.tea.ilearn.R;
-import com.tea.ilearn.databinding.FragmentHomeBinding;
 
 import com.github.abel533.echarts.axis.CategoryAxis;
 import com.github.abel533.echarts.axis.ValueAxis;
-import com.github.abel533.echarts.code.Magic;
-import com.github.abel533.echarts.code.Tool;
-import com.github.abel533.echarts.code.Trigger;
-import com.github.abel533.echarts.feature.MagicType;
-import com.github.abel533.echarts.series.Line;
 import com.github.abel533.echarts.json.GsonOption;
 import com.tea.ilearn.utils.EchartsView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import dev.bandb.graphview.AbstractGraphAdapter;
+import dev.bandb.graphview.graph.Graph;
+import dev.bandb.graphview.graph.Node;
+import dev.bandb.graphview.layouts.layered.SugiyamaArrowEdgeDecoration;
+import dev.bandb.graphview.layouts.layered.SugiyamaConfiguration;
+import dev.bandb.graphview.layouts.layered.SugiyamaLayoutManager;
 
 public class HomeFragment extends Fragment {
-    private EchartsView barChart, graphChart;
+    private EchartsView barChart;
+    private RecyclerView graphView;
+    private AbstractGraphAdapter adapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -75,21 +61,46 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        graphChart = getView().findViewById(R.id.graph_chart);
-        graphChart.setWebViewClient(new WebViewClient(){
+        graphView = getView().findViewById(R.id.graph_view);
+
+        SugiyamaConfiguration configuration = new SugiyamaConfiguration.Builder()
+                .setNodeSeparation(100)
+                .setLevelSeparation(100)
+                .build();
+        graphView.setLayoutManager(new SugiyamaLayoutManager(getContext(), configuration));
+
+        graphView.addItemDecoration(new SugiyamaArrowEdgeDecoration());
+
+        Graph graph = new Graph();
+        Node node1 = new Node("key");
+        Node node2 = new Node("Child 1");
+        Node node3 = new Node("Child 2");
+        Node node4 = new Node("Father");
+        Node node5 = new Node("Mother");
+        Node node6 = new Node("GrandPa");
+        Node node7 = new Node("GrandMa");
+
+        graph.addEdge(node1, node2);
+        graph.addEdge(node1, node3);
+        graph.addEdge(node4, node1);
+        graph.addEdge(node5, node1);
+        graph.addEdge(node6, node1);
+        graph.addEdge(node7, node1);
+
+        adapter = new AbstractGraphAdapter<NodeHolder>() {
             @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                refreshGraphChart();
+            public NodeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
+                return new NodeHolder(view);
             }
 
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
+            public void onBindViewHolder(NodeHolder holder, int position) {
+                holder.mText.setText(getNodeData(position).toString());
             }
-        });
-
+        };
+        adapter.submitGraph(graph);
+        graphView.setAdapter(adapter);
     }
 
     void refreshBarChart() {
@@ -107,52 +118,21 @@ public class HomeFragment extends Fragment {
         barChart.refreshEchartsWithOption(option);
     }
 
-    void refreshGraphChart() {
-        GsonOption option = new GsonOption();
-        option.title().text("今日推荐实体").x(X.center);
+    private class NodeHolder extends RecyclerView.ViewHolder {
+        TextView mText;
 
-        int n = 10;
-        List<Node> nodes = new ArrayList();
-        for (int i = 0; i < n; ++i) {
-            Node node = new Node();
-            node.category(i);
-            node.name("name"+i);
-            node.symbolSize(40);
-            nodes.add(node);
+        NodeHolder(View itemView) {
+            super(itemView);
+
+            mText = itemView.findViewById(R.id.text);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = getBindingAdapterPosition();
+                    Log.v("MYDEBUG", "Clicked on " + adapter.getNodeData(pos).toString());
+                    // TODO new intent here, nodes[pos] is clicked
+                }
+            });
         }
-
-        List<Link> links = new ArrayList();
-        for  (int i = 1; i < n; ++i) {
-            if (i % 2 == 1) {
-                Link link = new Link("name"+0, "name"+i, 1);
-                links.add(link);
-            }
-            else {
-                Link link = new Link("name"+i, "name"+0, 1);
-                links.add(link);
-            }
-        }
-
-        List<Category> categories = new ArrayList();
-        for (int i = 0; i < n; ++i) {
-            Category category = new Category("N"+i);
-            categories.add(category);
-        }
-
-        Graph graph = new Graph();
-        graph.nodes(nodes);
-        graph.links(links);
-        graph.categories(categories);
-        graph.layout(Layout.force);
-        graph.itemStyle().normal().label().show(true).position(Position.inside).textStyle().fontSize(18);
-        graph.itemStyle().normal().label().formatter("{b}");
-        graph.itemStyle().normal().lineStyle().color("source").width(20);
-        graph.itemStyle().emphasis().lineStyle().width(10);
-        Force force = new Force(); force.repulsion(1000);
-        graph.force(force);
-
-        option.series(graph);
-
-        graphChart.refreshEchartsWithOption(option);
     }
 }

@@ -7,23 +7,30 @@
     tools:context=".ui.home.HomeFragment">
 
     <com.tea.ilearn.utils.EchartsView
-        android:id="@+id/graph_chart"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center"
-        app:layout_constraintBottom_toTopOf="@id/bar_chart"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.tea.ilearn.utils.EchartsView
         android:id="@+id/bar_chart"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/zoom_layout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.otaliastudios.zoom.ZoomLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:hasClickableChildren="true"
+        android:id="@+id/zoom_layout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/graph_chart" />
+        app:layout_constraintTop_toBottomOf="@id/bar_chart" >
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/graph_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </com.otaliastudios.zoom.ZoomLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
