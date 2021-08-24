@@ -14,6 +14,9 @@ import androidx.annotation.NonNull;
 import com.tea.ilearn.R;
 import com.tea.ilearn.net.EduKG.EduKG;
 import com.tea.ilearn.net.EduKG.EntityDetail;
+import com.tea.ilearn.net.EduKG.Problem;
+
+import java.util.List;
 
 public class SearchableActivity extends ListActivity {
 
@@ -34,8 +37,9 @@ public class SearchableActivity extends ListActivity {
             // TODO: clear history for privacy
             // suggestions.clearHistory();
             Log.i("SearchableActivity", "onCreate: got query:" + query);
-            //EduKG.getInst().fuzzySearchEntity("chinese", "文章", new StaticHandler());
-            EduKG.getInst().getEntityDetail("chinese", "杜甫", new StaticHandler());
+            EduKG.getInst().fuzzySearchEntityWithCourse("chinese", "文章", new StaticHandler());
+            EduKG.getInst().getEntityDetails("chinese", "杜甫", new StaticHandler());
+            EduKG.getInst().getProblems("细胞", new StaticHandler());
         }
     }
 
@@ -43,9 +47,9 @@ public class SearchableActivity extends ListActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            Log.e("search entities", msg.what + (msg.obj == null ? "" : msg.obj.toString()));
-            EntityDetail.Property re = ((EntityDetail) msg.obj).getProperties().get(0);
-            Log.e("search", re.toString());
+            Log.e("search", msg.what + (msg.obj == null ? "" : msg.obj.toString()));
+            //Problem prob = ( (List<Problem>) msg.obj ).get(0);
+
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.tea.ilearn.net;
 
+import static java.lang.Thread.sleep;
+
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -42,9 +44,10 @@ public abstract class APIRequest {
         loginResponseClass = _loginResponseClass;
     }
 
-    protected static int maxRetries = 3;
+    protected static int maxRetries = 2;
     protected static int maxLoginRetries = 2;
-    protected static int timeoutSeconds = 5;
+    protected static int timeoutSeconds = 8;
+    protected static int retryIntervalSeconds = 3;
 
     protected abstract void onRefreshSuccess(Object response);
 
@@ -98,6 +101,7 @@ public abstract class APIRequest {
                             loginFailed.set(true);
                             return false;
                         }
+                        sleep(retryIntervalSeconds);
                         return true;
                     })
                     .subscribe(respObj -> {
