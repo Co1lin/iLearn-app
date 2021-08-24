@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -30,9 +29,6 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.tea.ilearn.databinding.ActivityMainBinding;
-import com.tea.ilearn.net.Requester;
-
-import java.io.IOException;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
@@ -139,23 +135,5 @@ public class MainActivity extends AppCompatActivity {
     public void doSearch(View v) {
         searchBox.setVisibility(View.VISIBLE);
         searchView.setIconified(false);
-        // test okhttp
-        Log.d("NET", "before1");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("NET", "before2");
-                Requester example = new Requester();
-                String json = "{\"username\": \"123\"}";
-                String response = null;
-                Log.d("NET", "before3");
-                try {
-                    response = example.post("https://dev-api.nsaop.enjoycolin.top/v2/user/check/username", json);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Log.d("NET", response);
-            }
-        }).start();
     }
 }

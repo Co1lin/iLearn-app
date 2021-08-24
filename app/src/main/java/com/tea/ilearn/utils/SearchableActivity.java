@@ -4,10 +4,16 @@ import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.tea.ilearn.R;
+import com.tea.ilearn.net.EduKG.EduKG;
+import com.tea.ilearn.net.EduKG.EntityDetail;
 
 public class SearchableActivity extends ListActivity {
 
@@ -27,7 +33,19 @@ public class SearchableActivity extends ListActivity {
             suggestions.saveRecentQuery(query, null);
             // TODO: clear history for privacy
             // suggestions.clearHistory();
-            Log.v("QUERY", query);
+            Log.i("SearchableActivity", "onCreate: got query:" + query);
+            //EduKG.getInst().fuzzySearchEntity("chinese", "文章", new StaticHandler());
+            EduKG.getInst().getEntityDetail("chinese", "杜甫", new StaticHandler());
+        }
+    }
+
+    static class StaticHandler extends Handler {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            Log.e("search entities", msg.what + (msg.obj == null ? "" : msg.obj.toString()));
+            EntityDetail.Property re = ((EntityDetail) msg.obj).getProperties().get(0);
+            Log.e("search", re.toString());
         }
     }
 }
