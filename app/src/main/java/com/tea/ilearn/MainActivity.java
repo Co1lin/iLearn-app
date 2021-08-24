@@ -13,16 +13,26 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
+import android.widget.Spinner;
+import android.widget.Toast;
+import android.view.ViewTreeObserver;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.tea.ilearn.databinding.ActivityMainBinding;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
+import net.yslibrary.android.keyboardvisibilityevent.Unregistrar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout searchBox;
     private RadioButton searchButton;
     private RadioGroup searchGroup;
+
+    View fab, bottomAppBar, frame;
+    CoordinatorLayout.LayoutParams params;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home,
-                R.id.navigation_dashboard,
+                R.id.navigation_chatbot,
                 R.id.navigation_notifications,
                 R.id.navigation_test
         ).build();
@@ -69,32 +82,11 @@ public class MainActivity extends AppCompatActivity {
         searchGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-                Log.v("MYDEBUG", "inside");
                 RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
-                { // set new checked color
-                    int color = that.getResources().getColor(R.color.white);
-                    GradientDrawable drawable = (GradientDrawable)btn.getBackground();
-//                    drawable.setStroke(3, color);
-                    drawable.setColor(color);
-                }
-                { // unset old checked color
-                    int color = that.getResources().getColor(R.color.purple_200);
-                    GradientDrawable drawable = (GradientDrawable)searchButton.getBackground();
-//                    drawable.setStroke(3, color);
-                    drawable.setColor(color);
-                }
-                searchButton = btn;
             }
         });
         searchBox.setVisibility(View.INVISIBLE);
-        Log.v("MYDEBUG", "outside");
         searchButton.setChecked(true);
-        { // set new checked color
-            int color = that.getResources().getColor(R.color.white);
-            GradientDrawable drawable = (GradientDrawable)searchButton.getBackground();
-//            drawable.setStroke(3, color);
-            drawable.setColor(color);
-        }
 
         int searchCloseButtonId = searchView.getContext().getResources()
                 .getIdentifier("android:id/search_close_btn", null, null);
@@ -104,10 +96,40 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 searchView.setQuery("",false);
                 searchBox.setVisibility(View.INVISIBLE);
-                searchButton = findViewById(R.id.search_entity);
                 searchButton.setChecked(true);
             }
         });
+
+        fab = findViewById(R.id.fab);
+        bottomAppBar = findViewById(R.id.bottomAppBar);
+        frame = findViewById(R.id.nav_host_fragment_activity_main);
+        params = new CoordinatorLayout.LayoutParams(-1, -1);
+
+        final ViewTreeObserver observer= fab.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                params.setMargins(0, 0, 0, fab.getHeight());
+                frame.setLayoutParams(params);
+            }
+        });
+
+        KeyboardVisibilityEvent.setEventListener(
+                this,
+                new KeyboardVisibilityEventListener() {
+                    @Override
+                    public void onVisibilityChanged(boolean isOpen) {
+                        if (isOpen) {
+                            findViewById(R.id.fab).setVisibility(View.GONE);
+                            findViewById(R.id.bottomAppBar).setVisibility(View.GONE);
+                        }
+                        else {
+                            findViewById(R.id.fab).setVisibility(View.VISIBLE);
+                            findViewById(R.id.bottomAppBar).setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+        );
     }
 
     public void doSearch(View v) {

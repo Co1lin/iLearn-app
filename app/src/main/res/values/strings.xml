@@ -1,12 +1,13 @@
 <resources>
     <string name="app_name">iLearn</string>
     <string name="title_home">题库</string>
-    <string name="title_dashboard">知识问答</string>
+    <string name="title_chatbot">知识问答</string>
     <string name="title_notifications">实体链接</string>
     <string name="title_test">我的</string>
     <string name="floating_search">搜索实体</string>
-    <string name="search_hint">这是一个搜索hint</string>
     <string name="search_entity">搜实体</string>
     <string name="search_linking">实体链接</string>
     <string name="search_problem">搜题</string>
+    <string name="input_hint">请输入</string>
+>>>>>>> feat-chat
 </resources>
