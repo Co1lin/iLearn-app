@@ -51,18 +51,22 @@ public abstract class APIRequest {
 
     protected abstract void onRefreshSuccess(Object response);
 
-    public void refresh() {
+    public boolean syncRefresh() {
         Log.i("APIRequest.refresh", "refreshing");
+        AtomicBoolean success = new AtomicBoolean(false);
         RxHttp.postForm(baseUrl + refreshPath)
                 .setSync()
                 .addAll(loginParams)
                 .asClass(loginResponseClass)
+                .timeout(3, TimeUnit.SECONDS)
                 .subscribe(response -> {
                     onRefreshSuccess(response);
+                    success.set(true);
                     Log.i("APIRequest.refresh", ": onRefreshSuccess completed");
                 }, throwable -> {
                     Log.e("APIRequest.refresh", "login error: " + throwable.toString());
                 });
+        return success.get();
     }
 
     /**
@@ -97,7 +101,7 @@ public abstract class APIRequest {
                     .retry(maxRetries, throwable -> {
                         Log.i("APIRequest.Request", "retry: " + throwable.getMessage());
                         if (throwable.getMessage().equals(loginFailedMessage)) {
-                            refresh();
+                            syncRefresh();
                             loginFailed.set(true);
                             return false;
                         }
@@ -153,6 +157,17 @@ public abstract class APIRequest {
                 params,
                 responseDefiner,
                 handler);
+    }
+
+    public boolean syncDetectOnline() {
+        return syncRefresh();
+    }
+
+    public void asyncDetectOnline(Handler handler) {
+        new Thread(() -> {
+            boolean isOnline = syncDetectOnline();
+            Message.obtain(handler, 0, isOnline);
+        }).start();
     }
 
     private RxHttp getSyncRxHttp(RxHttp _p) {
