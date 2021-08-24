@@ -7,6 +7,7 @@ import android.os.Message;
 import android.util.Log;
 
 import java.util.Map;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -14,11 +15,17 @@ import rxhttp.wrapper.param.RxHttp;
 import rxhttp.wrapper.param.RxHttpFormParam;
 import rxhttp.wrapper.param.RxHttpNoBodyParam;
 
+/**
+ * Generic class to request to API <br>
+ * Extend this class with <strong><i>Singleton Design Pattern</i></strong> <br>
+ * to request to a specific API
+ */
 public abstract class APIRequest {
     // variables need to be override
     protected String baseUrl;
     protected String refreshPath;
     protected String genericPath;
+    // login / refresh token
     protected Map<String, ?> loginParams;
     protected String tokenName;
     protected String tokenValue;
@@ -42,35 +49,96 @@ public abstract class APIRequest {
         tokenValue = "123";
         loginFailedMessage = _loginFailedMessage;
         loginResponseClass = _loginResponseClass;
+        listen();
     }
 
-    protected static int maxRetries = 2;
-    protected static int maxLoginRetries = 2;
-    protected static int timeoutSeconds = 8;
-    protected static int retryIntervalSeconds = 3;
+    /**
+     * Task to request with priority; Comparable wrapper of params of Request<br>
+     * Greater priority number means higher priority
+     */
+    protected class Task implements Comparable<Task> {
+        RxHttp p;
+        Map<String, Object> params;
+        ResponseDefiner responseDefiner;
+        Handler handler;
+        Integer priority;
+
+        public Task(
+                RxHttp _p,
+                Map<String, Object> _params,
+                ResponseDefiner _responseDefiner,
+                Handler _handler,
+                Integer _priority
+        ) {
+            p = _p;
+            params = _params;
+            responseDefiner = _responseDefiner;
+            handler = _handler;
+            priority = _priority;
+        }
+
+        public Task(
+                RxHttp _p,
+                Map<String, Object> _params,
+                ResponseDefiner _responseDefiner,
+                Handler _handler
+        ) {
+            this(_p, _params, _responseDefiner, _handler, 0);
+        }
+
+        @Override
+        public int compareTo(Task task) {
+            return -priority.compareTo(task.priority);
+        }
+    }
+
+    PriorityBlockingQueue<Task> queue = new PriorityBlockingQueue<>();
+
+    protected static final int maxRetries = 2;
+    protected static final int timeoutSeconds = 8;
+    protected static final int retryIntervalSeconds = 2;
+    // login / refresh token
+    protected static final int maxLoginRetries = 2;
+    protected Long lastRefreshSuccess = 0L;
+    protected static final long minRefreshIntervalMillis = 5000;
+    protected static final int maxConcurrentTasks = 20;
+    protected static final int tasksIntervalSeconds = 1;
 
     protected abstract void onRefreshSuccess(Object response);
 
     public boolean syncRefresh() {
-        Log.i("APIRequest.refresh", "refreshing");
-        AtomicBoolean success = new AtomicBoolean(false);
-        RxHttp.postForm(baseUrl + refreshPath)
-                .setSync()
-                .addAll(loginParams)
-                .asClass(loginResponseClass)
-                .timeout(3, TimeUnit.SECONDS)
-                .subscribe(response -> {
-                    onRefreshSuccess(response);
-                    success.set(true);
-                    Log.i("APIRequest.refresh", ": onRefreshSuccess completed");
-                }, throwable -> {
-                    Log.e("APIRequest.refresh", "login error: " + throwable.toString());
-                });
-        return success.get();
+        synchronized(lastRefreshSuccess) {
+            if (System.currentTimeMillis() - lastRefreshSuccess < minRefreshIntervalMillis)
+                return true;
+            Log.i("APIRequest.refresh", "refreshing");
+            AtomicBoolean success = new AtomicBoolean(false);
+            RxHttp.postForm(baseUrl + refreshPath)
+                    .setSync()
+                    .addAll(loginParams)
+                    .asClass(loginResponseClass)
+                    .timeout(3, TimeUnit.SECONDS)
+                    .subscribe(response -> {
+                        onRefreshSuccess(response);
+                        success.set(true);
+                        lastRefreshSuccess = System.currentTimeMillis();
+                        Log.i("APIRequest.refresh", ": onRefreshSuccess completed");
+                    }, throwable -> {
+                        Log.e("APIRequest.refresh", "login error: " + throwable.toString());
+                    });
+            return success.get();
+        }
+    }
+
+    public void asyncRefresh() {
+        synchronized(lastRefreshSuccess) {
+            new Thread(() -> {
+                syncRefresh();
+            }).start();
+        }
     }
 
     /**
-     * Generic Request to API
+     * Generic Request to API (Run in new thread)
      * @param _p                Object returned by RxHttp.<request method>(url)
      * @param params            Map containing key-value pairs to add to GET params
      * @param responseDefiner   Object of ResponseDefiner interface to
@@ -81,7 +149,8 @@ public abstract class APIRequest {
             RxHttp _p,
             Map<String, Object> params,
             ResponseDefiner responseDefiner,
-            Handler handler) {
+            Handler handler
+    ) {
         new Thread(() -> {
             AtomicBoolean loginFailed = new AtomicBoolean(false);
             AtomicBoolean messageSent = new AtomicBoolean(false);
@@ -99,13 +168,14 @@ public abstract class APIRequest {
                     .define(p)
                     .timeout(timeoutSeconds, TimeUnit.SECONDS)
                     .retry(maxRetries, throwable -> {
-                        Log.i("APIRequest.Request", "retry: " + throwable.getMessage());
+                        Log.i("APIRequest.Request", "retry: " + throwable.getMessage() + p.getParam().getUrl());
                         if (throwable.getMessage().equals(loginFailedMessage)) {
                             syncRefresh();
                             loginFailed.set(true);
                             return false;
                         }
-                        sleep(retryIntervalSeconds);
+                        double interval = retryIntervalSeconds - 0.5 + Math.random();
+                        sleep((long) (interval * 1000));
                         return true;
                     })
                     .subscribe(respObj -> {
@@ -113,12 +183,32 @@ public abstract class APIRequest {
                         messageSent.set(true);
                     }, throwable -> {
                         if (!throwable.getMessage().equals(loginFailedMessage))
-                            Log.e("APIRequest.Request", "error: " + throwable.getMessage());
+                            Log.e("APIRequest.Request", "error: " + throwable.getMessage() + p.getParam().getUrl());
                     });
             } while (loginFailed.get() && loopCounter < maxLoginRetries);
             if (!messageSent.get())
                 Message.obtain(handler, 1).sendToTarget();  // send failure message
         }).start();
+    }
+
+    /**
+     * Thread running in background to start request tasks retrieved from queue <br>
+     * Limit the concurrency by average simulation
+     */
+    private void listen() {
+        new Thread(() -> { while (true) {
+            try {
+                Task task = queue.take();
+                Request(task.p, task.params, task.responseDefiner, task.handler);
+                sleep(tasksIntervalSeconds * 1000 / maxConcurrentTasks);
+            } catch (InterruptedException e) {
+                Log.e("APIRequest.listen", e.toString());
+            }
+        }}).start();
+    }
+
+    private void addTask(Task task) {
+        queue.put(task);
     }
 
     /**
@@ -133,11 +223,25 @@ public abstract class APIRequest {
             String path,
             Map<String, Object> params,
             ResponseDefiner responseDefiner,
-            Handler handler) {
-        Request(RxHttp.get(baseUrl + genericPath + path),
+            Handler handler,
+            int priority
+    ) {
+        addTask(new Task(
+                RxHttp.get(baseUrl + genericPath + path),
                 params,
                 responseDefiner,
-                handler);
+                handler,
+                priority
+        ));
+    }
+
+    public void GET(
+            String path,
+            Map<String, Object> params,
+            ResponseDefiner responseDefiner,
+            Handler handler
+    ) {
+        GET(path, params, responseDefiner, handler, 0);
     }
 
     /**
@@ -152,11 +256,25 @@ public abstract class APIRequest {
             String path,
             Map<String, Object> params,
             ResponseDefiner responseDefiner,
-            Handler handler) {
-        Request(RxHttp.postForm(baseUrl + genericPath + path),
+            Handler handler,
+            int priority
+    ) {
+        addTask(new Task(
+                RxHttp.postForm(baseUrl + genericPath + path),
                 params,
                 responseDefiner,
-                handler);
+                handler,
+                priority
+        ));
+    }
+
+    public void POST(
+            String path,
+            Map<String, Object> params,
+            ResponseDefiner responseDefiner,
+            Handler handler
+    ) {
+        POST(path, params, responseDefiner, handler, 0);
     }
 
     public boolean syncDetectOnline() {

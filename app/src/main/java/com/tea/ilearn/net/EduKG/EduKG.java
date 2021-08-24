@@ -2,6 +2,7 @@ package com.tea.ilearn.net.EduKG;
 
 import android.os.Handler;
 
+import com.tea.ilearn.Constant;
 import com.tea.ilearn.net.APIRequest;
 
 import java.util.HashMap;
@@ -38,15 +39,29 @@ public class EduKG extends APIRequest {
         }
     }
 
-    public void fuzzySearchEntityWithCourse(String course, String searchKey, Handler handler) {
-        // TODO: cancel request to save resources
+    public void fuzzySearchEntityWithCourse(
+            String course, String searchKey, Handler handler
+    ) {
         GET("/instanceList",
             new HashMap<String, Object>() {{
                 put("course", course);
                 put("searchKey", searchKey);
             }},
             p -> p.asEduKGResponseList(Entity.class),
-            handler);
+            handler
+        );
+    }
+
+    public void fuzzySearchEntityWithAllCourse(String searchKey, Handler handler) {
+        for (String subject: Constant.EduKG.SUBJECTS) {
+            GET("/instanceList",
+                    new HashMap<String, Object>() {{
+                        put("course", subject);
+                        put("searchKey", searchKey);
+                    }},
+                    p -> p.asEduKGResponseList(Entity.class),
+                    handler);
+        }
     }
 
     public void getEntityDetails(String course, String entityName, Handler handler) {
@@ -56,7 +71,8 @@ public class EduKG extends APIRequest {
                 put("name", entityName);
             }},
             p -> p.asEduKGResponse(EntityDetail.class),
-            handler);
+            handler
+        );
     }
 
     public void getProblems(String keyword, Handler handler) {
@@ -65,7 +81,8 @@ public class EduKG extends APIRequest {
                     put("uriName", keyword);
                 }},
                 p -> p.asEduKGResponseList(Problem.class),
-                handler);
+                handler
+        );
     }
 
 }

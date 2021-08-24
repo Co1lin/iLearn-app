@@ -1,5 +1,7 @@
 package com.tea.ilearn.utils;
 
+import static java.lang.Thread.sleep;
+
 import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Intent;
@@ -37,19 +39,22 @@ public class SearchableActivity extends ListActivity {
             // TODO: clear history for privacy
             // suggestions.clearHistory();
             Log.i("SearchableActivity", "onCreate: got query:" + query);
-            EduKG.getInst().fuzzySearchEntityWithCourse("chinese", "文章", new StaticHandler());
-            EduKG.getInst().getEntityDetails("chinese", "杜甫", new StaticHandler());
-            EduKG.getInst().getProblems("细胞", new StaticHandler());
+            StaticHandler handler = new StaticHandler();
+            //EduKG.getInst().fuzzySearchEntityWithCourse("chinese", "文章", handler);
+            //EduKG.getInst().getEntityDetails("chinese", "杜甫", handler);
+            //EduKG.getInst().getProblems("细胞", handler);
+            EduKG.getInst().fuzzySearchEntityWithAllCourse("鸟", handler);
         }
     }
 
     static class StaticHandler extends Handler {
+        /**
+         * Run on UI Thread!
+         */
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             Log.e("search", msg.what + (msg.obj == null ? "" : msg.obj.toString()));
-            //Problem prob = ( (List<Problem>) msg.obj ).get(0);
-
         }
     }
 }
