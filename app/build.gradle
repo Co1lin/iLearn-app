@@ -53,4 +53,8 @@ dependencies {
 
     // keyboard appear/hide event handler
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC3'
+
+    // echart support
+    implementation 'com.github.abel533:ECharts:3.0.0.6'
+    implementation 'com.google.code.gson:gson:2.8.1'
 }
