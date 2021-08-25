@@ -5,6 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="bottom"
+    android:id="@+id/root_layout"
     tools:context=".MainActivity">
 
     <fragment
@@ -12,12 +14,9 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="80dp"
         android:paddingBottom="100dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/nav_view"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/mobile_navigation" />
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -25,14 +24,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:fabCradleMargin="10dp"
-        app:fabCradleRoundedCornerRadius="10dp"
-        app:fabCradleVerticalOffset="10dp">
+        app:hideOnScroll="true"
+        app:maxButtonHeight="56dp">
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/nav_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:background="@android:color/transparent"
             app:menu="@menu/bottom_nav_menu" />
@@ -43,8 +41,68 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_baseline_search_24"
-        app:layout_anchor="@id/bottomAppBar" />
+        android:onClick="doSearch"
+        android:layout_gravity="bottom|center_horizontal"
+        android:backgroundTint="?colorSecondary"
+        app:srcCompat="@drawable/ic_baseline_search_24" />
+
+    <LinearLayout
+        android:id="@+id/search_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="7dp"
+        android:orientation="vertical"
+        android:background="@drawable/bottom_corner"
+        >
+
+        <RadioGroup
+            android:id="@+id/search_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation='horizontal'>
+            <RadioButton
+                android:id="@+id/search_entity"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/top_corner"
+                android:button="@null"
+                android:gravity="center"
+                android:text="@string/search_entity" />
+
+            <RadioButton
+                android:id="@+id/search_linking"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/top_corner"
+                android:button="@null"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/search_linking" />
+
+            <RadioButton
+                android:id="@+id/search_problem"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/top_corner"
+                android:button="@null"
+                android:gravity="center"
+                android:text="@string/search_problem" />
+        </RadioGroup>
+
+        <SearchView
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white" />
+
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
