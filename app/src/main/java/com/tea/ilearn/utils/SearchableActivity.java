@@ -13,6 +13,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.net.EduKG.EduKG;
 import com.tea.ilearn.net.EduKG.EntityDetail;
@@ -43,7 +44,8 @@ public class SearchableActivity extends ListActivity {
             //EduKG.getInst().fuzzySearchEntityWithCourse("chinese", "文章", handler);
             //EduKG.getInst().getEntityDetails("chinese", "杜甫", handler);
             //EduKG.getInst().getProblems("细胞", handler);
-            EduKG.getInst().fuzzySearchEntityWithAllCourse("鸟", handler);
+            //EduKG.getInst().fuzzySearchEntityWithAllCourse("鸟", handler);
+            EduKG.getInst().qAWithAllSubjects("细胞膜的作用", handler);
         }
     }
 

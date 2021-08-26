@@ -54,13 +54,7 @@ public class EduKG extends APIRequest {
 
     public void fuzzySearchEntityWithAllCourse(String searchKey, Handler handler) {
         for (String subject: Constant.EduKG.SUBJECTS) {
-            GET("/instanceList",
-                    new HashMap<String, Object>() {{
-                        put("course", subject);
-                        put("searchKey", searchKey);
-                    }},
-                    p -> p.asEduKGResponseList(Entity.class),
-                    handler);
+            fuzzySearchEntityWithCourse(subject, searchKey, handler);
         }
     }
 
@@ -84,5 +78,24 @@ public class EduKG extends APIRequest {
                 handler
         );
     }
+
+    public void qAWithSubject(String course, String question, Handler handler) {
+        POST("/inputQuestion",
+                new HashMap<String, Object>() {{
+                    put("course", course);
+                    put("inputQuestion", question);
+                }},
+                p -> p.asEduKGResponseList(Answer.class),
+                handler
+        );
+    }
+
+    public void qAWithAllSubjects(String question, Handler handler) {
+        for (String subject: Constant.EduKG.SUBJECTS) {
+            qAWithSubject(subject, question, handler);
+        }
+    }
+
+    
 
 }
