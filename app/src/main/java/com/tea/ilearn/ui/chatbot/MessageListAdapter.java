@@ -29,6 +29,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         void bind(ChatMessage chatMessage) {
             messageText.setText(chatMessage.text);
             nameText.setText("小艾");
+            // TODO text can not select inside the recycler view
         }
     }
 
