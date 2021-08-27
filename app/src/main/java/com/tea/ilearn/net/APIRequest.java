@@ -158,8 +158,8 @@ public abstract class APIRequest {
             do {
                 loopCounter++;
                 loginFailed.set(false);
-                // BUG: new a RxHTTP to avoid unfix bug of RxHttp
-                RxHttp p = getSyncRxHttp(_p).removeAllQuery();
+                // BUG: new a RxHTTP to avoid unfixed bug of RxHttp
+                RxHttp p = getSyncRxHttp(_p);
                 params.put(tokenName, tokenValue);
                 paramAddAll(p, params);
                 Log.i("APIRequest.Request",
@@ -218,6 +218,7 @@ public abstract class APIRequest {
      * @param responseDefiner   Object of ResponseDefiner interface to
      *                          define the type of "data" field in Response<T>
      * @param handler           Handler to be sent the object of responseClass
+     * @param priority          Priority of this request in the blocking queue
      */
     public void GET(
             String path,
@@ -251,6 +252,7 @@ public abstract class APIRequest {
      * @param responseDefiner   Object of ResponseDefiner interface to
      *                          define the type of "data" field in Response<T>
      * @param handler           Handler to be sent the object of responseClass
+     * @param priority          Priority of this request in the blocking queue
      */
     public void POST(
             String path,
@@ -290,9 +292,9 @@ public abstract class APIRequest {
 
     private RxHttp getSyncRxHttp(RxHttp _p) {
         if (_p instanceof RxHttpNoBodyParam)
-            return new RxHttpNoBodyParam( ((RxHttpNoBodyParam) _p).getParam() ).setSync();
+            return new RxHttpNoBodyParam( ((RxHttpNoBodyParam) _p).getParam() ).setSync().removeAllQuery();
         else if (_p instanceof RxHttpFormParam) {
-            return new RxHttpFormParam( ((RxHttpFormParam) _p).getParam() ).setSync();
+            return new RxHttpFormParam( ((RxHttpFormParam) _p).getParam() ).setSync().removeAllBody();
         }
         throw new IllegalArgumentException("_p is instance of " + _p.getClass() + " which is not supported");
     }
