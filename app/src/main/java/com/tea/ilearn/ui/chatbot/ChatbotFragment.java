@@ -95,7 +95,7 @@ public class ChatbotFragment extends Fragment {
             if (msg.what == 0 && msg.obj != null) {
                 ArrayList<Answer> answerList = (ArrayList<Answer>) msg.obj;
                 if (!answerList.isEmpty()) {
-                    String answer = answerList.get(0).getAnswer();
+                    String answer = answerList.get(0).getAnswer().trim();
                     if (!answer.isEmpty()) {
                         mMessageAdapter.add(new ChatMessage(answer, 1));
                         answerReceived = 0;
