@@ -71,34 +71,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = findViewById(R.id.search_view);
-        searchBox = findViewById(R.id.search_box);
-        searchButton = findViewById(R.id.search_entity);
-        searchGroup = findViewById(R.id.search_group);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-        MainActivity that = this;
-        searchGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-                RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
-            }
-        });
-        searchBox.setVisibility(View.INVISIBLE);
-        searchButton.setChecked(true);
-
-        int searchCloseButtonId = searchView.getContext().getResources()
-                .getIdentifier("android:id/search_close_btn", null, null);
-        ImageView closeButton = (ImageView) this.searchView.findViewById(searchCloseButtonId);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchView.setQuery("",false);
-                searchBox.setVisibility(View.INVISIBLE);
-                searchButton.setChecked(true);
-            }
-        });
 
         fab = findViewById(R.id.fab);
         bottomAppBar = findViewById(R.id.bottomAppBar);
@@ -130,6 +102,50 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        // ==================================================================
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = findViewById(R.id.search_view);
+        searchBox = findViewById(R.id.search_box);
+        searchButton = findViewById(R.id.search_entity);
+        searchGroup = findViewById(R.id.search_group);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        MainActivity that = this;
+        searchGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
+                RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
+            }
+        });
+        searchBox.setVisibility(View.INVISIBLE);
+        searchButton.setChecked(true);
+
+        int searchCloseButtonId = searchView.getContext().getResources()
+                .getIdentifier("android:id/search_close_btn", null, null);
+        ImageView closeButton = (ImageView) this.searchView.findViewById(searchCloseButtonId);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.setQuery("",false);
+                searchBox.setVisibility(View.INVISIBLE);
+                searchButton.setChecked(true);
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchBox.setVisibility(View.INVISIBLE);
+                // TODO this cannot handle history suggestion.
+                return false;
+            }
+        });
     }
 
     public void doSearch(View v) {
