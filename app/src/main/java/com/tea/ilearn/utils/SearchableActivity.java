@@ -14,6 +14,7 @@ import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +22,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.widget.NestedScrollView;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -75,6 +77,9 @@ public class SearchableActivity extends Activity {
                     star = !star;
                     // TODO save data
                 }
+                else if (item.getItemId() == R.id.share) {
+                    // TODO share sdk support
+                }
                 return false;
             }
         });
@@ -91,9 +96,8 @@ public class SearchableActivity extends Activity {
                     SearchSuggestionProvider.MODE
             );
             suggestions.saveRecentQuery(query, null);
-            // TODO: clear history for privacy
-            // suggestions.clearHistory();
-            Log.i("SearchableActivity", "onCreate: got query:" + query);
+            // suggestions.clearHistory(); // TODO: clear history for privacy
+
             StaticHandler handler = new StaticHandler();
             //EduKG.getInst().fuzzySearchEntityWithCourse("chinese", "文章", handler);
             //EduKG.getInst().getEntityDetails("chinese", "杜甫", handler);

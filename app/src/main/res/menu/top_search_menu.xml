@@ -5,4 +5,10 @@
         android:icon="@drawable/ic_favorite_border_24"
         app:showAsAction="ifRoom"
         android:title="favorite" />
+
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/ic_share_24"
+        app:showAsAction="ifRoom"
+        android:title="share" />
 </menu>
