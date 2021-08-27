@@ -16,9 +16,28 @@ public class EntityDetail {
     String label;
     public class Relation {
         String predicate;
+        @SerializedName("predicate_label")
         String predicateLabel;
         String object;
+        @SerializedName("object_label")
         String objectLabel;
+        String subject;
+        @SerializedName("subject_label")
+        String subjectLabel;
+
+        public String getPredicateLabel() {
+            return predicateLabel;
+        }
+
+        public String getObjectLabel() {
+            if (object == null) return subjectLabel;
+            else return objectLabel;
+        }
+
+        public int getDirection() {
+            if (object == null) return 1;
+            else return 0;
+        }
     }
     @SerializedName("content")
     ArrayList<Relation> relations = new ArrayList<>();

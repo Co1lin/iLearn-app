@@ -1,13 +1,15 @@
 package com.tea.ilearn.activity;
 
+import java.util.List;
+
 class Info {
     int kd; // 0 for entity
     String name;
-    String property;
+    boolean star;
 
-    public Info(int kd, String name, String property) {
+    public Info(int kd, String name, boolean star) {
         this.kd = kd;
         this.name = name;
-        this.property = property;
+        this.star = star;
     }
 }
