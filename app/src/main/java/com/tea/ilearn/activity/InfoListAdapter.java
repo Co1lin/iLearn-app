@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,11 +17,25 @@ public class InfoListAdapter extends RecyclerView.Adapter {
 
     private class EntityHolder extends RecyclerView.ViewHolder {
         TextView nameText, propertyText;
+        LinearLayout collapseBox;
 
         EntityHolder(View itemView) {
             super(itemView);
             nameText = itemView.findViewById(R.id.entity_name);
             propertyText = itemView.findViewById(R.id.entity_property);
+            collapseBox = itemView.findViewById(R.id.collapse_box);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (collapseBox.getVisibility() == View.GONE) {
+                        collapseBox.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        collapseBox.setVisibility(View.GONE);
+                    }
+                }
+            });
+            // TODO related exercise button event
         }
 
         void bind(Info info) {
