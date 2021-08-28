@@ -87,7 +87,7 @@ public class ChatbotFragment extends Fragment {
             super();
             mMessageAdapter = _messageAdapter;
             expectedNum = _num;
-            mMessageAdapter = _messageAdapter;
+            mMessageRecycler = _messageRecycler;
         }
 
         /**
