@@ -13,4 +13,12 @@ class Info {
         this.loaded = loaded;
         this.category = category;
     }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

@@ -1,17 +1,92 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Note: A RecyclerView can also be used -->
+    <LinearLayout
+        android:id="@+id/sort_filter"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:id="@+id/sort_name"
+            android:layout_marginStart="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            <TextView
+                android:id="@+id/sort_name_text"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:gravity="center_vertical"
+                android:textSize="16dp"
+                android:text="实体名" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+                <ImageView
+                    android:id="@+id/sort_name_up"
+                    android:layout_width="12dp"
+                    android:layout_height="16dp"
+                    android:translationY="5dp"
+                    android:background="@drawable/ic_baseline_arrow_drop_up_24" />
+                <ImageView
+                    android:id="@+id/sort_name_down"
+                    android:layout_width="12dp"
+                    android:layout_height="16dp"
+                    android:translationY="-5dp"
+                    android:background="@drawable/ic_baseline_arrow_drop_down_24" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sort_category"
+            android:layout_marginStart="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            <TextView
+                android:id="@+id/sort_category_text"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:gravity="center_vertical"
+                android:textSize="16dp"
+                android:text="知识点" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+                <ImageView
+                    android:id="@+id/sort_category_up"
+                    android:layout_width="12dp"
+                    android:layout_height="16dp"
+                    android:translationY="5dp"
+                    android:background="@drawable/ic_baseline_arrow_drop_up_24" />
+                <ImageView
+                    android:id="@+id/sort_category_down"
+                    android:layout_width="12dp"
+                    android:layout_height="16dp"
+                    android:translationY="-5dp"
+                    android:background="@drawable/ic_baseline_arrow_drop_down_24" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/info_recycler"
+        app:layout_constraintTop_toBottomOf="@id/sort_filter"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     </androidx.recyclerview.widget.RecyclerView>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

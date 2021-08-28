@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
+import com.tea.ilearn.databinding.ActivitySearchableBinding;
 import com.tea.ilearn.net.EduKG.EduKG;
 import com.tea.ilearn.net.EduKG.Entity;
 
@@ -20,8 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchableActivity extends AppCompatActivity {
-    private boolean star;
-    private AppCompatActivity that;
+    private ActivitySearchableBinding binding;
     private RecyclerView mInfoRecycler;
     private InfoListAdapter mInfoAdapter;
 
@@ -29,9 +30,38 @@ public class SearchableActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_searchable);
+        binding = ActivitySearchableBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        that = this;
+        binding.sortName.setOnClickListener(view -> {
+            binding.sortCategoryUp.setVisibility(View.VISIBLE);
+            binding.sortCategoryDown.setVisibility(View.VISIBLE);
+            if (binding.sortNameUp.getVisibility() == View.VISIBLE && binding.sortNameDown.getVisibility() == View.INVISIBLE) {
+                binding.sortNameUp.setVisibility(View.INVISIBLE);
+                binding.sortNameDown.setVisibility(View.VISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getName, true);
+            }
+            else {
+                binding.sortNameUp.setVisibility(View.VISIBLE);
+                binding.sortNameDown.setVisibility(View.INVISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getName, false);
+            }
+        });
+
+        binding.sortCategory.setOnClickListener(view -> {
+            binding.sortNameUp.setVisibility(View.VISIBLE);
+            binding.sortNameDown.setVisibility(View.VISIBLE);
+            if (binding.sortCategoryUp.getVisibility() == View.VISIBLE && binding.sortCategoryDown.getVisibility() == View.INVISIBLE) {
+                binding.sortCategoryUp.setVisibility(View.INVISIBLE);
+                binding.sortCategoryDown.setVisibility(View.VISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getCategory, true);
+            }
+            else {
+                binding.sortCategoryUp.setVisibility(View.VISIBLE);
+                binding.sortCategoryDown.setVisibility(View.INVISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getCategory, false);
+            }
+        });
 
         // ===================================================================
 

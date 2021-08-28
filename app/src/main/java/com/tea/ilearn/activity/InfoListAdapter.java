@@ -16,7 +16,11 @@ import com.tea.ilearn.net.EduKG.EduKG;
 import com.tea.ilearn.net.EduKG.EntityDetail;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InfoListAdapter extends RecyclerView.Adapter {
 
@@ -53,12 +57,9 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                         // TODO save to database
                     }
                 }
-            });
-            binding.getRoot().setOnLongClickListener(view -> {
-                if (binding.collapseBox.getVisibility() == View.VISIBLE) {
+                else if (binding.collapseBox.getVisibility() == View.VISIBLE) {
                     binding.collapseBox.setVisibility(View.GONE);
                 }
-                return true;
             });
 
             mRelationRecycler = binding.relationRecycler;
@@ -96,6 +97,15 @@ public class InfoListAdapter extends RecyclerView.Adapter {
     public void add(Info info) {
         mInfoList.add(info);
         notifyItemInserted(mInfoList.size() - 1);
+    }
+
+    public <U extends Comparable<? super U>> void applySortAndFilter(Function<? super Info, ? extends U> f, boolean reverse) {
+//                .filter(info -> info.category.equals("组成细胞的分子"))
+        Stream s = mInfoList.stream();
+        if (reverse) s = s.sorted(Comparator.comparing(f).reversed());
+        else s = s.sorted(Comparator.comparing(f));
+        mInfoList = (List<Info>) s.collect(Collectors.toList());
+        notifyDataSetChanged();
     }
 
     @Override
