@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.net.EduKG.EduKG;
 import com.tea.ilearn.net.EduKG.Entity;
@@ -43,9 +44,10 @@ public class SearchableActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            StaticHandler handler = new StaticHandler(mInfoAdapter);
-            EduKG.getInst().fuzzySearchEntityWithAllCourse(query, handler);
-            //EduKG.getInst().getProblems("细胞", handler);
+            for (String sub : Constant.EduKG.SUBJECTS) {
+                StaticHandler handler = new StaticHandler(mInfoAdapter, sub);
+                EduKG.getInst().fuzzySearchEntityWithCourse(sub, query, handler);
+            }
 
 //            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(
 //                    this, SearchSuggestionProvider.AUTHORITY,
@@ -58,9 +60,11 @@ public class SearchableActivity extends AppCompatActivity {
 
     static class StaticHandler extends Handler {
         private InfoListAdapter mInfoAdapter;
+        private String subject;
 
-        StaticHandler(InfoListAdapter mInfoAdapter) {
+        StaticHandler(InfoListAdapter mInfoAdapter, String subject) {
             this.mInfoAdapter = mInfoAdapter;
+            this.subject = subject;
         }
 
         @Override
@@ -69,7 +73,14 @@ public class SearchableActivity extends AppCompatActivity {
             List<Entity> entities = (List<Entity>) msg.obj;
             if (entities != null) {
                 for (Entity e : entities) {
-                    mInfoAdapter.add(new Info(0, e.getLabel(), true));
+                    mInfoAdapter.add(new Info(
+                            0,
+                            e.getLabel(),
+                            subject,
+                            true,
+                            false,
+                            e.getCategory()
+                    ));
                 }
             } else {
                 // TODO empty hint
