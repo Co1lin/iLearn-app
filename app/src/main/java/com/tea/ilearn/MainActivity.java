@@ -5,8 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -24,6 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.tea.ilearn.databinding.ActivityMainBinding;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,10 +38,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getSupportActionBar().hide();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -61,6 +56,30 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+        fab = binding.fab;
+        bottomAppBar = binding.bottomAppBar;
+        frame = findViewById(R.id.nav_host_fragment_activity_main);
+        params = new CoordinatorLayout.LayoutParams(-1, -1);
+
+        final ViewTreeObserver observer= fab.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(() -> {
+            params.setMargins(0, 0, 0, fab.getHeight());
+            frame.setLayoutParams(params);
+        });
+
+        KeyboardVisibilityEvent.setEventListener(this, isOpen -> {
+            if (isOpen) {
+                fab.setVisibility(View.GONE);
+                bottomAppBar.setVisibility(View.GONE);
+            }
+            else {
+                fab.setVisibility(View.VISIBLE);
+                bottomAppBar.setVisibility(View.VISIBLE);
+            }
+        });
+
+        // ==================================================================
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = binding.searchView;
@@ -91,28 +110,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        fab = binding.fab;
-        bottomAppBar = binding.bottomAppBar;
-        frame = findViewById(R.id.nav_host_fragment_activity_main);
-        params = new CoordinatorLayout.LayoutParams(-1, -1);
-
-        final ViewTreeObserver observer= fab.getViewTreeObserver();
-        observer.addOnGlobalLayoutListener(() -> {
-            params.setMargins(0, 0, 0, fab.getHeight());
-            frame.setLayoutParams(params);
-        });
-
-        KeyboardVisibilityEvent.setEventListener(this, isOpen -> {
-                if (isOpen) {
-                    fab.setVisibility(View.GONE);
-                    bottomAppBar.setVisibility(View.GONE);
-                }
-                else {
-                    fab.setVisibility(View.VISIBLE);
-                    bottomAppBar.setVisibility(View.VISIBLE);
-                }
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
             }
-        );
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchBox.setVisibility(View.INVISIBLE);
+                // TODO this cannot handle history suggestion.
+                return false;
+            }
+        });
     }
 
     public void doSearch(View v) {
