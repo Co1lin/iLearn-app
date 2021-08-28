@@ -23,8 +23,8 @@ public class InfoListAdapter extends RecyclerView.Adapter {
     private class EntityHolder extends RecyclerView.ViewHolder {
         private EntityCardBinding binding;
         boolean mloaded;
-        private RecyclerView mRelationRecycler;
-        private RelationListAdapter mRelationAdapter;
+        private RecyclerView mRelationRecycler, mPropertyRecycler;
+        private RelationListAdapter mRelationAdapter, mPropertyAdapter;
 
         EntityHolder(EntityCardBinding binding) {
             super(binding.getRoot());
@@ -37,7 +37,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
             binding.entitySubject.setText(info.subject);
             mloaded = info.loaded;
             if (mloaded) {
-//                 StaticHandler handler = new StaticHandler(mRelationAdapter);
+//                 StaticHandler handler = new StaticHandler(mRelationAdapter, mPropertyAdapter);
 //                 Message.obtain(handler, 0, respObj).sendToTarget();
 //                 TODO load in local memory
             }
@@ -47,7 +47,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                 if (binding.collapseBox.getVisibility() == View.GONE) {
                     binding.collapseBox.setVisibility(View.VISIBLE);
                     if (!mloaded) {
-                        StaticHandler handler = new StaticHandler(mRelationAdapter);
+                        StaticHandler handler = new StaticHandler(mRelationAdapter, mPropertyAdapter);
                         EduKG.getInst().getEntityDetails(info.subject, binding.entityName.getText().toString(), handler); // TODO
                         mloaded = true;
                         // TODO save to database
@@ -65,17 +65,22 @@ public class InfoListAdapter extends RecyclerView.Adapter {
             mRelationAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
             mRelationRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
             mRelationRecycler.setAdapter(mRelationAdapter);
+            mPropertyRecycler = binding.propertyRecycler;
+            mPropertyAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
+            mPropertyRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
+            mPropertyRecycler.setAdapter(mPropertyAdapter);
 
             binding.star.setChecked(info.star);
             binding.star.setOnCheckedChangeListener((btn, star) -> {
                 // TODO save current "star" status in database
             });
 
-            binding.share.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // TODO share related sdk
-                }
+            binding.share.setOnClickListener(view -> {
+                // TODO share related sdk
+            });
+
+            binding.relatedExercise.setOnClickListener(view -> {
+                // TODO related problem
             });
         }
     }
@@ -104,7 +109,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
         return info.kd;
     }
 
-    // Inflates the appropriate layout according to the ViewType.
+    // Inflates the apriate layout according to the ViewType.
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
@@ -130,8 +135,10 @@ public class InfoListAdapter extends RecyclerView.Adapter {
 
     static class StaticHandler extends Handler {
         private RelationListAdapter mRelationAdapter;
+        private RelationListAdapter mPropertyAdapter;
 
-        StaticHandler(RelationListAdapter mRelationAdapter) {
+        StaticHandler(RelationListAdapter mRelationAdapter, RelationListAdapter mPropertyAdapter) {
+            this.mPropertyAdapter = mPropertyAdapter;
             this.mRelationAdapter = mRelationAdapter;
         }
 
@@ -142,11 +149,13 @@ public class InfoListAdapter extends RecyclerView.Adapter {
             if (detail != null) {
                 if (detail.getRelations() != null) {
                     for (EntityDetail.Relation r : detail.getRelations()) {
-                        mRelationAdapter.add(new Relation(r.getDirection(), r.getPredicateLabel(), r.getObjectLabel()));
+                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection()));
                     }
                 }
-                else {
-                    // TODO
+                if (detail.getProperties() != null) {
+                    for (EntityDetail.Property p : detail.getProperties()) {
+                        mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
+                    }
                 }
             } else {
                 // TODO

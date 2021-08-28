@@ -10,6 +10,10 @@ public class EntityDetail {
         //@SerializedName("predicateLabel")
         String predicateLabel;
         String object;
+
+        public String getPredicateLabel() { return predicateLabel; }
+
+        public String getObject() { return object; }
     }
     @SerializedName("property")
     ArrayList<Property> properties = new ArrayList<>();

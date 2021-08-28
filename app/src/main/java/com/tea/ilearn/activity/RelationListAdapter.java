@@ -3,51 +3,55 @@ package com.tea.ilearn.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.R;
+import com.tea.ilearn.databinding.PropertyCardBinding;
+import com.tea.ilearn.databinding.RelationCardBinding;
 
 import java.util.List;
 
 public class RelationListAdapter extends RecyclerView.Adapter {
 
     private class RelationHolder extends RecyclerView.ViewHolder {
-        TextView typeText, nameText;
-        ImageView direction;
+        RelationCardBinding binding;
 
-        RelationHolder(View itemView) {
-            super(itemView);
-            typeText = itemView.findViewById(R.id.type);
-            nameText = itemView.findViewById(R.id.name);
-            direction = itemView.findViewById(R.id.direction);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent (itemView.getContext(), SearchableActivity.class);
-                    intent.setAction(Intent.ACTION_SEARCH);
-                    intent.putExtra("query", nameText.getText().toString());
-                    itemView.getContext().startActivity(intent);
-                }
-            });
-            // TODO related exercise button event
+        RelationHolder(RelationCardBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
         void bind(Relation relation) {
-            nameText.setText(relation.name);
-            typeText.setText(relation.type);
+            binding.type.setText(relation.type);
+            binding.name.setText(relation.name);
             if (relation.dir == 0) {
-                direction.setBackgroundResource(R.drawable.ic_baseline_arrow_back_ios_24);
+                binding.direction.setBackgroundResource(R.drawable.ic_baseline_arrow_back_ios_24);
             }
             else {
-                direction.setBackgroundResource(R.drawable.ic_baseline_arrow_forward_ios_24);
+                binding.direction.setBackgroundResource(R.drawable.ic_baseline_arrow_forward_ios_24);
             }
+
+            binding.getRoot().setOnClickListener((view) -> {
+                Intent intent = new Intent (binding.getRoot().getContext(), SearchableActivity.class);
+                intent.setAction(Intent.ACTION_SEARCH);
+                intent.putExtra("query", binding.name.getText().toString());
+                binding.getRoot().getContext().startActivity(intent);
+            });
+        }
+    }
+
+    private class PropertyHolder extends RecyclerView.ViewHolder {
+        PropertyCardBinding binding;
+        PropertyHolder(PropertyCardBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        void bind(Relation relation) {
+            binding.type.setText(relation.type);
+            binding.name.setText(relation.name);
         }
     }
 
@@ -72,17 +76,20 @@ public class RelationListAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         Relation relation = mRelationList.get(position);
-        return 0;
+        if (relation.dir != 2) return 0;
+        return 1;
     }
 
     // Inflates the appropriate layout according to the ViewType.
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view;
-
         if (viewType == 0) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.relation_card, parent, false);
-            return new RelationHolder(view);
+            RelationCardBinding binding = RelationCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new RelationHolder(binding);
+        }
+        else if (viewType == 1) {
+            PropertyCardBinding binding = PropertyCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new PropertyHolder(binding);
         }
         return null;
     }
@@ -94,6 +101,9 @@ public class RelationListAdapter extends RecyclerView.Adapter {
         switch (holder.getItemViewType()) {
             case 0:
                 ((RelationHolder) holder).bind(relation);
+                break;
+            case 1:
+                ((PropertyHolder) holder).bind(relation);
                 break;
         }
     }
