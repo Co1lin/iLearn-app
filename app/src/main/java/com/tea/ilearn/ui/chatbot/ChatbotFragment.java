@@ -21,8 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
-import com.tea.ilearn.net.EduKG.Answer;
-import com.tea.ilearn.net.EduKG.EduKG;
+import com.tea.ilearn.net.edukg.Answer;
+import com.tea.ilearn.net.edukg.EduKG;
 
 import java.util.ArrayList;
 
@@ -51,7 +51,7 @@ public class ChatbotFragment extends Fragment {
         sendText = getView().findViewById(R.id.button_chat_send);
 
         sendText.setOnClickListener(mView -> {
-            String msg = editText.getText().toString();
+            String msg = editText.getText().toString().trim();
             if (msg.length() == 0) {
                 Toast toast = Toast.makeText(getContext(), "请输入后再发送", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
@@ -59,15 +59,17 @@ public class ChatbotFragment extends Fragment {
             }
             else {
                 mMessageAdapter.add(new ChatMessage(msg, 0));   // user sends a msg
-                if (Constant.EduKG.SUBJECTS.contains(msg.substring(0, 2))) {
-                    // QA with the specific subject
-                    EduKG.getInst().qAWithSubject(msg.substring(0, 2), msg.substring(2), new StaticHandler(mMessageAdapter));
+                if (msg.length() >= 4 && Constant.EduKG.SUBJECTS.contains(msg.substring(1, 3))) {
+                    // QA with the specific subject when matches [**]
+                    EduKG.getInst().qAWithSubject(msg.substring(1, 3), msg.substring(4),
+                            new StaticHandler(mMessageAdapter, 1, mMessageRecycler));
                 }
                 else {
-                    EduKG.getInst().qAWithAllSubjects(msg, new StaticHandler(mMessageAdapter));
+                    EduKG.getInst().qAWithAllSubjects(msg,
+                            new StaticHandler(mMessageAdapter, Constant.EduKG.SUBJECTS.size(), mMessageRecycler));
                 }
                 editText.setText("");
-                mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount()-1);
+                mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
             }
             InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(mView.getWindowToken(), 0);
@@ -75,13 +77,17 @@ public class ChatbotFragment extends Fragment {
     }
 
     static class StaticHandler extends Handler {
-
+        private RecyclerView mMessageRecycler;
         private MessageListAdapter mMessageAdapter;
+        private int expectedNum;
         private int answerReceived = 0;
+        private int errorReceived = 0;
 
-        public StaticHandler(MessageListAdapter _mMessageAdapter) {
+        public StaticHandler(MessageListAdapter _messageAdapter, int _num, RecyclerView _messageRecycler) {
             super();
-            mMessageAdapter = _mMessageAdapter;
+            mMessageAdapter = _messageAdapter;
+            expectedNum = _num;
+            mMessageAdapter = _messageAdapter;
         }
 
         /**
@@ -91,17 +97,25 @@ public class ChatbotFragment extends Fragment {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             Log.i("Chatbot/handleMessage", msg.what + ", " + (msg.obj == null ? "" : msg.obj.toString()));
-            answerReceived++;
             if (msg.what == 0 && msg.obj != null) {
+                answerReceived++;
                 ArrayList<Answer> answerList = (ArrayList<Answer>) msg.obj;
-                if (!answerList.isEmpty()) {
-                    String answer = answerList.get(0).getAnswer();
+                if (!answerList.isEmpty()) { // assert answerList.isEmpty() == false
+                    String answer = answerList.get(0).getAnswer().trim();
                     if (!answer.isEmpty()) {
                         mMessageAdapter.add(new ChatMessage(answer, 1));
                         answerReceived = 0;
                     }
-                    else if (answerReceived == Constant.EduKG.SUBJECTS.size())
+                    else if (answerReceived == expectedNum - errorReceived)
                         mMessageAdapter.add(new ChatMessage("小艾还在上幼儿园，这个问题还不会 ;(T_T);", 1));
+                    mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+                }
+            }
+            else {
+                errorReceived++;
+                if (errorReceived == expectedNum) {
+                    mMessageAdapter.add(new ChatMessage("系统错误，请稍后重试或联系客服。", 1));
+                    mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
                 }
             }
         }
