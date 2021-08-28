@@ -61,10 +61,12 @@ public class ChatbotFragment extends Fragment {
                 mMessageAdapter.add(new ChatMessage(msg, 0));   // user sends a msg
                 if (Constant.EduKG.SUBJECTS.contains(msg.substring(0, 2))) {
                     // QA with the specific subject
-                    EduKG.getInst().qAWithSubject(msg.substring(0, 2), msg.substring(2), new StaticHandler(mMessageAdapter));
+                    EduKG.getInst().qAWithSubject(msg.substring(0, 2), msg.substring(2),
+                            new StaticHandler(mMessageAdapter, 1));
                 }
                 else {
-                    EduKG.getInst().qAWithAllSubjects(msg, new StaticHandler(mMessageAdapter));
+                    EduKG.getInst().qAWithAllSubjects(msg,
+                            new StaticHandler(mMessageAdapter, Constant.EduKG.SUBJECTS.size()));
                 }
                 editText.setText("");
                 mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount()-1);
@@ -77,12 +79,14 @@ public class ChatbotFragment extends Fragment {
     static class StaticHandler extends Handler {
 
         private MessageListAdapter mMessageAdapter;
+        private int expectedNum;
         private int answerReceived = 0;
         private int errorReceived = 0;
 
-        public StaticHandler(MessageListAdapter _mMessageAdapter) {
+        public StaticHandler(MessageListAdapter _mMessageAdapter, int _num) {
             super();
             mMessageAdapter = _mMessageAdapter;
+            expectedNum = _num;
         }
 
         /**
@@ -92,22 +96,22 @@ public class ChatbotFragment extends Fragment {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             Log.i("Chatbot/handleMessage", msg.what + ", " + (msg.obj == null ? "" : msg.obj.toString()));
-            answerReceived++;
             if (msg.what == 0 && msg.obj != null) {
+                answerReceived++;
                 ArrayList<Answer> answerList = (ArrayList<Answer>) msg.obj;
-                if (!answerList.isEmpty()) {
+                if (!answerList.isEmpty()) { // assert answerList.isEmpty() == false
                     String answer = answerList.get(0).getAnswer().trim();
                     if (!answer.isEmpty()) {
                         mMessageAdapter.add(new ChatMessage(answer, 1));
                         answerReceived = 0;
                     }
-                    else if (answerReceived == Constant.EduKG.SUBJECTS.size())
+                    else if (answerReceived == expectedNum - errorReceived)
                         mMessageAdapter.add(new ChatMessage("小艾还在上幼儿园，这个问题还不会 ;(T_T);", 1));
                 }
             }
             else {
                 errorReceived++;
-                if (errorReceived == Constant.EduKG.SUBJECTS.size())
+                if (errorReceived + answerReceived == expectedNum)
                     mMessageAdapter.add(new ChatMessage("系统错误，请稍后重试或联系客服。", 1));
             }
         }
