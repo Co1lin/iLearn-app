@@ -1,13 +1,13 @@
-package com.tea.ilearn.ui.test;
+package com.tea.ilearn.ui.me;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class TestViewModel extends ViewModel {
+public class MeViewModel extends ViewModel {
     private MutableLiveData<String> mText;
 
-    public TestViewModel() {
+    public MeViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is test fragment");
     }

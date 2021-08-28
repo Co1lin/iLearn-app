@@ -1,16 +1,16 @@
-package com.tea.ilearn.ui.notifications;
+package com.tea.ilearn.ui.link;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class NotificationsViewModel extends ViewModel {
+public class LinkViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public NotificationsViewModel() {
+    public LinkViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is notifications fragment");
+        mText.setValue("This is Link fragment");
     }
 
     public LiveData<String> getText() {

@@ -1,4 +1,4 @@
-package com.tea.ilearn.ui.test;
+package com.tea.ilearn.ui.me;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,24 +12,24 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.tea.ilearn.databinding.FragmentTestBinding;
+import com.tea.ilearn.databinding.FragmentMeBinding;
 
-public class TestFragment extends Fragment {
+public class MeFragment extends Fragment {
 
-    private TestViewModel testViewModel;
-    private FragmentTestBinding binding;
+    private MeViewModel MeViewModel;
+    private FragmentMeBinding binding;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        testViewModel =
-                new ViewModelProvider(this).get(TestViewModel.class);
+        MeViewModel =
+                new ViewModelProvider(this).get(MeViewModel.class);
 
-        binding = FragmentTestBinding.inflate(inflater, container, false);
+        binding = FragmentMeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textTest;
-        testViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        final TextView textView = binding.textMe;
+        MeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
