@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.tea.ilearn"
-        minSdk 21
+        minSdk 28
         targetSdk 31
         versionCode 1
         versionName "1.0"
@@ -78,4 +78,7 @@ dependencies {
     // graphview support
     implementation 'dev.bandb.graphview:graphview:0.8.1'
     implementation 'com.otaliastudios:zoomlayout:1.8.0'
+
+    // flowlayout support
+    implementation 'com.github.LightSun:android-drag-FlowLayout:1.8.8'
 }

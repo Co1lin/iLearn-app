@@ -103,6 +103,30 @@
             android:layout_weight="1"
             android:background="@color/white" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+            <com.heaven7.android.dragflowlayout.DragFlowLayout
+                android:id="@+id/drag_flowLayout"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/edit_menu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+            </com.heaven7.android.dragflowlayout.DragFlowLayout>
+
+            <CheckBox
+                android:id="@+id/edit_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/ic_baseline_menu_24"
+                android:translationX="20dp"
+                app:layout_constraintLeft_toRightOf="@id/drag_flowLayout"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

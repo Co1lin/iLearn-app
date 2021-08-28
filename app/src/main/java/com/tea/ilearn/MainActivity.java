@@ -3,6 +3,7 @@ package com.tea.ilearn;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
@@ -10,7 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.navigation.NavController;
@@ -19,10 +22,12 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.heaven7.android.dragflowlayout.ClickToDeleteItemListenerImpl;
+import com.heaven7.android.dragflowlayout.DragAdapter;
+import com.heaven7.android.dragflowlayout.DragFlowLayout;
 import com.tea.ilearn.databinding.ActivityMainBinding;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -89,11 +94,8 @@ public class MainActivity extends AppCompatActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         MainActivity that = this;
-        searchGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-                RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
-            }
+        searchGroup.setOnCheckedChangeListener((radioGroup, checkedId) -> {
+            RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
         });
         searchBox.setVisibility(View.INVISIBLE);
         searchButton.setChecked(true);
@@ -101,13 +103,10 @@ public class MainActivity extends AppCompatActivity {
         int searchCloseButtonId = searchView.getContext().getResources()
                 .getIdentifier("android:id/search_close_btn", null, null);
         ImageView closeButton = (ImageView) this.searchView.findViewById(searchCloseButtonId);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchView.setQuery("",false);
-                searchBox.setVisibility(View.INVISIBLE);
-                searchButton.setChecked(true);
-            }
+        closeButton.setOnClickListener(view -> {
+            searchView.setQuery("",false);
+            searchBox.setVisibility(View.INVISIBLE);
+            searchButton.setChecked(true);
         });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -122,6 +121,55 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        binding.dragFlowLayout.setOnItemClickListener(new ClickToDeleteItemListenerImpl(R.id.iv_close){
+            @Override
+            protected void onDeleteSuccess(DragFlowLayout dfl, View child, Object data) {
+                //your code
+                Log.v("MYDEBUG", "?");
+            }
+        });
+
+        binding.dragFlowLayout.setDragAdapter(new DragAdapter<String>() {
+            @Override  //获取你的item布局Id
+            public int getItemLayoutId() {
+                return R.layout.chip;
+            }
+            //绑定对应item的数据
+            @Override
+            public void onBindData(View itemView, int dragState, String data) {
+                itemView.setTag(data);
+
+                ((TextView) itemView.findViewById(R.id.text)).setText(data);
+                itemView.findViewById(R.id.iv_close).setVisibility(
+                    dragState != DragFlowLayout.DRAG_STATE_IDLE ? View.VISIBLE : View.GONE
+                );
+            }
+
+            @NonNull
+            @Override
+            public String getData(View itemView) {
+                return (String) itemView.getTag();
+            }
+        });
+
+        binding.dragFlowLayout.getDragItemManager().addItems("语文", "数学", "数学", "数学", "数学", "数学", "数学", "数学", "数学", "数学");
+
+        binding.editMenu.setOnClickListener(view -> {
+            if (binding.editMenu.isChecked()) {
+                binding.dragFlowLayout.beginDrag();
+            } else {
+                binding.dragFlowLayout.finishDrag();
+            }
+        });
+
+//        binding.dragFlowLayout.setOnDragStateChangeListener(new DragFlowLayout.OnDragStateChangeListener() {
+//            @Override
+//            public void onDragStateChange(DragFlowLayout dfl, int dragState) {
+//                if (dragState != DragFlowLayout.DRAG_STATE_IDLE)
+//                    binding.editMenu.setChecked(true);
+//            }
+//        });
     }
 
     public void doSearch(View v) {
