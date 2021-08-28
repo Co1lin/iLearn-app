@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ActionBarEx">
+        <attr name="ab_immersion" format="enum">
+            <enum name="unchanged" value="0" />
+            <enum name="ordinary" value="1" />
+            <enum name="immersed" value="2" />
+        </attr>
+        <attr name="ab_backgroundLayerLayout" format="reference" />
+        <attr name="ab_backgroundLayerImageRes" format="reference" />
+        <attr name="ab_statusBarVisible" format="enum">
+            <enum name="auto" value="0" />
+            <enum name="visible" value="1" />
+            <enum name="gone" value="2" />
+        </attr>
+        <attr name="ab_statusBarColor" format="color|reference" />
+        <attr name="ab_statusBarMode" format="enum">
+            <enum name="unchanged" value="0" />
+            <enum name="light" value="1" />
+            <enum name="dark" value="2" />
+            <enum name="auto" value="3" />
+            <enum name="realTime" value="4" />
+        </attr>
+        <attr name="ab_clickToFinish" format="reference" />
+        <attr name="ab_titleBarLayout" format="reference" />
+        <attr name="ab_titleBarHeight" format="dimension|reference" />
+        <attr name="ab_bottomLineHeight" format="dimension|reference" />
+        <attr name="ab_bottomLineColor" format="color|reference" />
+        <attr name="ab_bottomLineResId" format="reference" />
+        <attr name="ab_bottomLineOutside" format="boolean|reference" />
+        <attr name="ab_foregroundLayerLayout" format="reference" />
+    </declare-styleable>
+</resources>

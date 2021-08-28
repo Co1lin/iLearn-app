@@ -7,30 +7,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.exercise.ExerciseFragment">
 
-    <com.tea.ilearn.utils.TitleBarSearch
+    <per.goweii.actionbarex.common.ActionBarSearch
         android:id="@+id/search_action_bar_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="#ffffff"
-        app:ab_immersion="unchanged"
-        app:ab_bottomLineColor="@color/purple_200"
+        android:background="@color/transparent"
+        app:ab_bottomLineColor="@color/actionbarex_line"
         app:ab_bottomLineHeight="1dp"
         app:ab_foregroundLayerLayout="@layout/loading_bar"
+        app:ab_immersion="unchanged"
         app:ab_statusBarColor="@color/transparent"
         app:ab_statusBarMode="unchanged"
         app:ab_statusBarVisible="gone"
         app:ab_titleBarHeight="48dp"
         app:abs_leftIconColor="@color/black"
-        app:abs_leftIconRes="@mipmap/ic_bot"
+        app:abs_leftIconRes="@mipmap/back"
         app:abs_rightIconColor="@color/black"
-        app:abs_rightIconRes="@mipmap/ic_launcher"
+        app:abs_rightIconRes="@mipmap/search"
         app:abs_titleBgRes="@drawable/search_bar_title_et_bg"
         app:abs_titleHintColor="#aaaaaa"
         app:abs_titleHintText="这是一个搜索框..."
         app:abs_titleMarginVertical="8dp"
         app:abs_titlePaddingHorizontal="16dp"
         app:abs_titleTextColor="#232323"
-        app:abs_titleTextSize="15sp" />
+        app:abs_titleTextSize="15sp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

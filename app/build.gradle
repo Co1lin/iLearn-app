@@ -80,6 +80,7 @@ dependencies {
     implementation 'com.otaliastudios:zoomlayout:1.8.0'
 
     // ActionBarEx
-    implementation 'com.github.goweii:ActionBarEx:3.3.0'
+    implementation project(':actionbarex')
+    implementation project(':actionbarex-common')
     implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
 }
