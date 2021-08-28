@@ -21,8 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
-import com.tea.ilearn.net.EduKG.Answer;
-import com.tea.ilearn.net.EduKG.EduKG;
+import com.tea.ilearn.net.edukg.Answer;
+import com.tea.ilearn.net.edukg.EduKG;
 
 import java.util.ArrayList;
 
@@ -51,7 +51,7 @@ public class ChatbotFragment extends Fragment {
         sendText = getView().findViewById(R.id.button_chat_send);
 
         sendText.setOnClickListener(mView -> {
-            String msg = editText.getText().toString();
+            String msg = editText.getText().toString().trim();
             if (msg.length() == 0) {
                 Toast toast = Toast.makeText(getContext(), "请输入后再发送", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
@@ -59,7 +59,7 @@ public class ChatbotFragment extends Fragment {
             }
             else {
                 mMessageAdapter.add(new ChatMessage(msg, 0));   // user sends a msg
-                if (Constant.EduKG.SUBJECTS.contains(msg.substring(0, 2))) {
+                if (msg.length() >= 2 && Constant.EduKG.SUBJECTS.contains(msg.substring(0, 2))) {
                     // QA with the specific subject
                     EduKG.getInst().qAWithSubject(msg.substring(0, 2), msg.substring(2),
                             new StaticHandler(mMessageAdapter, 1));
@@ -111,7 +111,7 @@ public class ChatbotFragment extends Fragment {
             }
             else {
                 errorReceived++;
-                if (errorReceived + answerReceived == expectedNum)
+                if (errorReceived == expectedNum)
                     mMessageAdapter.add(new ChatMessage("系统错误，请稍后重试或联系客服。", 1));
             }
         }

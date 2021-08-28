@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,17 +12,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
 import com.tea.ilearn.R;
-import com.tea.ilearn.net.EduKG.EduKG;
-import com.tea.ilearn.net.EduKG.Entity;
-import com.tea.ilearn.net.EduKG.EntityDetail;
+import com.tea.ilearn.net.edukg.EduKG;
+import com.tea.ilearn.net.edukg.EntityDetail;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.tea.ilearn.net.EduKG;
+package com.tea.ilearn.net.edukg;
 
 import com.tea.ilearn.net.Response;
 
