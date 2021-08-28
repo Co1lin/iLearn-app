@@ -59,17 +59,17 @@ public class ChatbotFragment extends Fragment {
             }
             else {
                 mMessageAdapter.add(new ChatMessage(msg, 0));   // user sends a msg
-                if (msg.length() >= 2 && Constant.EduKG.SUBJECTS.contains(msg.substring(0, 2))) {
-                    // QA with the specific subject
-                    EduKG.getInst().qAWithSubject(msg.substring(0, 2), msg.substring(2),
-                            new StaticHandler(mMessageAdapter, 1));
+                if (msg.length() >= 4 && Constant.EduKG.SUBJECTS.contains(msg.substring(1, 3))) {
+                    // QA with the specific subject when matches [**]
+                    EduKG.getInst().qAWithSubject(msg.substring(1, 3), msg.substring(4),
+                            new StaticHandler(mMessageAdapter, 1, mMessageRecycler));
                 }
                 else {
                     EduKG.getInst().qAWithAllSubjects(msg,
-                            new StaticHandler(mMessageAdapter, Constant.EduKG.SUBJECTS.size()));
+                            new StaticHandler(mMessageAdapter, Constant.EduKG.SUBJECTS.size(), mMessageRecycler));
                 }
                 editText.setText("");
-                mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount()-1);
+                mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
             }
             InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(mView.getWindowToken(), 0);
@@ -77,16 +77,17 @@ public class ChatbotFragment extends Fragment {
     }
 
     static class StaticHandler extends Handler {
-
+        private RecyclerView mMessageRecycler;
         private MessageListAdapter mMessageAdapter;
         private int expectedNum;
         private int answerReceived = 0;
         private int errorReceived = 0;
 
-        public StaticHandler(MessageListAdapter _mMessageAdapter, int _num) {
+        public StaticHandler(MessageListAdapter _messageAdapter, int _num, RecyclerView _messageRecycler) {
             super();
-            mMessageAdapter = _mMessageAdapter;
+            mMessageAdapter = _messageAdapter;
             expectedNum = _num;
+            mMessageAdapter = _messageAdapter;
         }
 
         /**
@@ -107,12 +108,15 @@ public class ChatbotFragment extends Fragment {
                     }
                     else if (answerReceived == expectedNum - errorReceived)
                         mMessageAdapter.add(new ChatMessage("小艾还在上幼儿园，这个问题还不会 ;(T_T);", 1));
+                    mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
                 }
             }
             else {
                 errorReceived++;
-                if (errorReceived == expectedNum)
+                if (errorReceived == expectedNum) {
                     mMessageAdapter.add(new ChatMessage("系统错误，请稍后重试或联系客服。", 1));
+                    mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+                }
             }
         }
     }

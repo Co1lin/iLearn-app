@@ -78,4 +78,8 @@ dependencies {
     // graphview support
     implementation 'dev.bandb.graphview:graphview:0.8.1'
     implementation 'com.otaliastudios:zoomlayout:1.8.0'
+
+    // ActionBarEx
+    implementation 'com.github.goweii:ActionBarEx:3.3.0'
+    implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
 }
