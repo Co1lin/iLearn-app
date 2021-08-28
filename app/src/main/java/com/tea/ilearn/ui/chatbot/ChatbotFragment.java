@@ -78,6 +78,7 @@ public class ChatbotFragment extends Fragment {
 
         private MessageListAdapter mMessageAdapter;
         private int answerReceived = 0;
+        private int errorReceived = 0;
 
         public StaticHandler(MessageListAdapter _mMessageAdapter) {
             super();
@@ -103,6 +104,11 @@ public class ChatbotFragment extends Fragment {
                     else if (answerReceived == Constant.EduKG.SUBJECTS.size())
                         mMessageAdapter.add(new ChatMessage("小艾还在上幼儿园，这个问题还不会 ;(T_T);", 1));
                 }
+            }
+            else {
+                errorReceived++;
+                if (errorReceived == Constant.EduKG.SUBJECTS.size())
+                    mMessageAdapter.add(new ChatMessage("系统错误，请稍后重试或联系客服。", 1));
             }
         }
     }
