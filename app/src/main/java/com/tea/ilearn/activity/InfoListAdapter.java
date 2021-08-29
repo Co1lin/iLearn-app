@@ -100,10 +100,10 @@ public class InfoListAdapter extends RecyclerView.Adapter {
     }
 
     public <U extends Comparable<? super U>> void applySortAndFilter(Function<? super Info, ? extends U> f, boolean reverse) {
-//                .filter(info -> info.category.equals("组成细胞的分子"))
         Stream s = mInfoList.stream();
         if (reverse) s = s.sorted(Comparator.comparing(f).reversed());
         else s = s.sorted(Comparator.comparing(f));
+        // s.filter(info -> info.category.equals("组成细胞的分子"))
         mInfoList = (List<Info>) s.collect(Collectors.toList());
         notifyDataSetChanged();
     }

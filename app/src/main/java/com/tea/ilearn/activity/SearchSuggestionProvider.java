@@ -10,3 +10,4 @@ public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
         setupSuggestions(AUTHORITY, MODE);
     }
 }
+// TODO this file is useless ? also the references in manifest ?

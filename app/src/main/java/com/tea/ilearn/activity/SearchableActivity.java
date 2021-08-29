@@ -40,11 +40,13 @@ public class SearchableActivity extends AppCompatActivity {
                 binding.sortNameUp.setVisibility(View.INVISIBLE);
                 binding.sortNameDown.setVisibility(View.VISIBLE);
                 mInfoAdapter.applySortAndFilter(Info::getName, true);
+                mInfoRecycler.scrollToPosition(0);
             }
             else {
                 binding.sortNameUp.setVisibility(View.VISIBLE);
                 binding.sortNameDown.setVisibility(View.INVISIBLE);
                 mInfoAdapter.applySortAndFilter(Info::getName, false);
+                mInfoRecycler.scrollToPosition(0);
             }
         });
 
@@ -55,11 +57,13 @@ public class SearchableActivity extends AppCompatActivity {
                 binding.sortCategoryUp.setVisibility(View.INVISIBLE);
                 binding.sortCategoryDown.setVisibility(View.VISIBLE);
                 mInfoAdapter.applySortAndFilter(Info::getCategory, true);
+                mInfoRecycler.scrollToPosition(0);
             }
             else {
                 binding.sortCategoryUp.setVisibility(View.VISIBLE);
                 binding.sortCategoryDown.setVisibility(View.INVISIBLE);
                 mInfoAdapter.applySortAndFilter(Info::getCategory, false);
+                mInfoRecycler.scrollToPosition(0);
             }
         });
 

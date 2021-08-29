@@ -1,14 +1,11 @@
 package com.tea.ilearn;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,9 +15,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.heaven7.android.dragflowlayout.ClickToDeleteItemListenerImpl;
-import com.heaven7.android.dragflowlayout.DragAdapter;
-import com.heaven7.android.dragflowlayout.DragFlowLayout;
 import com.tea.ilearn.databinding.ActivityMainBinding;
 import com.tea.ilearn.ui.chatbot.ChatbotFragment;
 import com.tea.ilearn.ui.exercise.ExerciseFragment;
@@ -30,7 +24,6 @@ import com.tea.ilearn.ui.me.MeFragment;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,57 +126,4 @@ public class MainActivity extends AppCompatActivity {
             return fragments.size();
         }
     }
-
-//        KeyboardVisibilityEvent.setEventListener(this, isOpen -> {
-//            if (isOpen) {
-//                fab.setVisibility(View.GONE);
-//                bottomAppBar.setVisibility(View.GONE);
-//            }
-//            else {
-//                fab.setVisibility(View.VISIBLE);
-//                bottomAppBar.setVisibility(View.VISIBLE);
-//            }
-//        });
-
-    //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        searchView = binding.searchView;
-//        searchBox = binding.searchBox;
-//        searchButton = binding.searchEntity;
-//        searchGroup = binding.searchGroup;
-        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-//        MainActivity that = this;
-//        searchGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-//                RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
-//            }
-//        });
-//        searchBox.setVisibility(View.INVISIBLE);
-//        searchButton.setChecked(true);
-
-//        int searchCloseButtonId = searchView.getContext().getResources()
-//                .getIdentifier("android:id/search_close_btn", null, null);
-//        ImageView closeButton = (ImageView) this.searchView.findViewById(searchCloseButtonId);
-//        closeButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                searchView.setQuery("",false);
-//                searchBox.setVisibility(View.INVISIBLE);
-//                searchButton.setChecked(true);
-//            }
-//        });
-//
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                return false;
-//            }
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                searchBox.setVisibility(View.INVISIBLE);
-//                // TODO this cannot handle history suggestion.
-//                return false;
-//            }
-//        });
 }
