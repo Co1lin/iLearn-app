@@ -139,7 +139,7 @@
                                 android:layout_alignParentBottom="true"
                                 android:gravity="center_vertical"
                                 android:text="分享iLearn"
-                                android:textAppearance="?attr/textAppearanceBody2"></TextView>
+                                android:textAppearance="?attr/textAppearanceBody2" />
 
                             <ImageButton
                                 android:layout_width="wrap_content"
@@ -149,7 +149,7 @@
                                 android:layout_alignParentBottom="true"
                                 android:background="?attr/selectableItemBackgroundBorderless"
                                 android:layout_marginEnd="8dp"
-                                android:src="@drawable/ic_share_square_24"></ImageButton>
+                                android:src="@drawable/ic_share_square_24" />
                         </RelativeLayout>
                     </com.google.android.material.card.MaterialCardView>
 
