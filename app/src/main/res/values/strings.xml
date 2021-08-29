@@ -10,4 +10,5 @@
     <string name="search_linking">实体链接</string>
     <string name="search_problem">搜题</string>
     <string name="input_hint">请输入</string>
+    <string name="dark_mode">黑夜模式</string>
 </resources>

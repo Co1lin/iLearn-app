@@ -86,11 +86,9 @@ public class InfoListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private Context mContext;
     private List<Info> mInfoList;
 
     public InfoListAdapter(Context context, List<Info> infoList) {
-        mContext = context;
         mInfoList = infoList;
     }
 
@@ -122,8 +120,6 @@ public class InfoListAdapter extends RecyclerView.Adapter {
     // Inflates the apriate layout according to the ViewType.
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view;
-
         if (viewType == 0) {
             return new EntityHolder(EntityCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }
