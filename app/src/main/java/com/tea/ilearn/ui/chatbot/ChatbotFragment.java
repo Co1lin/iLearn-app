@@ -35,7 +35,13 @@ public class ChatbotFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_chatbot, container, false);
+        try {
+            return inflater.inflate(R.layout.fragment_chatbot, container, false);
+        }
+        catch (Exception e) {
+            Log.e("ChatbotFragment", e.toString());
+        }
+        return null;
     }
 
     @Override
@@ -59,7 +65,10 @@ public class ChatbotFragment extends Fragment {
             }
             else {
                 mMessageAdapter.add(new ChatMessage(msg, 0));   // user sends a msg
-                if (msg.length() >= 4 && Constant.EduKG.SUBJECTS.contains(msg.substring(1, 3))) {
+                if (msg.length() >= 4 &&
+                        (msg.substring(0, 1).equals("[") && msg.substring(3, 4).equals("]") ||
+                         msg.substring(0, 1).equals("【") && msg.substring(3, 4).equals("】")) &&
+                        Constant.EduKG.SUBJECTS.contains(msg.substring(1, 3))) {
                     // QA with the specific subject when matches [**]
                     EduKG.getInst().qAWithSubject(msg.substring(1, 3), msg.substring(4),
                             new StaticHandler(mMessageAdapter, 1, mMessageRecycler));

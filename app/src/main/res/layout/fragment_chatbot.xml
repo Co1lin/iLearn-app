@@ -5,14 +5,33 @@ xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent">
 
+    <per.goweii.actionbarex.common.ActionBarCommon
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:background="@color/transparent"
+        app:ab_immersion="unchanged"
+        app:ab_bottomLineColor="@color/transparent"
+        app:ab_bottomLineHeight="0dp"
+        app:ab_foregroundLayerLayout="@layout/loading_bar"
+        app:ab_statusBarColor="@color/transparent"
+        app:ab_statusBarMode="unchanged"
+        app:ab_statusBarVisible="gone"
+        app:ab_titleBarHeight="48dp"
+        app:abc_titleText="小艾 AI"
+        app:abc_titleTextColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/recycler_chat"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="16dp"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@+id/text_chat_indicator"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/text_chat_indicator"
+        app:layout_constraintTop_toBottomOf="@id/title_bar"/>
 
     <TextView
         android:id="@+id/text_chat_indicator"
