@@ -82,6 +82,9 @@ dependencies {
     // flowlayout support
     implementation 'com.github.LightSun:android-drag-FlowLayout:1.8.8'
 
+    // spinner
+    implementation 'com.github.arcadefire:nice-spinner:1.4.4'
+
     // ActionBarEx
     implementation project(':actionbarex')
     implementation project(':actionbarex-common')
