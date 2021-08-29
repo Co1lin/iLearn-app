@@ -7,22 +7,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AdapterView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.abel533.echarts.code.X;
-import com.github.abel533.echarts.series.Bar;
-import com.tea.ilearn.R;
-
 import com.github.abel533.echarts.axis.CategoryAxis;
 import com.github.abel533.echarts.axis.ValueAxis;
+import com.github.abel533.echarts.code.X;
 import com.github.abel533.echarts.json.GsonOption;
+import com.github.abel533.echarts.series.Bar;
+import com.tea.ilearn.R;
 import com.tea.ilearn.utils.EchartsView;
 
 import dev.bandb.graphview.AbstractGraphAdapter;
@@ -37,6 +34,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView graphView;
     private AbstractGraphAdapter adapter;
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home, container, false);

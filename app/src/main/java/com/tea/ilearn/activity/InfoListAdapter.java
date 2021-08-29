@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.databinding.EntityCardBinding;
-import com.tea.ilearn.net.EduKG.EduKG;
-import com.tea.ilearn.net.EduKG.EntityDetail;
+import com.tea.ilearn.net.edukg.EduKG;
+import com.tea.ilearn.net.edukg.EntityDetail;
 
 import java.util.ArrayList;
 import java.util.Comparator;

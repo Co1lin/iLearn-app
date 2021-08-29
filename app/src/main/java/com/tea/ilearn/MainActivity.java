@@ -1,11 +1,8 @@
 package com.tea.ilearn;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -15,19 +12,25 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.heaven7.android.dragflowlayout.ClickToDeleteItemListenerImpl;
 import com.heaven7.android.dragflowlayout.DragAdapter;
 import com.heaven7.android.dragflowlayout.DragFlowLayout;
 import com.tea.ilearn.databinding.ActivityMainBinding;
+import com.tea.ilearn.ui.chatbot.ChatbotFragment;
+import com.tea.ilearn.ui.exercise.ExerciseFragment;
+import com.tea.ilearn.ui.home.HomeFragment;
+import com.tea.ilearn.ui.link.LinkFragment;
+import com.tea.ilearn.ui.me.MeFragment;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,8 +40,12 @@ public class MainActivity extends AppCompatActivity {
     private RadioButton searchButton;
     private RadioGroup searchGroup;
 
-    View fab, bottomAppBar, frame;
-    CoordinatorLayout.LayoutParams params;
+    private ViewPager2 viewPager;
+    private FragmentStateAdapter pagerAdapter;
+    private BottomNavigationView navView;
+
+    //View fab, bottomAppBar, frame;
+    //CoordinatorLayout.LayoutParams params;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,134 +53,122 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        viewPager = binding.pager;
+        navView = binding.navView;
+        List<Fragment> fragments = new ArrayList<Fragment>() {{
+            add(new ExerciseFragment());
+            add(new ChatbotFragment());
+            add(new HomeFragment());
+            add(new LinkFragment());
+            add(new MeFragment());
+        }};
 
-        BottomNavigationView navView = binding.navView;
-        navView.setBackground(null);
-        navView.getMenu().getItem(2).setEnabled(false);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home,
-                R.id.navigation_chatbot,
-                R.id.navigation_notifications,
-                R.id.navigation_test
-        ).build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
-
-        fab = binding.fab;
-        bottomAppBar = binding.bottomAppBar;
-        frame = findViewById(R.id.nav_host_fragment_activity_main);
-        params = new CoordinatorLayout.LayoutParams(-1, -1);
-
-        final ViewTreeObserver observer= fab.getViewTreeObserver();
-        observer.addOnGlobalLayoutListener(() -> {
-            params.setMargins(0, 0, 0, fab.getHeight());
-            frame.setLayoutParams(params);
-        });
-
-        KeyboardVisibilityEvent.setEventListener(this, isOpen -> {
-            if (isOpen) {
-                fab.setVisibility(View.GONE);
-                bottomAppBar.setVisibility(View.GONE);
-            }
-            else {
-                fab.setVisibility(View.VISIBLE);
-                bottomAppBar.setVisibility(View.VISIBLE);
-            }
-        });
-
-        // ==================================================================
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = binding.searchView;
-        searchBox = binding.searchBox;
-        searchButton = binding.searchEntity;
-        searchGroup = binding.searchGroup;
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-        MainActivity that = this;
-        searchGroup.setOnCheckedChangeListener((radioGroup, checkedId) -> {
-            RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
-        });
-        searchBox.setVisibility(View.INVISIBLE);
-        searchButton.setChecked(true);
-
-        int searchCloseButtonId = searchView.getContext().getResources()
-                .getIdentifier("android:id/search_close_btn", null, null);
-        ImageView closeButton = (ImageView) this.searchView.findViewById(searchCloseButtonId);
-        closeButton.setOnClickListener(view -> {
-            searchView.setQuery("",false);
-            searchBox.setVisibility(View.INVISIBLE);
-            searchButton.setChecked(true);
-        });
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        pagerAdapter = new ScreenSlidePagerAdapter(this, fragments);
+        viewPager.setAdapter(pagerAdapter);
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                searchBox.setVisibility(View.INVISIBLE);
-                // TODO this cannot handle history suggestion.
-                return false;
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                navView.getMenu().getItem(position).setChecked(true);
             }
         });
 
-        binding.dragFlowLayout.setOnItemClickListener(new ClickToDeleteItemListenerImpl(R.id.iv_close){
-            @Override
-            protected void onDeleteSuccess(DragFlowLayout dfl, View child, Object data) {
-                //your code
-                Log.v("MYDEBUG", "?");
-            }
-        });
+        navView.setOnNavigationItemSelectedListener(
+                item -> {
+                    switch (item.getItemId()) {
+                        case(R.id.navigation_exercise):
+                            viewPager.setCurrentItem(0, true);
+                            break;
+                        case(R.id.navigation_chatbot):
+                            viewPager.setCurrentItem(1, true);
+                            break;
+                        case(R.id.navigation_home):
+                            viewPager.setCurrentItem(2, true);
+                            break;
+                        case(R.id.navigation_link):
+                            viewPager.setCurrentItem(3, true);
+                            break;
+                        case(R.id.navigation_me):
+                            viewPager.setCurrentItem(4, true);
+                            break;
+                    }
+                    return true;
+                }
+        );
+    }
 
-        binding.dragFlowLayout.setDragAdapter(new DragAdapter<String>() {
-            @Override  //获取你的item布局Id
-            public int getItemLayoutId() {
-                return R.layout.chip;
-            }
-            //绑定对应item的数据
-            @Override
-            public void onBindData(View itemView, int dragState, String data) {
-                itemView.setTag(data);
+    private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
 
-                ((TextView) itemView.findViewById(R.id.text)).setText(data);
-                itemView.findViewById(R.id.iv_close).setVisibility(
-                    dragState != DragFlowLayout.DRAG_STATE_IDLE ? View.VISIBLE : View.GONE
-                );
-            }
+        private List<Fragment> fragments;
 
-            @NonNull
-            @Override
-            public String getData(View itemView) {
-                return (String) itemView.getTag();
-            }
-        });
+        public ScreenSlidePagerAdapter(FragmentActivity fragmentActivity,
+                                       List<Fragment> _fragments) {
+            super(fragmentActivity);
+            fragments = _fragments;
+        }
 
-        binding.dragFlowLayout.getDragItemManager().addItems("语文", "数学", "数学", "数学", "数学", "数学", "数学", "数学", "数学", "数学");
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            return fragments.get(position);
+        }
 
-        binding.editMenu.setOnClickListener(view -> {
-            if (binding.editMenu.isChecked()) {
-                binding.dragFlowLayout.beginDrag();
-            } else {
-                binding.dragFlowLayout.finishDrag();
-            }
-        });
+        @Override
+        public int getItemCount() {
+            return fragments.size();
+        }
+    }
 
-//        binding.dragFlowLayout.setOnDragStateChangeListener(new DragFlowLayout.OnDragStateChangeListener() {
-//            @Override
-//            public void onDragStateChange(DragFlowLayout dfl, int dragState) {
-//                if (dragState != DragFlowLayout.DRAG_STATE_IDLE)
-//                    binding.editMenu.setChecked(true);
+//        KeyboardVisibilityEvent.setEventListener(this, isOpen -> {
+//            if (isOpen) {
+//                fab.setVisibility(View.GONE);
+//                bottomAppBar.setVisibility(View.GONE);
+//            }
+//            else {
+//                fab.setVisibility(View.VISIBLE);
+//                bottomAppBar.setVisibility(View.VISIBLE);
 //            }
 //        });
-    }
 
-    public void doSearch(View v) {
-        searchBox.setVisibility(View.VISIBLE);
-        searchView.setIconified(false);
-    }
+    //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        searchView = binding.searchView;
+//        searchBox = binding.searchBox;
+//        searchButton = binding.searchEntity;
+//        searchGroup = binding.searchGroup;
+        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+//        MainActivity that = this;
+//        searchGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
+//                RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
+//            }
+//        });
+//        searchBox.setVisibility(View.INVISIBLE);
+//        searchButton.setChecked(true);
+
+//        int searchCloseButtonId = searchView.getContext().getResources()
+//                .getIdentifier("android:id/search_close_btn", null, null);
+//        ImageView closeButton = (ImageView) this.searchView.findViewById(searchCloseButtonId);
+//        closeButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                searchView.setQuery("",false);
+//                searchBox.setVisibility(View.INVISIBLE);
+//                searchButton.setChecked(true);
+//            }
+//        });
+//
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                searchBox.setVisibility(View.INVISIBLE);
+//                // TODO this cannot handle history suggestion.
+//                return false;
+//            }
+//        });
 }

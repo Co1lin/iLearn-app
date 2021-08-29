@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.ActivitySearchableBinding;
-import com.tea.ilearn.net.EduKG.EduKG;
-import com.tea.ilearn.net.EduKG.Entity;
+import com.tea.ilearn.net.edukg.EduKG;
+import com.tea.ilearn.net.edukg.Entity;
 
 import java.util.ArrayList;
 import java.util.List;

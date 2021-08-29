@@ -6,10 +6,10 @@
     app:startDestination="@+id/navigation_home">
 
     <fragment
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_exercise"
         android:name="com.tea.ilearn.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:label="@string/title_exercise"
+        tools:layout="@layout/fragment_exercise" />
 
     <fragment
         android:id="@+id/navigation_chatbot"
@@ -18,13 +18,20 @@
         tools:layout="@layout/fragment_chatbot" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.tea.ilearn.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_home"
+        android:name="com.tea.ilearn.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
     <fragment
-        android:id="@+id/navigation_test"
-        android:name="com.tea.ilearn.ui.test.TestFragment"
-        android:label="@string/title_test"
-        tools:layout="@layout/fragment_test" />
+        android:id="@+id/navigation_link"
+        android:name="com.tea.ilearn.ui.link.LinkFragment"
+        android:label="@string/title_link"
+        tools:layout="@layout/fragment_link" />
+
+    <fragment
+        android:id="@+id/navigation_me"
+        android:name="com.tea.ilearn.ui.me.MeFragment"
+        android:label="@string/title_me"
+        tools:layout="@layout/fragment_me" />
 </navigation>

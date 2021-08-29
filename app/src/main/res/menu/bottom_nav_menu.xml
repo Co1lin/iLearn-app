@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_exercise"
         android:icon="@drawable/ic_baseline_menu_book_24"
-        android:title="@string/title_home" />
+        android:title="@string/title_exercise" />
 
     <item
         android:id="@+id/navigation_chatbot"
@@ -12,17 +12,18 @@
         android:title="@string/title_chatbot" />
 
     <item
-        android:id="@+id/placeholder"
-        android:title="" />
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/title_home" />
 
     <item
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_link"
         android:icon="@drawable/ic_link_24"
-        android:title="@string/title_notifications" />
+        android:title="@string/title_link" />
 
     <item
-        android:id="@+id/navigation_test"
+        android:id="@+id/navigation_me"
         android:icon="@drawable/ic_user"
-        android:title="@string/title_test" />
+        android:title="@string/title_me" />
 
 </menu>
