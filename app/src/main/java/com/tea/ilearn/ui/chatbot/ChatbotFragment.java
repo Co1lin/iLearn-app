@@ -35,13 +35,8 @@ public class ChatbotFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        try {
-            return inflater.inflate(R.layout.fragment_chatbot, container, false);
-        }
-        catch (Exception e) {
-            Log.e("ChatbotFragment", e.toString());
-        }
-        return null;
+        // TODO: refactor
+        return inflater.inflate(R.layout.fragment_chatbot, container, false);
     }
 
     @Override

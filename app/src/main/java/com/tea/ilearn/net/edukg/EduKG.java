@@ -96,6 +96,15 @@ public class EduKG extends APIRequest {
         }
     }
 
-    
+    public void getNamedEntities(String course, String queryString, Handler handler) {
+        POST("/linkInstance",
+            new HashMap<String, Object>(){{
+                put("course", course);
+                put("context", queryString);
+            }},
+            p -> p.asEduKGResponse(LinkResults.class),
+            handler
+        );
+    }
 
 }
