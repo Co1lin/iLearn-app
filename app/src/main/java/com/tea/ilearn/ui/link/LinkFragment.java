@@ -45,6 +45,7 @@ public class LinkFragment extends Fragment {
 
         binding.clearButton.setOnClickListener(view -> {
             binding.text.setText("");
+            binding.nerResult.removeAllViews();
         });
 
         binding.courseSpinner.attachDataSource(Constant.EduKG.SUBJECTS);
@@ -106,7 +107,7 @@ public class LinkFragment extends Fragment {
                 }
             }
             else {
-                Toast.makeText(chipGroup.getContext(), "API又炸啦哈哈哈哈哈真好用", Toast.LENGTH_LONG);
+                Toast.makeText(chipGroup.getContext(), Constant.EduKG.ERROR_MSG, Toast.LENGTH_LONG);
             }
         }
     }

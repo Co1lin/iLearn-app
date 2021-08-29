@@ -52,7 +52,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                     binding.collapseBox.setVisibility(View.VISIBLE);
                     if (!mloaded) {
                         StaticHandler handler = new StaticHandler(mRelationAdapter, mPropertyAdapter);
-                        EduKG.getInst().getEntityDetails(info.subject, binding.entityName.getText().toString(), handler); // TODO
+                        EduKG.getInst().getEntityDetails(info.subject, binding.entityName.getText().toString(), handler);
                         mloaded = true;
                         // TODO save to database
                     }
@@ -100,10 +100,10 @@ public class InfoListAdapter extends RecyclerView.Adapter {
     }
 
     public <U extends Comparable<? super U>> void applySortAndFilter(Function<? super Info, ? extends U> f, boolean reverse) {
-//                .filter(info -> info.category.equals("组成细胞的分子"))
         Stream s = mInfoList.stream();
         if (reverse) s = s.sorted(Comparator.comparing(f).reversed());
         else s = s.sorted(Comparator.comparing(f));
+        // s.filter(info -> info.category.equals("组成细胞的分子"))
         mInfoList = (List<Info>) s.collect(Collectors.toList());
         notifyDataSetChanged();
     }
@@ -125,8 +125,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
         View view;
 
         if (viewType == 0) {
-            EntityCardBinding binding = EntityCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            return new EntityHolder(binding);
+            return new EntityHolder(EntityCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }
         return null;
     }
@@ -168,7 +167,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                     }
                 }
             } else {
-                // TODO
+                // TODO empty content in entity detail
             }
         }
     }

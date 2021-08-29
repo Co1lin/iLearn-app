@@ -20,5 +20,7 @@ public class Constant {
                         CHEMISTRY, BIOLOGY, HISTORY, GEO, POLITICS
                 )
         );
+
+        public static final String ERROR_MSG    = "系统错误，请稍后重试或联系客服。";
     }
 }
