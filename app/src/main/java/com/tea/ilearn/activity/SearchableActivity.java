@@ -88,7 +88,7 @@ public class SearchableActivity extends AppCompatActivity {
 //                    SearchSuggestionProvider.MODE
 //            ); // TODO reinstall bug?
 //            suggestions.saveRecentQuery(query, null);
-//            // suggestions.clearHistory(); // TODO: clear history for privacy
+//            // suggestions.clearHistory(); // TODO colin: clear history for privacy
         }
     }
 
