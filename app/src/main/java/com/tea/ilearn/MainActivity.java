@@ -95,6 +95,13 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
         );
+
+        KeyboardVisibilityEvent.setEventListener(this, isOpen -> {
+            if (isOpen)
+                navView.setVisibility(View.GONE);
+            else
+                navView.setVisibility(View.VISIBLE);
+        });
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
