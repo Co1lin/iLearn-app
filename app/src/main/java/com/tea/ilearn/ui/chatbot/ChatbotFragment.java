@@ -98,12 +98,14 @@ public class ChatbotFragment extends Fragment {
         private int expectedNum;
         private int answerReceived = 0;
         private int errorReceived = 0;
+        private ArrayList<String> receivedAnswer;
 
         public StaticHandler(MessageListAdapter _messageAdapter, int _num, RecyclerView _messageRecycler) {
             super();
             mMessageAdapter = _messageAdapter;
             expectedNum = _num;
             mMessageRecycler = _messageRecycler;
+            receivedAnswer = new ArrayList<>();
         }
 
         /**
@@ -119,7 +121,10 @@ public class ChatbotFragment extends Fragment {
                 if (!answerList.isEmpty()) { // assert answerList.isEmpty() == false
                     String answer = answerList.get(0).getAnswer().trim();
                     if (!answer.isEmpty()) {
-                        mMessageAdapter.add(new ChatMessage(answer, 1));
+                        if (!receivedAnswer.contains(answer)) {
+                            mMessageAdapter.add(new ChatMessage(answer, 1));
+                            receivedAnswer.add(answer);
+                        }
                         answerReceived = 0;
                     }
                     else if (answerReceived == expectedNum - errorReceived)
