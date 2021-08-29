@@ -45,6 +45,7 @@ public class LinkFragment extends Fragment {
 
         binding.clearButton.setOnClickListener(view -> {
             binding.text.setText("");
+            binding.nerResult.removeAllViews();
         });
 
         binding.courseSpinner.attachDataSource(Constant.EduKG.SUBJECTS);

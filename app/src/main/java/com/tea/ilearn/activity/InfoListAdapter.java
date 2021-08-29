@@ -125,8 +125,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
         View view;
 
         if (viewType == 0) {
-            EntityCardBinding binding = EntityCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            return new EntityHolder(binding);
+            return new EntityHolder(EntityCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }
         return null;
     }
