@@ -16,26 +16,32 @@
         android:hint="在此输入要分析实体的句子"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/ner_result" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/ner_result"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:chipSpacingHorizontal="0dp"
         android:layout_margin="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text" >
+        app:layout_constraintTop_toBottomOf="@+id/text">
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/ner_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:chipSpacingHorizontal="0dp" />
+    </ScrollView>
 
-    </com.google.android.material.chip.ChipGroup>
 
-    <LinearLayout
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-    </LinearLayout>
+    <ImageButton
+        android:id="@+id/clear_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_clear_24"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:alpha="0.5"
+        app:layout_constraintBottom_toBottomOf="@id/text"
+        app:layout_constraintEnd_toEndOf="@id/text" />
 </androidx.constraintlayout.widget.ConstraintLayout>

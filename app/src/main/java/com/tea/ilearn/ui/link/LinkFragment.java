@@ -37,6 +37,10 @@ public class LinkFragment extends Fragment {
             return false;
         });
 
+        binding.clearButton.setOnClickListener(view -> {
+            binding.text.setText("");
+        });
+
         return root;
     }
 
