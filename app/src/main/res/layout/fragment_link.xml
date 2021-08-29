@@ -6,17 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".ui.link.LinkFragment">
 
-    <TextView
-        android:id="@+id/text_link"
+    <EditText
+        android:id="@+id/text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
+        android:layout_height="200dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        android:hint="在此输入要分析实体的句子"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/ner_result" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/ner_result"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:chipSpacingHorizontal="0dp"
+        android:layout_margin="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/text" >
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

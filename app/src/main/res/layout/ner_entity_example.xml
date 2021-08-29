@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.chip.Chip
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ner_example"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:height="48dp"
+    android:backgroundTint="@color/teal_200"
+    app:chipCornerRadius="10dp"
+    app:chipEndPadding="2dp"
+    app:chipStartPadding="0dp" />
