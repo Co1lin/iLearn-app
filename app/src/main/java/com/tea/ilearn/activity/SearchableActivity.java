@@ -117,7 +117,7 @@ public class SearchableActivity extends AppCompatActivity {
                     ));
                 }
             } else {
-                // TODO empty hint
+                // TODO empty hint card (new a type of viewholder)
             }
         }
     }

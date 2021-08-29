@@ -120,7 +120,7 @@ public class ChatbotFragment extends Fragment {
             else {
                 errorReceived++;
                 if (errorReceived == expectedNum) {
-                    mMessageAdapter.add(new ChatMessage("系统错误，请稍后重试或联系客服。", 1));
+                    mMessageAdapter.add(new ChatMessage(Constant.EduKG.ERROR_MSG, 1));
                     mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
                 }
             }

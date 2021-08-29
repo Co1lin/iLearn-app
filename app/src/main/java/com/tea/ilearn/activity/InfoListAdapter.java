@@ -52,7 +52,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                     binding.collapseBox.setVisibility(View.VISIBLE);
                     if (!mloaded) {
                         StaticHandler handler = new StaticHandler(mRelationAdapter, mPropertyAdapter);
-                        EduKG.getInst().getEntityDetails(info.subject, binding.entityName.getText().toString(), handler); // TODO
+                        EduKG.getInst().getEntityDetails(info.subject, binding.entityName.getText().toString(), handler);
                         mloaded = true;
                         // TODO save to database
                     }
@@ -167,7 +167,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                     }
                 }
             } else {
-                // TODO
+                // TODO empty content in entity detail
             }
         }
     }
