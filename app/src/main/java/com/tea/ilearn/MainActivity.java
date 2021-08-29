@@ -1,14 +1,7 @@
 package com.tea.ilearn;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.SearchView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,9 +11,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.heaven7.android.dragflowlayout.ClickToDeleteItemListenerImpl;
-import com.heaven7.android.dragflowlayout.DragAdapter;
-import com.heaven7.android.dragflowlayout.DragFlowLayout;
 import com.tea.ilearn.databinding.ActivityMainBinding;
 import com.tea.ilearn.ui.chatbot.ChatbotFragment;
 import com.tea.ilearn.ui.exercise.ExerciseFragment;
@@ -30,17 +20,16 @@ import com.tea.ilearn.ui.me.MeFragment;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private SearchView searchView;
-    private LinearLayout searchBox;
-    private RadioButton searchButton;
-    private RadioGroup searchGroup;
+//    private SearchView searchView;
+//    private LinearLayout searchBox;
+//    private RadioButton searchButton;
+//    private RadioGroup searchGroup;
 
     private ViewPager2 viewPager;
     private FragmentStateAdapter pagerAdapter;
@@ -75,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
                 navView.getMenu().getItem(position).setChecked(true);
             }
         });
+
+        viewPager.setOffscreenPageLimit(6);
 
         navView.setOnNavigationItemSelectedListener(
                 item -> {
