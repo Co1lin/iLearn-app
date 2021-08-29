@@ -30,10 +30,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private SearchView searchView;
-    private LinearLayout searchBox;
-    private RadioButton searchButton;
-    private RadioGroup searchGroup;
+//    private SearchView searchView;
+//    private LinearLayout searchBox;
+//    private RadioButton searchButton;
+//    private RadioGroup searchGroup;
 
     private ViewPager2 viewPager;
     private FragmentStateAdapter pagerAdapter;
@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
                 navView.getMenu().getItem(position).setChecked(true);
             }
         });
+
+        viewPager.setOffscreenPageLimit(6);
 
         navView.setOnNavigationItemSelectedListener(
                 item -> {
