@@ -29,6 +29,8 @@ import com.tea.ilearn.ui.link.LinkFragment;
 import com.tea.ilearn.ui.me.MeFragment;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
         pagerAdapter = new ScreenSlidePagerAdapter(this, fragments);
         viewPager.setAdapter(pagerAdapter);
+        setDefaultView(2);
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -102,6 +105,11 @@ public class MainActivity extends AppCompatActivity {
             else
                 navView.setVisibility(View.VISIBLE);
         });
+    }
+
+    private void setDefaultView(int position) {
+        viewPager.setCurrentItem(position, false);
+        navView.getMenu().getItem(position).setChecked(true);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStateAdapter {

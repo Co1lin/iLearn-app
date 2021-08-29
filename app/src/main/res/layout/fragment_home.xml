@@ -6,6 +6,34 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
+    <per.goweii.actionbarex.common.ActionBarSearch
+        android:id="@+id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        app:ab_bottomLineColor="@color/actionbarex_line"
+        app:ab_bottomLineHeight="1dp"
+        app:ab_foregroundLayerLayout="@layout/loading_bar"
+        app:ab_immersion="unchanged"
+        app:ab_statusBarColor="@color/transparent"
+        app:ab_statusBarMode="unchanged"
+        app:ab_statusBarVisible="gone"
+        app:ab_titleBarHeight="48dp"
+        app:abs_leftIconColor="?colorPrimary"
+        app:abs_leftIconRes="@mipmap/back"
+        app:abs_rightIconColor="?colorPrimary"
+        app:abs_rightIconRes="@mipmap/search"
+        app:abs_titleBgRes="@drawable/search_bar_title_et_bg"
+        app:abs_titleHintColor="#aaaaaa"
+        app:abs_titleHintText="这是一个搜索框..."
+        app:abs_titleMarginVertical="8dp"
+        app:abs_titlePaddingHorizontal="16dp"
+        app:abs_titleTextColor="#232323"
+        app:abs_titleTextSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/bar_chart"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
     <com.tea.ilearn.utils.EchartsView
         android:id="@+id/bar_chart"
         android:layout_width="match_parent"
@@ -14,7 +42,7 @@
         app:layout_constraintBottom_toTopOf="@id/zoom_layout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/search_bar" />
 
     <com.otaliastudios.zoom.ZoomLayout
         android:layout_width="match_parent"
