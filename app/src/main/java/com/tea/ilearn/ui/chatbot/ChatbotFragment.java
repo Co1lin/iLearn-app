@@ -10,8 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,38 +20,38 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.Constant;
-import com.tea.ilearn.R;
+import com.tea.ilearn.databinding.FragmentChatbotBinding;
 import com.tea.ilearn.net.edukg.Answer;
 import com.tea.ilearn.net.edukg.EduKG;
 
 import java.util.ArrayList;
 
+import per.goweii.actionbarex.common.ActionBarSearch;
+
 public class ChatbotFragment extends Fragment {
     private RecyclerView mMessageRecycler;
     private MessageListAdapter mMessageAdapter;
-    private EditText editText;
-    private Button sendText;
+    private FragmentChatbotBinding binding;
+    private View root;
+    private ActionBarSearch bottomSendBar;
+    private AutoCompleteTextView editText;
+    private ImageView sendButton;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        // TODO: refactor
-        return inflater.inflate(R.layout.fragment_chatbot, container, false);
-    }
+        binding = FragmentChatbotBinding.inflate(inflater, container, false);
+        root = binding.getRoot();
+        bottomSendBar = binding.sendBar;
+        editText = bottomSendBar.getEditTextView();
+        sendButton = bottomSendBar.getRightIconView();
 
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        mMessageRecycler = getView().findViewById(R.id.recycler_chat);
+        mMessageRecycler = binding.recyclerChat;
         mMessageAdapter = new MessageListAdapter(getContext(), new ArrayList<>());
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         mMessageRecycler.setAdapter(mMessageAdapter);
 
-        editText = getView().findViewById(R.id.edit_chat_message);
-        sendText = getView().findViewById(R.id.button_chat_send);
-
-        sendText.setOnClickListener(mView -> {
+        bottomSendBar.setOnRightIconClickListener(mView -> {
             String msg = editText.getText().toString().trim();
             if (msg.length() == 0) {
                 Toast toast = Toast.makeText(getContext(), "请输入后再发送", Toast.LENGTH_SHORT);
@@ -62,7 +62,7 @@ public class ChatbotFragment extends Fragment {
                 mMessageAdapter.add(new ChatMessage(msg, 0));   // user sends a msg
                 if (msg.length() >= 4 &&
                         (msg.substring(0, 1).equals("[") && msg.substring(3, 4).equals("]") ||
-                         msg.substring(0, 1).equals("【") && msg.substring(3, 4).equals("】")) &&
+                                msg.substring(0, 1).equals("【") && msg.substring(3, 4).equals("】")) &&
                         Constant.EduKG.SUBJECTS.contains(msg.substring(1, 3))) {
                     // QA with the specific subject when matches [**]
                     EduKG.getInst().qAWithSubject(msg.substring(1, 3), msg.substring(4),
@@ -78,6 +78,8 @@ public class ChatbotFragment extends Fragment {
             InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(mView.getWindowToken(), 0);
         });
+
+        return root;
     }
 
     static class StaticHandler extends Handler {
