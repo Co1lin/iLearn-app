@@ -1,101 +1,87 @@
 package com.tea.ilearn.activity;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.tea.ilearn.R;
+import com.tea.ilearn.databinding.EntityCardBinding;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EntityDetail;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InfoListAdapter extends RecyclerView.Adapter {
 
     private class EntityHolder extends RecyclerView.ViewHolder {
-        TextView nameText, propertyText;
-        ImageView star, share; boolean mstar;
-        Context ctx;
-        LinearLayout collapseBox;
-        private RecyclerView mRelationRecycler;
-        private RelationListAdapter mRelationAdapter;
+        private EntityCardBinding binding;
+        boolean mloaded;
+        private RecyclerView mRelationRecycler, mPropertyRecycler;
+        private RelationListAdapter mRelationAdapter, mPropertyAdapter;
 
-        EntityHolder(View itemView) {
-            super(itemView);
-            nameText = itemView.findViewById(R.id.entity_name);
-            propertyText = itemView.findViewById(R.id.entity_property);
-            star = itemView.findViewById(R.id.star);
-            share = itemView.findViewById(R.id.share);
-            collapseBox = itemView.findViewById(R.id.collapse_box);
-            ctx = itemView.getContext();
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (collapseBox.getVisibility() == View.GONE) {
-                        collapseBox.setVisibility(View.VISIBLE);
-                        StaticHandler handler = new StaticHandler(mRelationAdapter);
-                        EduKG.getInst().getEntityDetails("chinese", nameText.getText().toString(), handler); // TODO
-                    }
-                    else {
-                        collapseBox.setVisibility(View.GONE);
-                    }
-                }
-            });
-            // TODO related exercise button event
-
-            mRelationRecycler = itemView.findViewById(R.id.relation_recycler);
-            mRelationAdapter = new RelationListAdapter(ctx, new ArrayList<Relation>());
-            mRelationRecycler.setLayoutManager(new LinearLayoutManager(ctx));
-            mRelationRecycler.setAdapter(mRelationAdapter);
+        EntityHolder(EntityCardBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
         void bind(Info info) {
-            nameText.setText(info.name);
-            mstar = info.star;
-
-            Drawable drawable;
-            if (!mstar) {
-                drawable = DrawableCompat.wrap(ctx.getDrawable(R.drawable.ic_favorite_border_24));
-            } else {
-                drawable = DrawableCompat.wrap(ctx.getDrawable(R.drawable.ic_favorite_filled_24));
+            binding.entityName.setText(info.name);
+            binding.entityCategory.setText(info.category);
+            binding.entitySubject.setText(info.subject);
+            mloaded = info.loaded;
+            if (mloaded) {
+//                 StaticHandler handler = new StaticHandler(mRelationAdapter, mPropertyAdapter);
+//                 Message.obtain(handler, 0, respObj).sendToTarget();
+//                 TODO load in local memory
             }
-            DrawableCompat.setTint(drawable, ContextCompat.getColor(ctx, R.color.teal_200));
-            star.setBackground(drawable);
-            star.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (mstar == false) {
-                        Drawable drawable = DrawableCompat.wrap(ctx.getDrawable(R.drawable.ic_favorite_filled_24));
-                        DrawableCompat.setTint(drawable, ContextCompat.getColor(ctx, R.color.teal_200));
-                        star.setBackground(drawable);
+            // TODO related exercise button event
+
+            binding.getRoot().setOnClickListener(view -> {
+                if (binding.collapseBox.getVisibility() == View.GONE) {
+                    binding.collapseBox.setVisibility(View.VISIBLE);
+                    if (!mloaded) {
+                        StaticHandler handler = new StaticHandler(mRelationAdapter, mPropertyAdapter);
+                        EduKG.getInst().getEntityDetails(info.subject, binding.entityName.getText().toString(), handler); // TODO
+                        mloaded = true;
+                        // TODO save to database
                     }
-                    else {
-                        Drawable drawable = DrawableCompat.wrap(ctx.getDrawable(R.drawable.ic_favorite_border_24));
-                        DrawableCompat.setTint(drawable, ContextCompat.getColor(ctx, R.color.teal_200));
-                        star.setBackground(drawable);
-                    }
-                    mstar = !mstar;
+                }
+                else if (binding.collapseBox.getVisibility() == View.VISIBLE) {
+                    binding.collapseBox.setVisibility(View.GONE);
                 }
             });
-            share.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // TODO share related sdk
-                }
+
+            mRelationRecycler = binding.relationRecycler;
+            mRelationAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
+            mRelationRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
+            mRelationRecycler.setAdapter(mRelationAdapter);
+            mPropertyRecycler = binding.propertyRecycler;
+            mPropertyAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
+            mPropertyRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
+            mPropertyRecycler.setAdapter(mPropertyAdapter);
+
+            binding.star.setChecked(info.star);
+            binding.star.setOnCheckedChangeListener((btn, star) -> {
+                // TODO save current "star" status in database
+            });
+
+            binding.share.setOnClickListener(view -> {
+                // TODO share related sdk
+            });
+
+            binding.relatedExercise.setOnClickListener(view -> {
+                // TODO related problem
             });
         }
     }
@@ -113,6 +99,15 @@ public class InfoListAdapter extends RecyclerView.Adapter {
         notifyItemInserted(mInfoList.size() - 1);
     }
 
+    public <U extends Comparable<? super U>> void applySortAndFilter(Function<? super Info, ? extends U> f, boolean reverse) {
+//                .filter(info -> info.category.equals("组成细胞的分子"))
+        Stream s = mInfoList.stream();
+        if (reverse) s = s.sorted(Comparator.comparing(f).reversed());
+        else s = s.sorted(Comparator.comparing(f));
+        mInfoList = (List<Info>) s.collect(Collectors.toList());
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return mInfoList.size();
@@ -124,14 +119,14 @@ public class InfoListAdapter extends RecyclerView.Adapter {
         return info.kd;
     }
 
-    // Inflates the appropriate layout according to the ViewType.
+    // Inflates the apriate layout according to the ViewType.
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
 
         if (viewType == 0) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.entity_card, parent, false);
-            return new EntityHolder(view);
+            EntityCardBinding binding = EntityCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new EntityHolder(binding);
         }
         return null;
     }
@@ -150,8 +145,10 @@ public class InfoListAdapter extends RecyclerView.Adapter {
 
     static class StaticHandler extends Handler {
         private RelationListAdapter mRelationAdapter;
+        private RelationListAdapter mPropertyAdapter;
 
-        StaticHandler(RelationListAdapter mRelationAdapter) {
+        StaticHandler(RelationListAdapter mRelationAdapter, RelationListAdapter mPropertyAdapter) {
+            this.mPropertyAdapter = mPropertyAdapter;
             this.mRelationAdapter = mRelationAdapter;
         }
 
@@ -162,11 +159,13 @@ public class InfoListAdapter extends RecyclerView.Adapter {
             if (detail != null) {
                 if (detail.getRelations() != null) {
                     for (EntityDetail.Relation r : detail.getRelations()) {
-                        mRelationAdapter.add(new Relation(r.getDirection(), r.getPredicateLabel(), r.getObjectLabel()));
+                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection()));
                     }
                 }
-                else {
-                    // TODO
+                if (detail.getProperties() != null) {
+                    for (EntityDetail.Property p : detail.getProperties()) {
+                        mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
+                    }
                 }
             } else {
                 // TODO

@@ -1,11 +1,14 @@
 package com.tea.ilearn;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +18,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.heaven7.android.dragflowlayout.ClickToDeleteItemListenerImpl;
+import com.heaven7.android.dragflowlayout.DragAdapter;
+import com.heaven7.android.dragflowlayout.DragFlowLayout;
 import com.tea.ilearn.databinding.ActivityMainBinding;
 import com.tea.ilearn.ui.chatbot.ChatbotFragment;
 import com.tea.ilearn.ui.exercise.ExerciseFragment;
@@ -23,7 +29,6 @@ import com.tea.ilearn.ui.link.LinkFragment;
 import com.tea.ilearn.ui.me.MeFragment;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,29 +125,6 @@ public class MainActivity extends AppCompatActivity {
             return fragments.size();
         }
     }
-        //navView.getMenu().getItem(2).setEnabled(false);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-//        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-//                R.id.navigation_home,
-//                R.id.navigation_chatbot,
-//                R.id.navigation_notifications,
-//                R.id.navigation_test
-//        ).build();
-//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-//        NavigationUI.setupWithNavController(binding.navView, navController);
-
-//        fab = binding.fab;
-//        bottomAppBar = binding.bottomAppBar;
-//        frame = findViewById(R.id.nav_host_fragment_activity_main);
-        //params = new CoordinatorLayout.LayoutParams(-1, -1);
-
-//        final ViewTreeObserver observer= fab.getViewTreeObserver();
-//        observer.addOnGlobalLayoutListener(() -> {
-//            params.setMargins(0, 0, 0, fab.getHeight());
-//            frame.setLayoutParams(params);
-//        });
 
 //        KeyboardVisibilityEvent.setEventListener(this, isOpen -> {
 //            if (isOpen) {
@@ -155,9 +137,7 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        // ==================================================================
-
-        //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+    //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 //        searchView = binding.searchView;
 //        searchBox = binding.searchBox;
 //        searchButton = binding.searchEntity;
