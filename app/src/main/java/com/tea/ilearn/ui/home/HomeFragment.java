@@ -127,7 +127,6 @@ public class HomeFragment extends Fragment {
                 R.id.ac_text, R.id.image_button_del, COUNTRIES,
                 acTextView);
         acTextView.setAdapter(historyAdapter);
-        //acTextView.setDropDownAlwaysVisible(true);
         acTextView.setDropDownAnchor(searchBar.getId());
         acTextView.setThreshold(1); // default 2, minimum 1
         acTextView.setOnFocusChangeListener((view, hasFocus) -> {
