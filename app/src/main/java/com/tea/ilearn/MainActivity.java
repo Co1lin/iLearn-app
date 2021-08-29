@@ -1,6 +1,7 @@
 package com.tea.ilearn;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -20,6 +21,8 @@ import com.tea.ilearn.ui.exercise.ExerciseFragment;
 import com.tea.ilearn.ui.home.HomeFragment;
 import com.tea.ilearn.ui.link.LinkFragment;
 import com.tea.ilearn.ui.me.MeFragment;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +90,13 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
         );
+
+        KeyboardVisibilityEvent.setEventListener(this, isOpen -> {
+            if (isOpen)
+                navView.setVisibility(View.GONE);
+            else
+                navView.setVisibility(View.VISIBLE);
+        });
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
