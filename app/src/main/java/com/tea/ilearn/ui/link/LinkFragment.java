@@ -107,6 +107,7 @@ public class LinkFragment extends Fragment {
                 }
             }
             else {
+                // TODO
                 Toast.makeText(chipGroup.getContext(), "API又炸啦哈哈哈哈哈真好用", Toast.LENGTH_LONG);
             }
         }
