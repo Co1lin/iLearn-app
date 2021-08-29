@@ -30,11 +30,11 @@
         android:id="@+id/actionbarex_common_et_title"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_toRightOf="@+id/actionbarex_common_ll_left"
+        android:layout_centerInParent="true"
         android:layout_toLeftOf="@+id/actionbarex_common_ll_right"
+        android:layout_toRightOf="@+id/actionbarex_common_ll_left"
         android:background="@null"
-        android:singleLine="true"
-        android:layout_centerInParent="true"/>
+        android:singleLine="true" />
 
     <LinearLayout
         android:id="@+id/actionbarex_common_ll_right"

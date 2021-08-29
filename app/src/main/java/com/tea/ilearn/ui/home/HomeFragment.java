@@ -1,7 +1,9 @@
 package com.tea.ilearn.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +12,6 @@ import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +21,8 @@ import com.github.abel533.echarts.code.X;
 import com.github.abel533.echarts.json.GsonOption;
 import com.github.abel533.echarts.series.Bar;
 import com.tea.ilearn.R;
+import com.tea.ilearn.activity.SearchableActivity;
+import com.tea.ilearn.databinding.FragmentHomeBinding;
 import com.tea.ilearn.utils.EchartsView;
 
 import dev.bandb.graphview.AbstractGraphAdapter;
@@ -28,23 +31,23 @@ import dev.bandb.graphview.graph.Node;
 import dev.bandb.graphview.layouts.layered.SugiyamaArrowEdgeDecoration;
 import dev.bandb.graphview.layouts.layered.SugiyamaConfiguration;
 import dev.bandb.graphview.layouts.layered.SugiyamaLayoutManager;
+import per.goweii.actionbarex.common.ActionBarSearch;
 
 public class HomeFragment extends Fragment {
     private EchartsView barChart;
     private RecyclerView graphView;
     private AbstractGraphAdapter adapter;
+    private FragmentHomeBinding binding;
+    private ActionBarSearch searchBar;
+    private View root;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_home, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        barChart = getView().findViewById(R.id.bar_chart);
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        root = binding.getRoot();
+        searchBar = binding.searchBar;
+        barChart = binding.barChart;
         barChart.setWebViewClient(new WebViewClient(){
             @Override
             public void onPageFinished(WebView view, String url) {
@@ -59,7 +62,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        graphView = getView().findViewById(R.id.graph_view);
+        graphView = binding.graphView;
 
         SugiyamaConfiguration configuration = new SugiyamaConfiguration.Builder()
                 .setNodeSeparation(100)
@@ -99,6 +102,25 @@ public class HomeFragment extends Fragment {
         };
         adapter.submitGraph(graph);
         graphView.setAdapter(adapter);
+
+        searchBar.setOnRightIconClickListener(view -> search());
+
+        searchBar.getEditTextView().setOnKeyListener((view, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                search();
+                return true;
+            }
+            return false;
+        });
+
+        return root;
+    }
+
+    void search() {
+        Intent intent = new Intent (root.getContext(), SearchableActivity.class);
+        intent.setAction(Intent.ACTION_SEARCH);
+        intent.putExtra("query", searchBar.getEditTextView().getText().toString());
+        root.getContext().startActivity(intent);
     }
 
     void refreshBarChart() {
