@@ -30,29 +30,18 @@
         app:abs_titlePaddingHorizontal="16dp"
         app:abs_titleTextColor="#232323"
         app:abs_titleTextSize="15sp"
-        app:layout_constraintBottom_toTopOf="@+id/bar_chart"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="0dp" />
-
-    <com.tea.ilearn.utils.EchartsView
-        android:id="@+id/bar_chart"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center"
-        app:layout_constraintBottom_toTopOf="@id/zoom_layout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_bar" />
 
     <com.otaliastudios.zoom.ZoomLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:hasClickableChildren="true"
         android:id="@+id/zoom_layout"
+        app:layout_constraintTop_toBottomOf="@id/search_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bar_chart" >
+        app:layout_constraintRight_toRightOf="parent" >
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/graph_view"
