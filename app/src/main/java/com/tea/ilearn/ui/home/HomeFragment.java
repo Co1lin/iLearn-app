@@ -7,19 +7,12 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.abel533.echarts.axis.CategoryAxis;
-import com.github.abel533.echarts.axis.ValueAxis;
-import com.github.abel533.echarts.code.X;
-import com.github.abel533.echarts.json.GsonOption;
-import com.github.abel533.echarts.series.Bar;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.SearchableActivity;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
@@ -47,20 +40,6 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         root = binding.getRoot();
         searchBar = binding.searchBar;
-        barChart = binding.barChart;
-        barChart.setWebViewClient(new WebViewClient(){
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                refreshBarChart();
-            }
-
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
-        });
 
         graphView = binding.graphView;
 
@@ -121,21 +100,6 @@ public class HomeFragment extends Fragment {
         intent.setAction(Intent.ACTION_SEARCH);
         intent.putExtra("query", searchBar.getEditTextView().getText().toString());
         root.getContext().startActivity(intent);
-    }
-
-    void refreshBarChart() {
-        GsonOption option = new GsonOption();
-        option.xAxis(new CategoryAxis().data("周一", "周二", "周三", "周四", "周五", "周六", "周日"));
-        option.yAxis(new ValueAxis());
-        option.title().text("本周学习点").x(X.center);
-
-        Bar bar = new Bar();
-        bar.itemStyle().normal().label().show(true).position("inside");
-        bar.data(120, 200, 150, 80, 70, 110, 130);
-
-        option.series(bar);
-
-        barChart.refreshEchartsWithOption(option);
     }
 
     private class NodeHolder extends RecyclerView.ViewHolder {
