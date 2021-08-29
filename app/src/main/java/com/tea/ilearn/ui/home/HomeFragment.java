@@ -23,7 +23,11 @@ import com.github.abel533.echarts.series.Bar;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.SearchableActivity;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
+import com.tea.ilearn.utils.ACAdapter;
 import com.tea.ilearn.utils.EchartsView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import dev.bandb.graphview.AbstractGraphAdapter;
 import dev.bandb.graphview.graph.Graph;
@@ -32,6 +36,7 @@ import dev.bandb.graphview.layouts.layered.SugiyamaArrowEdgeDecoration;
 import dev.bandb.graphview.layouts.layered.SugiyamaConfiguration;
 import dev.bandb.graphview.layouts.layered.SugiyamaLayoutManager;
 import per.goweii.actionbarex.common.ActionBarSearch;
+import per.goweii.actionbarex.common.AutoComplTextView;
 
 public class HomeFragment extends Fragment {
     private EchartsView barChart;
@@ -39,6 +44,8 @@ public class HomeFragment extends Fragment {
     private AbstractGraphAdapter adapter;
     private FragmentHomeBinding binding;
     private ActionBarSearch searchBar;
+    private AutoComplTextView acTextView;
+    private View loadingBar;
     private View root;
 
     @Override
@@ -47,6 +54,8 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         root = binding.getRoot();
         searchBar = binding.searchBar;
+        loadingBar = searchBar.getForegroundLayer();
+        acTextView = searchBar.getEditTextView();
         barChart = binding.barChart;
         barChart.setWebViewClient(new WebViewClient(){
             @Override
@@ -102,28 +111,45 @@ public class HomeFragment extends Fragment {
         };
         adapter.submitGraph(graph);
         graphView.setAdapter(adapter);
-
         searchBar.setOnRightIconClickListener(view -> search());
-
+        // bind enter key
         searchBar.getEditTextView().setOnKeyListener((view, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
                 search();
                 return true;
             }
             return false;
         });
+        // auto completion
+        ArrayList<String> COUNTRIES = new ArrayList<>(Arrays.asList("Belgium", "France", "Italy", "Germany", "Spain", "Sp11", "Sp22"));
+        ACAdapter<String> historyAdapter = new ACAdapter<>(
+                getContext(), R.layout.autocompletion_item,
+                R.id.ac_text, R.id.image_button_del, COUNTRIES,
+                acTextView);
+        acTextView.setAdapter(historyAdapter);
+        //acTextView.setDropDownAlwaysVisible(true);
+        acTextView.setDropDownAnchor(searchBar.getId());
+        acTextView.setThreshold(1); // default 2, minimum 1
+        acTextView.setOnFocusChangeListener((view, hasFocus) -> {
+            AutoComplTextView acTView = (AutoComplTextView) view;
+            if (hasFocus)
+                acTView.showDropDown();
+        });
 
         return root;
     }
 
-    void search() {
+    private void search() {
         Intent intent = new Intent (root.getContext(), SearchableActivity.class);
         intent.setAction(Intent.ACTION_SEARCH);
         intent.putExtra("query", searchBar.getEditTextView().getText().toString());
         root.getContext().startActivity(intent);
+        loadingBar.setVisibility(View.VISIBLE);
+        // TODO colin: invisible after expected num of msg are received
+        // TODO colin: invisible after return to the home view
     }
 
-    void refreshBarChart() {
+    private void refreshBarChart() {
         GsonOption option = new GsonOption();
         option.xAxis(new CategoryAxis().data("周一", "周二", "周三", "周四", "周五", "周六", "周日"));
         option.yAxis(new ValueAxis());

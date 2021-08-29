@@ -6,11 +6,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -27,6 +27,7 @@ import com.tea.ilearn.net.edukg.EduKG;
 import java.util.ArrayList;
 
 import per.goweii.actionbarex.common.ActionBarSearch;
+import per.goweii.actionbarex.common.AutoComplTextView;
 
 public class ChatbotFragment extends Fragment {
     private RecyclerView mMessageRecycler;
@@ -34,7 +35,7 @@ public class ChatbotFragment extends Fragment {
     private FragmentChatbotBinding binding;
     private View root;
     private ActionBarSearch bottomSendBar;
-    private AutoCompleteTextView editText;
+    private AutoComplTextView editText;
     private ImageView sendButton;
 
     @Override
@@ -51,35 +52,44 @@ public class ChatbotFragment extends Fragment {
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         mMessageRecycler.setAdapter(mMessageAdapter);
 
-        bottomSendBar.setOnRightIconClickListener(mView -> {
-            String msg = editText.getText().toString().trim();
-            if (msg.length() == 0) {
-                Toast toast = Toast.makeText(getContext(), "请输入后再发送", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
+        bottomSendBar.setOnRightIconClickListener(view -> sendMessage(view));
+        bottomSendBar.getEditTextView().setOnKeyListener((view, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
+                sendMessage(view);
+                return true;
             }
-            else {
-                mMessageAdapter.add(new ChatMessage(msg, 0));   // user sends a msg
-                if (msg.length() >= 4 &&
-                        (msg.substring(0, 1).equals("[") && msg.substring(3, 4).equals("]") ||
-                                msg.substring(0, 1).equals("【") && msg.substring(3, 4).equals("】")) &&
-                        Constant.EduKG.SUBJECTS.contains(msg.substring(1, 3))) {
-                    // QA with the specific subject when matches [**]
-                    EduKG.getInst().qAWithSubject(msg.substring(1, 3), msg.substring(4),
-                            new StaticHandler(mMessageAdapter, 1, mMessageRecycler));
-                }
-                else {
-                    EduKG.getInst().qAWithAllSubjects(msg,
-                            new StaticHandler(mMessageAdapter, Constant.EduKG.SUBJECTS.size(), mMessageRecycler));
-                }
-                editText.setText("");
-                mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
-            }
-            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(mView.getWindowToken(), 0);
+            return false;
         });
 
         return root;
+    }
+
+    private void sendMessage(View view) {
+        String msg = editText.getText().toString().trim();
+        if (msg.length() == 0) {
+            Toast toast = Toast.makeText(getContext(), "请输入后再发送", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+        else {
+            mMessageAdapter.add(new ChatMessage(msg, 0));   // user sends a msg
+            if (msg.length() >= 4 &&
+                    (msg.substring(0, 1).equals("[") && msg.substring(3, 4).equals("]") ||
+                            msg.substring(0, 1).equals("【") && msg.substring(3, 4).equals("】")) &&
+                    Constant.EduKG.SUBJECTS.contains(msg.substring(1, 3))) {
+                // QA with the specific subject when matches [**]
+                EduKG.getInst().qAWithSubject(msg.substring(1, 3), msg.substring(4),
+                        new StaticHandler(mMessageAdapter, 1, mMessageRecycler));
+            }
+            else {
+                EduKG.getInst().qAWithAllSubjects(msg,
+                        new StaticHandler(mMessageAdapter, Constant.EduKG.SUBJECTS.size(), mMessageRecycler));
+            }
+            editText.setText("");
+            mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        }
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     static class StaticHandler extends Handler {

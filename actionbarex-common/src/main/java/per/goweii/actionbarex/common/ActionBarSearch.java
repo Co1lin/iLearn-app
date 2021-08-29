@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -16,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import per.goweii.actionbarex.ActionBarEx;
-
 /**
  * @author Cuizhen
  * @date 2018/8/30-上午11:10
@@ -51,7 +49,7 @@ public final class ActionBarSearch extends ActionBarEx {
 
     private ImageView leftIconView;
     private TextView leftTextView;
-    private AutoCompleteTextView titleEditText;
+    private AutoComplTextView titleEditText;
     private TextView rightTextView;
     private ImageView rightIconView;
 
@@ -75,7 +73,7 @@ public final class ActionBarSearch extends ActionBarEx {
         return leftTextView;
     }
 
-    public AutoCompleteTextView getEditTextView() {
+    public AutoComplTextView getEditTextView() {
         return titleEditText;
     }
 
