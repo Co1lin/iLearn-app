@@ -11,9 +11,9 @@ public class LinkResults {
         @SerializedName("entity_url")
         String entityUri;
         @SerializedName("start_index")
-        String startIndex;
+        Integer startIndex;
         @SerializedName("end_index")
-        String endIndex;
+        Integer endIndex;
         String entity;
 
         public String getEntityType() {
@@ -24,11 +24,11 @@ public class LinkResults {
             return entityUri;
         }
 
-        public String getStartIndex() {
+        public Integer getStartIndex() {
             return startIndex;
         }
 
-        public String getEndIndex() {
+        public Integer getEndIndex() {
             return endIndex;
         }
 
