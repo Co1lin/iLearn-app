@@ -7,7 +7,8 @@ public class Problem {
     String answer;
     int id;
     @SerializedName("qBody")
-    String raw;
+    String raw = "";
+    boolean drop = false;
 
     String description;
     String[] choices;
@@ -25,31 +26,37 @@ public class Problem {
     }
 
     private void parse() {
-        String[] regexes = new String[]{
-                "A[.．]", "B[.．]", "C[.．]", "D[.．]",
-        };
-        String remained;
-        String[] res;
-        res = raw.split(regexes[0]);    // "A."
-        description = res[0];
-        remained = res[1];
-        choices = new String[4];
-        for (int i = 1; i < 4; i++) {
-            res = remained.split(regexes[i]);
-            choices[i - 1] = res[0];
+        try {
+            String[] regexes = new String[]{
+                    "A[.．]", "B[.．]", "C[.．]", "D[.．]",
+            };
+            String remained;
+            String[] res;
+            res = raw.split(regexes[0]);    // "A.津津乐道发 B. 基分散的交流放大是 C圣诞快乐防守打法D"
+            description = res[0];
             remained = res[1];
+            choices = new String[4];
+            for (int i = 1; i < 4; i++) {
+                res = remained.split(regexes[i]);
+                choices[i - 1] = res[0];
+                remained = res[1];
+            }
+            choices[3] = remained;
+        } catch (Exception e) {
+            drop = true;
+            description = null;
+            choices = null;
         }
-        choices[3] = remained;
     }
 
     public String getDescription() {
-        if (description == null)
+        if (description == null && !drop)
             parse();
         return description;
     }
 
     public String[] getChoices() {
-        if (choices == null)
+        if (choices == null && !drop)
             parse();
         return choices;
     }
