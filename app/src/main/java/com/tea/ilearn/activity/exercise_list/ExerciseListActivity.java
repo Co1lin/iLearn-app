@@ -53,9 +53,15 @@ public class ExerciseListActivity extends AppCompatActivity {
             List<Problem> problems = (List<Problem>) msg.obj;
             if (problems != null) {
                 List<ExerciseFragment> fragments = new ArrayList<>();
-                for (Problem p : problems) {
-                    ExerciseFragment fragment = new ExerciseFragment();
-                    fragment.bind(p.getDescription(), p.getChoices());
+                int i = 0;
+                for (Problem p : problems) { // TODO these code is slow, acceleration is needed
+                    i += 1;
+                    ExerciseFragment fragment = new ExerciseFragment(
+                            i+"/"+problems.size(),
+                            p.getDescription(),
+                            p.getChoices(),
+                            p.getAnswer()
+                    );
                     fragments.add(fragment);
                 }
                 ExerciseListAdapter mExerciseAdapter = new ExerciseListAdapter(fm, fragments);
