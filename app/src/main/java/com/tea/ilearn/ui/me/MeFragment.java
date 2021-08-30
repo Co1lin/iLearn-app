@@ -1,5 +1,6 @@
 package com.tea.ilearn.ui.me;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.github.abel533.echarts.axis.ValueAxis;
 import com.github.abel533.echarts.code.X;
 import com.github.abel533.echarts.json.GsonOption;
 import com.github.abel533.echarts.series.Bar;
+import com.tea.ilearn.activity.signin.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 
 public class MeFragment extends Fragment {
@@ -26,6 +28,11 @@ public class MeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentMeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        binding.profile.setOnClickListener($ -> {
+            Intent intent = new Intent(root.getContext(), SigninActivity.class);
+            root.getContext().startActivity(intent);
+        });
 
         binding.darkModeSwitch.setOnCheckedChangeListener((view, isChecked) -> {
             if (isChecked) {
