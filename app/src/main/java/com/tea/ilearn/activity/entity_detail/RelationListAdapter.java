@@ -32,13 +32,12 @@ public class RelationListAdapter extends RecyclerView.Adapter {
                 binding.direction.setBackgroundResource(R.drawable.ic_baseline_arrow_forward_ios_24);
             }
 
-            binding.getRoot().setOnLongClickListener(view -> {
+            binding.getRoot().setOnClickListener(view -> {
                 // TODO
 //                Intent intent = new Intent (binding.getRoot().getContext(), EntityDetailActivity.class);
 //                intent.setAction(Intent.ACTION_SEARCH);
 //                intent.putExtra("name", relation.name);
 //                binding.getRoot().getContext().startActivity(intent);
-                return true;
             });
         }
     }

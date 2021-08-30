@@ -29,15 +29,18 @@ public class EntityDetailActivity extends AppCompatActivity {
         binding = ActivityEntityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        mPropertyRecycler = binding.propertyRecycler;
+        mPropertyAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
+        mPropertyRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
+        mPropertyRecycler.setAdapter(mPropertyAdapter);
+
         mRelationRecycler = binding.relationRecycler;
         mRelationAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
         mRelationRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
         mRelationRecycler.setAdapter(mRelationAdapter);
 
-        mPropertyRecycler = binding.propertyRecycler;
-        mPropertyAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
-        mPropertyRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
-        mPropertyRecycler.setAdapter(mPropertyAdapter);
+        mPropertyRecycler.setNestedScrollingEnabled(false);
+        mRelationRecycler.setNestedScrollingEnabled(false);
 
         binding.hide.setOnClickListener($ -> {
             finish();
@@ -82,8 +85,8 @@ public class EntityDetailActivity extends AppCompatActivity {
 
         StaticHandler(TextView entityDescription, RelationListAdapter mRelationAdapter, RelationListAdapter mPropertyAdapter) {
             this.entityDescription = entityDescription;
-            this.mPropertyAdapter = mPropertyAdapter;
             this.mRelationAdapter = mRelationAdapter;
+            this.mPropertyAdapter = mPropertyAdapter;
         }
 
         @Override
