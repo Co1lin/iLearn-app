@@ -16,8 +16,16 @@ public class Constant {
         public static final String POLITICS     = "politics";
         public static final ArrayList<String> SUBJECTS = new ArrayList<>(
                 Arrays.asList(
-                        CHINESE, ENGLISH, MATH, PHYSICS,
-                        CHEMISTRY, BIOLOGY, HISTORY, GEO, POLITICS
+                        CHINESE, MATH, ENGLISH,
+                        PHYSICS, CHEMISTRY, BIOLOGY,
+                        HISTORY, GEO, POLITICS
+                )
+        );
+        public static final ArrayList<String> SUBJECTS_ZH = new ArrayList<>(
+                Arrays.asList(
+                        "语文", "数学", "英语",
+                        "物理", "化学", "生物",
+                        "历史", "地理", "政治"
                 )
         );
 

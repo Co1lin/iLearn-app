@@ -1,6 +1,7 @@
 package com.tea.ilearn.ui.link;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,6 +20,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
+import com.tea.ilearn.activity.entity_detail.EntityDetailActivity;
 import com.tea.ilearn.databinding.FragmentLinkBinding;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.LinkResults;
@@ -48,7 +50,7 @@ public class LinkFragment extends Fragment {
             binding.nerResult.removeAllViews();
         });
 
-        binding.courseSpinner.attachDataSource(Constant.EduKG.SUBJECTS);
+        binding.courseSpinner.attachDataSource(Constant.EduKG.SUBJECTS_ZH);
         binding.courseSpinner.setOnSpinnerItemSelectedListener((parent, view, position, id) -> {
             doNER();
         });
@@ -62,18 +64,20 @@ public class LinkFragment extends Fragment {
 
     private void doNER() {
         String text = binding.text.getText().toString();
-        StaticHandler handler = new StaticHandler(binding.nerResult, text);
-        EduKG.getInst().getNamedEntities((String)binding.courseSpinner.getSelectedItem(), text, handler);
+        String subject = Constant.EduKG.SUBJECTS.get(binding.courseSpinner.getSelectedIndex());
+        StaticHandler handler = new StaticHandler(binding.nerResult, text, subject);
+        EduKG.getInst().getNamedEntities(subject, text, handler);
     }
 
     static class StaticHandler extends Handler {
         private ChipGroup chipGroup;
-        private String origin;
+        private String origin, subject;
 
-        public StaticHandler(ChipGroup chipGroup, String origin) {
+        public StaticHandler(ChipGroup chipGroup, String origin, String subject) {
             super();
             this.chipGroup = chipGroup;
             this.origin = origin;
+            this.subject = subject;
         }
 
         /**
@@ -95,7 +99,15 @@ public class LinkFragment extends Fragment {
                     }
                     Chip ch = (Chip)LayoutInflater.from(chipGroup.getContext()).inflate(R.layout.ner_entity_example, null);
                     ch.setText(origin.substring(e.getStartIndex(), e.getEndIndex()+1));
-                    // TODO ch onclick listener
+                    ch.setOnClickListener($ -> {
+                        Intent intent = new Intent(chipGroup.getContext(), EntityDetailActivity.class);
+                        intent.setAction(Intent.ACTION_SEARCH);
+                        intent.putExtra("name", e.getEntity());
+                        intent.putExtra("id", e.getEntityUri());
+                        intent.putExtra("subject", subject);
+                        intent.putExtra("category", e.getEntityType());
+                        chipGroup.getContext().startActivity(intent);
+                    });
                     chipGroup.addView(ch);
                     cursor = e.getEndIndex() + 1;
                 }
