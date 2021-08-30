@@ -89,4 +89,7 @@ dependencies {
     implementation project(':actionbarex')
     implementation project(':actionbarex-common')
     implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
+
+    // bubble tooltip hint
+    implementation 'com.github.florent37:viewtooltip:1.0.4'
 }
