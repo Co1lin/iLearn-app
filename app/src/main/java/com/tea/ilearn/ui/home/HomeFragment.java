@@ -3,6 +3,7 @@ package com.tea.ilearn.ui.home;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.ReentrantLock;
 
 import per.goweii.actionbarex.common.ActionBarSearch;
 import per.goweii.actionbarex.common.AutoComplTextView;
@@ -39,8 +39,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView mInfoRecycler;
     private InfoListAdapter mInfoAdapter;
 
-    static final ReentrantLock reentrantLock = new ReentrantLock();
-    static volatile CountDownLatch searchNumLatch;
+    private CountDownLatch searchSubjectNum = new CountDownLatch(0);
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -83,14 +82,13 @@ public class HomeFragment extends Fragment {
                 binding.sortNameUp.setVisibility(View.INVISIBLE);
                 binding.sortNameDown.setVisibility(View.VISIBLE);
                 mInfoAdapter.applySortAndFilter(Info::getName, true);
-                mInfoRecycler.scrollToPosition(0);
             }
             else {
                 binding.sortNameUp.setVisibility(View.VISIBLE);
                 binding.sortNameDown.setVisibility(View.INVISIBLE);
                 mInfoAdapter.applySortAndFilter(Info::getName, false);
-                mInfoRecycler.scrollToPosition(0);
             }
+            mInfoRecycler.scrollToPosition(0);
         });
 
         binding.sortCategory.setOnClickListener(view -> {
@@ -100,14 +98,13 @@ public class HomeFragment extends Fragment {
                 binding.sortCategoryUp.setVisibility(View.INVISIBLE);
                 binding.sortCategoryDown.setVisibility(View.VISIBLE);
                 mInfoAdapter.applySortAndFilter(Info::getCategory, true);
-                mInfoRecycler.scrollToPosition(0);
             }
             else {
                 binding.sortCategoryUp.setVisibility(View.VISIBLE);
                 binding.sortCategoryDown.setVisibility(View.INVISIBLE);
                 mInfoAdapter.applySortAndFilter(Info::getCategory, false);
-                mInfoRecycler.scrollToPosition(0);
             }
+            mInfoRecycler.scrollToPosition(0);
         });
 
         mInfoRecycler = binding.infoRecycler;
@@ -119,7 +116,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void search() {
-        if (reentrantLock.tryLock()) {
+        if (searchSubjectNum.getCount() == 0) {
             String query = searchBar.getEditTextView().getText().toString();
             loadingBar.setVisibility(View.VISIBLE);
             mInfoAdapter.clear();
@@ -128,35 +125,36 @@ public class HomeFragment extends Fragment {
             binding.sortNameUp.setVisibility(View.VISIBLE);
             binding.sortNameDown.setVisibility(View.VISIBLE);
             List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
-            searchNumLatch = new CountDownLatch(subjects.size());
+            searchSubjectNum = new CountDownLatch(subjects.size());
             for (String sub : subjects) {
-                StaticHandler handler = new StaticHandler(mInfoAdapter, sub);
+                StaticHandler handler = new StaticHandler(
+                        mInfoAdapter, sub, searchSubjectNum, loadingBar);
                 EduKG.getInst().fuzzySearchEntityWithCourse(sub, query, handler);
             }
-//            try { // TODO why this stuck handler thread?
-//                searchNumLatch.await(); // TODO set timeout
-//                loadingBar.setVisibility(View.INVISIBLE);
-//            } catch (InterruptedException e) {
-//                // TODO deal with timeout (when network unaccessable)
-//            }
-        } else {
-            // TODO 点击过于频繁提示
         }
     }
 
     static class StaticHandler extends Handler {
         private InfoListAdapter mInfoAdapter;
+        private View loadingBar;
         private String subject;
+        private CountDownLatch expectedNum;
 
-        StaticHandler(InfoListAdapter mInfoAdapter, String subject) {
+        StaticHandler(InfoListAdapter mInfoAdapter, String subject,
+                      CountDownLatch _latch, View _loadingBar) {
             this.mInfoAdapter = mInfoAdapter;
             this.subject = subject;
+            this.expectedNum = _latch;
+            this.loadingBar = _loadingBar;
         }
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-            searchNumLatch.countDown();
             super.handleMessage(msg);
+            Log.i("HomeFragment/handleMessage", "msg.what: " + msg.what);
+            this.expectedNum.countDown();
+            if (this.expectedNum.getCount() == 0)
+                loadingBar.setVisibility(View.INVISIBLE);
             List<Entity> entities = (List<Entity>) msg.obj;
             if (entities != null) {
                 for (Entity e : entities) {
