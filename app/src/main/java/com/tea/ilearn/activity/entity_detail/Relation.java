@@ -1,4 +1,4 @@
-package com.tea.ilearn.activity;
+package com.tea.ilearn.activity.entity_detail;
 
 public class Relation {
 
