@@ -13,10 +13,16 @@ import com.tea.ilearn.databinding.ExerciseCardBinding;
 
 public class ExerciseFragment extends Fragment {
     private ExerciseCardBinding binding;
+    private String description;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ExerciseCardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        binding.description.setText(description);
         return root;
+    }
+
+    public void bind(String description, String[] Choices) {
+        this.description = description;
     }
 }

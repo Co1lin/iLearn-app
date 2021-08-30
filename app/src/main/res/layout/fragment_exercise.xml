@@ -7,4 +7,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.exercise.ExerciseFragment">
 
+    <Button
+        android:id="@+id/temp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="蛋白质套题" />
 </androidx.constraintlayout.widget.ConstraintLayout>

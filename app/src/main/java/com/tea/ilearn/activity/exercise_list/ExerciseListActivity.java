@@ -52,19 +52,16 @@ public class ExerciseListActivity extends AppCompatActivity {
             super.handleMessage(msg);
             List<Problem> problems = (List<Problem>) msg.obj;
             if (problems != null) {
-                ExerciseListAdapter mExerciseAdapter = new ExerciseListAdapter(fm, new ArrayList<ExerciseFragment>());
+                List<ExerciseFragment> fragments = new ArrayList<>();
+                for (Problem p : problems) {
+                    ExerciseFragment fragment = new ExerciseFragment();
+                    fragment.bind(p.getDescription(), p.getChoices());
+                    fragments.add(fragment);
+                }
+                ExerciseListAdapter mExerciseAdapter = new ExerciseListAdapter(fm, fragments);
+                vp.setOffscreenPageLimit(fragments.size());
+                vp.setPageMargin(10);
                 vp.setAdapter(mExerciseAdapter);
-
-//                for (Problem p : problems) {
-//                    mExerciseAdapter.add(new Info(
-//                            0,
-//                            p.getDescription(),
-//                            subject,
-//                            false, // TODO from database
-//                            false, // TODO from database
-//                            String.valueOf(p.getId())
-//                    ));
-//                }
             } else {
                 // TODO empty hint (may be a new type of viewholder)
             }

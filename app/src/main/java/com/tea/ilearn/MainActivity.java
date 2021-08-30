@@ -31,17 +31,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-//    private SearchView searchView;
-//    private LinearLayout searchBox;
-//    private RadioButton searchButton;
-//    private RadioGroup searchGroup;
-
     private ViewPager2 viewPager;
     private FragmentStateAdapter pagerAdapter;
     private BottomNavigationView navView;
-
-    //View fab, bottomAppBar, frame;
-    //CoordinatorLayout.LayoutParams params;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,28 +64,26 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager.setOffscreenPageLimit(6);
 
-        navView.setOnNavigationItemSelectedListener(
-                item -> {
-                    switch (item.getItemId()) {
-                        case(R.id.navigation_exercise):
-                            viewPager.setCurrentItem(0, true);
-                            break;
-                        case(R.id.navigation_chatbot):
-                            viewPager.setCurrentItem(1, true);
-                            break;
-                        case(R.id.navigation_home):
-                            viewPager.setCurrentItem(2, true);
-                            break;
-                        case(R.id.navigation_link):
-                            viewPager.setCurrentItem(3, true);
-                            break;
-                        case(R.id.navigation_me):
-                            viewPager.setCurrentItem(4, true);
-                            break;
-                    }
-                    return true;
-                }
-        );
+        navView.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case(R.id.navigation_exercise):
+                    viewPager.setCurrentItem(0, true);
+                    break;
+                case(R.id.navigation_chatbot):
+                    viewPager.setCurrentItem(1, true);
+                    break;
+                case(R.id.navigation_home):
+                    viewPager.setCurrentItem(2, true);
+                    break;
+                case(R.id.navigation_link):
+                    viewPager.setCurrentItem(3, true);
+                    break;
+                case(R.id.navigation_me):
+                    viewPager.setCurrentItem(4, true);
+                    break;
+            }
+            return true;
+        });
 
         KeyboardVisibilityEvent.setEventListener(this, isOpen -> {
             if (isOpen)
