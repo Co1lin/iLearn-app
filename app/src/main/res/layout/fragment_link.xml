@@ -48,6 +48,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <ScrollView
+        android:id="@+id/result_box"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="16dp"
@@ -61,7 +62,6 @@
             android:layout_height="wrap_content"
             app:chipSpacingHorizontal="0dp" />
     </ScrollView>
-
 
     <ImageButton
         android:id="@+id/clear_button"
