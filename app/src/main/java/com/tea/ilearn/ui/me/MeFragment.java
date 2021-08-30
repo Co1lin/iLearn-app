@@ -18,7 +18,7 @@ import com.github.abel533.echarts.axis.ValueAxis;
 import com.github.abel533.echarts.code.X;
 import com.github.abel533.echarts.json.GsonOption;
 import com.github.abel533.echarts.series.Bar;
-import com.tea.ilearn.activity.signin.SigninActivity;
+import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 
 public class MeFragment extends Fragment {

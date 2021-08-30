@@ -6,7 +6,7 @@
     android:padding="32dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.signup.SignupActivity">
+    tools:context=".activity.account.SignupActivity">
 
     <LinearLayout
         android:orientation="vertical"

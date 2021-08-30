@@ -1,4 +1,4 @@
-package com.tea.ilearn.activity.signup;
+package com.tea.ilearn.activity.account;
 
 import android.os.Bundle;
 import android.view.View;
@@ -33,7 +33,9 @@ public class SignupActivity extends AppCompatActivity {
             }
             // TODO database
         });
-        binding.agree.setOnCheckedChangeListener((btn, checked) -> {
-        });
+
+//        TODO ?
+//        binding.serviceTerm.setOnClickListener($->{});
+//        binding.privacyPolicy.setOnClickListener($->{});
     }
 }
