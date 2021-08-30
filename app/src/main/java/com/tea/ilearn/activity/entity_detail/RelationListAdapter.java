@@ -69,6 +69,10 @@ public class RelationListAdapter extends RecyclerView.Adapter {
         notifyItemInserted(mRelationList.size() - 1);
     }
 
+    public void clear() {
+        mRelationList.clear();
+    }
+
     @Override
     public int getItemCount() {
         return mRelationList.size();

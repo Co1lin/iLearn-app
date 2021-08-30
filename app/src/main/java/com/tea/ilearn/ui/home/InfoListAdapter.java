@@ -6,16 +6,18 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.tea.ilearn.databinding.EntityCardBinding;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EntityDetail;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
@@ -27,8 +29,6 @@ public class InfoListAdapter extends RecyclerView.Adapter {
     private class EntityHolder extends RecyclerView.ViewHolder {
         private EntityCardBinding binding;
         boolean mloaded;
-        private RecyclerView mRelationRecycler, mPropertyRecycler;
-        private RelationListAdapter mRelationAdapter, mPropertyAdapter;
 
         EntityHolder(EntityCardBinding binding) {
             super(binding.getRoot());
@@ -41,55 +41,55 @@ public class InfoListAdapter extends RecyclerView.Adapter {
             binding.entitySubject.setText(info.subject);
             mloaded = info.loaded;
             if (mloaded) {
-//                 StaticHandler handler = new StaticHandler(mRelationAdapter, mPropertyAdapter);
-//                 Message.obtain(handler, 0, respObj).sendToTarget();
-//                 TODO load in local memory
+                // TODO mark as different color
             }
-            // TODO related exercise button event
+//            binding.star.setChecked(info.star); // TODO resume may change this
 
             binding.getRoot().setOnClickListener(view -> {
-                if (binding.collapseBox.getVisibility() == View.GONE) {
-                    binding.collapseBox.setVisibility(View.VISIBLE);
-                    if (!mloaded) {
-                        StaticHandler handler = new StaticHandler(mRelationAdapter, mPropertyAdapter);
-                        EduKG.getInst().getEntityDetails(info.subject, binding.entityName.getText().toString(), handler);
-                        mloaded = true;
-                        // TODO save to database
-                    }
+                mRelationAdapter.clear();
+                mPropertyAdapter.clear();
+                detailPage.setVisibility(View.VISIBLE);
+                if (!mloaded) {
+                    star.setChecked(false);
+                    StaticHandler handler = new StaticHandler(mRelationAdapter, mPropertyAdapter);
+                    EduKG.getInst().getEntityDetails(info.subject, binding.entityName.getText().toString(), handler);
+                    mloaded = true;
+                    // TODO mark as different color
+                    // TODO save to database
                 }
-                else if (binding.collapseBox.getVisibility() == View.VISIBLE) {
-                    binding.collapseBox.setVisibility(View.GONE);
+                else {
+                    // TODO load from database (star, properties, relations)
                 }
+                star.setOnCheckedChangeListener((btn, checked) -> {
+                    binding.star.setChecked(checked);
+                    // TODO save current "star" status in database (related to current entity)
+                });
+                share.setOnClickListener($ -> {
+                    // TODO share related sdk (related to current entity)
+                });
+                relatedExercise.setOnClickListener($ -> {
+                    // TODO related problem (related to current entity)
+                });
             });
 
-            mRelationRecycler = binding.relationRecycler;
-            mRelationAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
-            mRelationRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
-            mRelationRecycler.setAdapter(mRelationAdapter);
-            mPropertyRecycler = binding.propertyRecycler;
-            mPropertyAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
-            mPropertyRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
-            mPropertyRecycler.setAdapter(mPropertyAdapter);
-
-            binding.star.setChecked(info.star);
-            binding.star.setOnCheckedChangeListener((btn, star) -> {
-                // TODO save current "star" status in database
-            });
-
-            binding.share.setOnClickListener(view -> {
-                // TODO share related sdk
-            });
-
-            binding.relatedExercise.setOnClickListener(view -> {
-                // TODO related problem
-            });
         }
     }
 
     private List<Info> mInfoList;
+    private MaterialCardView detailPage;
+    private CheckBox star;
+    private ImageButton share;
+    private MaterialButton relatedExercise;
+    private RelationListAdapter mRelationAdapter, mPropertyAdapter;
 
-    public InfoListAdapter(Context context, List<Info> infoList) {
+    public InfoListAdapter(Context context, List<Info> infoList, MaterialCardView detailPage, CheckBox star, ImageButton share, MaterialButton relatedExercise, RelationListAdapter mRelationAdapter, RelationListAdapter mPropertyAdapter) {
         mInfoList = infoList;
+        this.detailPage = detailPage;
+        this.star = star;
+        this.share = share;
+        this.relatedExercise = relatedExercise;
+        this.mRelationAdapter = mRelationAdapter;
+        this.mPropertyAdapter = mPropertyAdapter;
     }
 
     public void add(Info info) {
