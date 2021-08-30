@@ -33,7 +33,7 @@ public class RelationListAdapter extends RecyclerView.Adapter {
             }
 
             binding.getRoot().setOnClickListener(view -> {
-                // TODO
+                // TODO how to get category and subject info?
 //                Intent intent = new Intent (binding.getRoot().getContext(), EntityDetailActivity.class);
 //                intent.setAction(Intent.ACTION_SEARCH);
 //                intent.putExtra("name", relation.name);

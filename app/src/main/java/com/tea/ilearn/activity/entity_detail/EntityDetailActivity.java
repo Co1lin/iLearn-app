@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EntityDetail;
@@ -45,15 +46,6 @@ public class EntityDetailActivity extends AppCompatActivity {
         binding.hide.setOnClickListener($ -> {
             finish();
         });
-        binding.star.setOnCheckedChangeListener((btn, checked) -> {
-            // TODO save current "star" status in database
-        });
-        binding.share.setOnClickListener($ -> {
-            // TODO share related sdk
-        });
-        binding.relatedExercise.setOnClickListener($ -> {
-            // TODO related problem
-        });
 
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
@@ -65,6 +57,20 @@ public class EntityDetailActivity extends AppCompatActivity {
             binding.entityName.setText(name);
             binding.entityCategory.setText(category);
             binding.entitySubject.setText(subject);
+
+            binding.star.setOnCheckedChangeListener((btn, checked) -> {
+                // TODO save current "star" status in database
+            });
+            binding.share.setOnClickListener($ -> {
+                // TODO share related sdk
+            });
+            binding.relatedExercise.setOnClickListener($ -> {
+                Intent inten = new Intent (binding.getRoot().getContext(), ExerciseListActivity.class);
+                inten.setAction(Intent.ACTION_SEARCH);
+                inten.putExtra("name", name);
+                inten.putExtra("subject", subject);
+                binding.getRoot().getContext().startActivity(inten);
+            });
 
             boolean loaded = false; // TODO get info from database (base on id?)
             if (!loaded) {

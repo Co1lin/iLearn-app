@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.entity_detail.EntityDetailActivity;
-import com.tea.ilearn.databinding.EntityCardBinding;
+import com.tea.ilearn.databinding.AbstractCardBinding;
 
 import java.util.Comparator;
 import java.util.List;
@@ -19,11 +19,10 @@ import java.util.stream.Stream;
 
 public class InfoListAdapter extends RecyclerView.Adapter {
 
-    private class EntityHolder extends RecyclerView.ViewHolder {
-        private EntityCardBinding binding;
-        String id;
+    private class AbstractHolder extends RecyclerView.ViewHolder {
+        private AbstractCardBinding binding;
 
-        EntityHolder(EntityCardBinding binding) {
+        AbstractHolder(AbstractCardBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
@@ -32,7 +31,6 @@ public class InfoListAdapter extends RecyclerView.Adapter {
             binding.entityName.setText(info.name);
             binding.entityCategory.setText(info.category);
             binding.entitySubject.setText(info.subject);
-            id = info.id;
 
             if (info.loaded) {
                 binding.getRoot().setCardBackgroundColor(binding.getRoot().getContext().getResources().getColor(R.color.teal_200));
@@ -46,7 +44,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                 Intent intent = new Intent (binding.getRoot().getContext(), EntityDetailActivity.class);
                 intent.setAction(Intent.ACTION_SEARCH);
                 intent.putExtra("name", info.name);
-                intent.putExtra("id", id);
+                intent.putExtra("id", info.id);
                 intent.putExtra("category", info.category);
                 intent.putExtra("subject", info.subject);
                 binding.getRoot().getContext().startActivity(intent);
@@ -94,7 +92,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == 0) {
-            return new EntityHolder(EntityCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+            return new AbstractHolder(AbstractCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }
         return null;
     }
@@ -104,7 +102,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
         Info info = mInfoList.get(position);
         switch (holder.getItemViewType()) {
             case 0:
-                ((EntityHolder) holder).bind(info);
+                ((AbstractHolder) holder).bind(info);
                 break;
         }
     }

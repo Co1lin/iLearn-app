@@ -123,6 +123,10 @@ public class HomeFragment extends Fragment {
             String query = searchBar.getEditTextView().getText().toString();
             loadingBar.setVisibility(View.VISIBLE);
             mInfoAdapter.clear();
+            binding.sortCategoryUp.setVisibility(View.VISIBLE);
+            binding.sortCategoryDown.setVisibility(View.VISIBLE);
+            binding.sortNameUp.setVisibility(View.VISIBLE);
+            binding.sortNameDown.setVisibility(View.VISIBLE);
             List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
             searchNumLatch = new CountDownLatch(subjects.size());
             for (String sub : subjects) {
