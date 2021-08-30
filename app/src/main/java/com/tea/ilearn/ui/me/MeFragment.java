@@ -68,3 +68,5 @@ public class MeFragment extends Fragment {
         binding.barChart.refreshEchartsWithOption(option);
     }
 }
+// TODO left padding of the text
+// TODO issue in dark mode
