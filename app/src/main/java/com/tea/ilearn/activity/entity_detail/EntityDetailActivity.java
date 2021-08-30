@@ -1,30 +1,25 @@
 package com.tea.ilearn.activity.entity_detail;
 
-import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.tea.ilearn.Constant;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
-import com.tea.ilearn.databinding.ActivitySearchableBinding;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EntityDetail;
-import com.tea.ilearn.ui.home.InfoListAdapter;
 
 import java.util.ArrayList;
 
-public class SearchableActivity extends AppCompatActivity {
+public class EntityDetailActivity extends AppCompatActivity {
     private ActivityEntityDetailBinding binding;
-    private RecyclerView mInfoRecycler, mRelationRecycler, mPropertyRecycler;
-    private InfoListAdapter mInfoAdapter;
+    private RecyclerView mRelationRecycler, mPropertyRecycler;
     private RelationListAdapter mRelationAdapter, mPropertyAdapter;
 
     @Override
@@ -33,9 +28,6 @@ public class SearchableActivity extends AppCompatActivity {
 
         binding = ActivityEntityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-
-        // ===================================================================
 
         mRelationRecycler = binding.relationRecycler;
         mRelationAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
@@ -48,34 +40,48 @@ public class SearchableActivity extends AppCompatActivity {
         mPropertyRecycler.setAdapter(mPropertyAdapter);
 
         binding.hide.setOnClickListener($ -> {
-            binding.detailPage.setVisibility(View.GONE);
+            finish();
         });
         binding.star.setOnCheckedChangeListener((btn, checked) -> {
-            // TODO save current "star" status in database (related to current entity)
+            // TODO save current "star" status in database
         });
         binding.share.setOnClickListener($ -> {
-            // TODO share related sdk (related to current entity)
+            // TODO share related sdk
         });
         binding.relatedExercise.setOnClickListener($ -> {
-            // TODO related problem (related to current entity)
+            // TODO related problem
         });
 
-        // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            for (String sub : Constant.EduKG.SUBJECTS) {
-                StaticHandler handler = new StaticHandler(mInfoAdapter, sub);
-                EduKG.getInst().fuzzySearchEntityWithCourse(sub, query, handler);
+            String name = intent.getStringExtra("name");
+            String id = intent.getStringExtra("id");
+            String category = intent.getStringExtra("category");
+            String subject = intent.getStringExtra("subject");
+
+            binding.entityName.setText(name);
+            binding.entityCategory.setText(category);
+            binding.entitySubject.setText(subject);
+
+            boolean loaded = false; // TODO get info from database (base on id?)
+            if (!loaded) {
+                StaticHandler handler = new StaticHandler(binding.entityDescription, mRelationAdapter, mPropertyAdapter);
+                EduKG.getInst().getEntityDetails(subject, name, handler);
+                // TODO save to database
+            }
+            else {
+                // TODO load from database (star, properties, relations)
             }
         }
     }
 
     static class StaticHandler extends Handler {
+        private TextView entityDescription;
         private RelationListAdapter mRelationAdapter;
         private RelationListAdapter mPropertyAdapter;
 
-        StaticHandler(RelationListAdapter mRelationAdapter, RelationListAdapter mPropertyAdapter) {
+        StaticHandler(TextView entityDescription, RelationListAdapter mRelationAdapter, RelationListAdapter mPropertyAdapter) {
+            this.entityDescription = entityDescription;
             this.mPropertyAdapter = mPropertyAdapter;
             this.mRelationAdapter = mRelationAdapter;
         }
@@ -85,14 +91,15 @@ public class SearchableActivity extends AppCompatActivity {
             super.handleMessage(msg);
             EntityDetail detail = (EntityDetail) msg.obj;
             if (detail != null) {
+                entityDescription.setText("实体描述，这里还不知道放啥"); // TODO
                 if (detail.getRelations() != null) {
                     for (EntityDetail.Relation r : detail.getRelations()) {
-                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection()));
+                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection())); // TODO 格式调整
                     }
                 }
                 if (detail.getProperties() != null) {
                     for (EntityDetail.Property p : detail.getProperties()) {
-                        mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
+                        mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2)); // TODO 格式调整
                     }
                 }
             } else {

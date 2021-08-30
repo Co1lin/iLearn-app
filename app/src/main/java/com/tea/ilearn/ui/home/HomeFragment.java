@@ -1,94 +1,55 @@
 package com.tea.ilearn.ui.home;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
-import com.tea.ilearn.activity.SearchableActivity;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
+import com.tea.ilearn.net.edukg.EduKG;
+import com.tea.ilearn.net.edukg.Entity;
 import com.tea.ilearn.utils.ACAdapter;
-import com.tea.ilearn.utils.EchartsView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.ReentrantLock;
 
-import dev.bandb.graphview.AbstractGraphAdapter;
-import dev.bandb.graphview.graph.Graph;
-import dev.bandb.graphview.graph.Node;
-import dev.bandb.graphview.layouts.layered.SugiyamaArrowEdgeDecoration;
-import dev.bandb.graphview.layouts.layered.SugiyamaConfiguration;
-import dev.bandb.graphview.layouts.layered.SugiyamaLayoutManager;
 import per.goweii.actionbarex.common.ActionBarSearch;
 import per.goweii.actionbarex.common.AutoComplTextView;
 
 public class HomeFragment extends Fragment {
-    private RecyclerView graphView;
-    private AbstractGraphAdapter adapter;
     private FragmentHomeBinding binding;
     private ActionBarSearch searchBar;
     private AutoComplTextView acTextView;
     private View loadingBar;
     private View root;
 
+    private RecyclerView mInfoRecycler;
+    private InfoListAdapter mInfoAdapter;
+
+    static final ReentrantLock reentrantLock = new ReentrantLock();
+    static volatile CountDownLatch searchNumLatch;
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         root = binding.getRoot();
         searchBar = binding.searchBar;
         loadingBar = searchBar.getForegroundLayer();
         acTextView = searchBar.getEditTextView();
 
-        graphView = binding.graphView;
-
-        SugiyamaConfiguration configuration = new SugiyamaConfiguration.Builder()
-                .setNodeSeparation(100)
-                .setLevelSeparation(100)
-                .build();
-        graphView.setLayoutManager(new SugiyamaLayoutManager(getContext(), configuration));
-
-        graphView.addItemDecoration(new SugiyamaArrowEdgeDecoration());
-
-        Graph graph = new Graph();
-        Node node1 = new Node("key");
-        Node node2 = new Node("Child 1");
-        Node node3 = new Node("Child 2");
-        Node node4 = new Node("Father");
-        Node node5 = new Node("Mother");
-        Node node6 = new Node("GrandPa");
-        Node node7 = new Node("GrandMa");
-
-        graph.addEdge(node1, node2);
-        graph.addEdge(node1, node3);
-        graph.addEdge(node4, node1);
-        graph.addEdge(node5, node1);
-        graph.addEdge(node6, node1);
-        graph.addEdge(node7, node1);
-
-        adapter = new AbstractGraphAdapter<NodeHolder>() {
-            @Override
-            public NodeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
-                return new NodeHolder(view);
-            }
-
-            @Override
-            public void onBindViewHolder(NodeHolder holder, int position) {
-                holder.mText.setText(getNodeData(position).toString());
-            }
-        };
-        adapter.submitGraph(graph);
-        graphView.setAdapter(adapter);
         searchBar.setOnRightIconClickListener(view -> search());
         // bind enter key
         searchBar.getEditTextView().setOnKeyListener((view, keyCode, event) -> {
@@ -113,34 +74,101 @@ public class HomeFragment extends Fragment {
                 acTView.showDropDown();
         });
 
+        // ================================================================================
+
+        binding.sortName.setOnClickListener(view -> {
+            binding.sortCategoryUp.setVisibility(View.VISIBLE);
+            binding.sortCategoryDown.setVisibility(View.VISIBLE);
+            if (binding.sortNameUp.getVisibility() == View.VISIBLE && binding.sortNameDown.getVisibility() == View.INVISIBLE) {
+                binding.sortNameUp.setVisibility(View.INVISIBLE);
+                binding.sortNameDown.setVisibility(View.VISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getName, true);
+                mInfoRecycler.scrollToPosition(0);
+            }
+            else {
+                binding.sortNameUp.setVisibility(View.VISIBLE);
+                binding.sortNameDown.setVisibility(View.INVISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getName, false);
+                mInfoRecycler.scrollToPosition(0);
+            }
+        });
+
+        binding.sortCategory.setOnClickListener(view -> {
+            binding.sortNameUp.setVisibility(View.VISIBLE);
+            binding.sortNameDown.setVisibility(View.VISIBLE);
+            if (binding.sortCategoryUp.getVisibility() == View.VISIBLE && binding.sortCategoryDown.getVisibility() == View.INVISIBLE) {
+                binding.sortCategoryUp.setVisibility(View.INVISIBLE);
+                binding.sortCategoryDown.setVisibility(View.VISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getCategory, true);
+                mInfoRecycler.scrollToPosition(0);
+            }
+            else {
+                binding.sortCategoryUp.setVisibility(View.VISIBLE);
+                binding.sortCategoryDown.setVisibility(View.INVISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getCategory, false);
+                mInfoRecycler.scrollToPosition(0);
+            }
+        });
+
+        mInfoRecycler = binding.infoRecycler;
+        mInfoAdapter = new InfoListAdapter(root.getContext(), new ArrayList<Info>());
+        mInfoRecycler.setLayoutManager(new LinearLayoutManager(root.getContext()));
+        mInfoRecycler.setAdapter(mInfoAdapter);
+
         return root;
     }
 
     private void search() {
-        Intent intent = new Intent (root.getContext(), SearchableActivity.class);
-        intent.setAction(Intent.ACTION_SEARCH);
-        intent.putExtra("query", searchBar.getEditTextView().getText().toString());
-        root.getContext().startActivity(intent);
-        loadingBar.setVisibility(View.VISIBLE);
-        // TODO colin: invisible after expected num of msg are received
-        // TODO colin: invisible after return to the home view
+        if (reentrantLock.tryLock()) {
+            String query = searchBar.getEditTextView().getText().toString();
+            loadingBar.setVisibility(View.VISIBLE);
+            mInfoAdapter.clear();
+            List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
+            searchNumLatch = new CountDownLatch(subjects.size());
+            for (String sub : subjects) {
+                StaticHandler handler = new StaticHandler(mInfoAdapter, sub);
+                EduKG.getInst().fuzzySearchEntityWithCourse(sub, query, handler);
+            }
+//            try { // TODO why this stuck handler thread?
+//                searchNumLatch.await(); // TODO set timeout
+//                loadingBar.setVisibility(View.INVISIBLE);
+//            } catch (InterruptedException e) {
+//                // TODO deal with timeout (when network unaccessable)
+//            }
+        } else {
+            // TODO 点击过于频繁提示
+        }
     }
 
-    private class NodeHolder extends RecyclerView.ViewHolder {
-        TextView mText;
+    static class StaticHandler extends Handler {
+        private InfoListAdapter mInfoAdapter;
+        private String subject;
 
-        NodeHolder(View itemView) {
-            super(itemView);
+        StaticHandler(InfoListAdapter mInfoAdapter, String subject) {
+            this.mInfoAdapter = mInfoAdapter;
+            this.subject = subject;
+        }
 
-            mText = itemView.findViewById(R.id.text);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int pos = getBindingAdapterPosition();
-                    Log.v("MYDEBUG", "Clicked on " + adapter.getNodeData(pos).toString());
-                    // TODO new intent here, nodes[pos] is clicked
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            searchNumLatch.countDown();
+            super.handleMessage(msg);
+            List<Entity> entities = (List<Entity>) msg.obj;
+            if (entities != null) {
+                for (Entity e : entities) {
+                    mInfoAdapter.add(new Info(
+                            0,
+                            e.getLabel(),
+                            subject,
+                            false, // TODO from database
+                            false, // TODO from database
+                            e.getCategory(),
+                            e.getUri()
+                    ));
                 }
-            });
+            } else {
+                // TODO empty hint (may be a new type of viewholder)
+            }
         }
     }
 }
