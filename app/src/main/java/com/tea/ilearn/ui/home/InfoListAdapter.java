@@ -33,13 +33,13 @@ public class InfoListAdapter extends RecyclerView.Adapter {
             binding.entitySubject.setText(info.subject);
 
             if (info.loaded) {
-                binding.getRoot().setCardBackgroundColor(binding.getRoot().getContext().getResources().getColor(R.color.teal_200));
+                binding.getRoot().setCardBackgroundColor(binding.getRoot().getContext().getResources().getColor(R.color.md_grey_600));
             }
             else {
-                binding.getRoot().setCardBackgroundColor(binding.getRoot().getContext().getResources().getColor(R.color.white));
+                binding.getRoot().setCardBackgroundColor(binding.getRoot().getContext().getResources().getColor(R.color.md_white_1000));
             }
             binding.getRoot().setOnClickListener(view -> {
-                binding.getRoot().setCardBackgroundColor(binding.getRoot().getContext().getResources().getColor(R.color.teal_200));
+                binding.getRoot().setCardBackgroundColor(binding.getRoot().getContext().getResources().getColor(R.color.md_grey_600));
 
                 Intent intent = new Intent (binding.getRoot().getContext(), EntityDetailActivity.class);
                 intent.setAction(Intent.ACTION_SEARCH);

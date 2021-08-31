@@ -45,7 +45,7 @@
                 android:id="@+id/share"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/teal_700"
+                android:backgroundTint="?colorSecondary"
                 android:src="@drawable/ic_share_24"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_marginEnd="16dp"

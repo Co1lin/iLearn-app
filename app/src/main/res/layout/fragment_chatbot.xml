@@ -20,7 +20,7 @@ android:layout_height="match_parent">
         app:ab_statusBarVisible="gone"
         app:ab_titleBarHeight="48dp"
         app:abc_titleText="小艾 AI"
-        app:abc_titleTextColor="@color/white"
+        app:abc_titleTextColor="?colorOnSecondary"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/recycler_chat"/>
 

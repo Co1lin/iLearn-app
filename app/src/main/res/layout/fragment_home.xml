@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/transparent"
-        app:ab_bottomLineColor="@color/actionbarex_line"
+        app:ab_bottomLineColor="?customColorValue"
         app:ab_bottomLineHeight="1dp"
         app:ab_foregroundLayerLayout="@layout/loading_bar"
         app:ab_immersion="unchanged"
