@@ -13,7 +13,10 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-        <org.angmarch.views.NiceSpinner
+        <com.jaredrummler.materialspinner.MaterialSpinner
+            app:ms_arrow_tint="?colorOnPrimary"
+            app:ms_text_color="?colorOnPrimary"
+            app:ms_background_color="?customColorValue"
             android:id="@+id/course_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -50,8 +50,8 @@ public class LinkFragment extends Fragment {
             binding.nerResult.removeAllViews();
         });
 
-        binding.courseSpinner.attachDataSource(Constant.EduKG.SUBJECTS_ZH);
-        binding.courseSpinner.setOnSpinnerItemSelectedListener((parent, view, position, id) -> {
+        binding.courseSpinner.setItems(Constant.EduKG.SUBJECTS_ZH);
+        binding.courseSpinner.setOnItemSelectedListener((view, position, id, item) -> {
             doNER();
         });
 
