@@ -2,9 +2,11 @@ package com.tea.ilearn.ui.home;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.R;
@@ -33,13 +35,16 @@ public class InfoListAdapter extends RecyclerView.Adapter {
             binding.entitySubject.setText(info.subject);
 
             if (info.loaded) {
-                binding.getRoot().setCardBackgroundColor(binding.getRoot().getContext().getResources().getColor(R.color.teal_200));
-            }
-            else {
-                binding.getRoot().setCardBackgroundColor(binding.getRoot().getContext().getResources().getColor(R.color.white));
+                TypedValue typedValue = new TypedValue();
+                binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.customColorValue, typedValue, true);
+                int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
+                binding.getRoot().setCardBackgroundColor(color);
             }
             binding.getRoot().setOnClickListener(view -> {
-                binding.getRoot().setCardBackgroundColor(binding.getRoot().getContext().getResources().getColor(R.color.teal_200));
+                TypedValue typedValue = new TypedValue();
+                binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.customColorValue, typedValue, true);
+                int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
+                binding.getRoot().setCardBackgroundColor(color);
 
                 Intent intent = new Intent (binding.getRoot().getContext(), EntityDetailActivity.class);
                 intent.setAction(Intent.ACTION_SEARCH);

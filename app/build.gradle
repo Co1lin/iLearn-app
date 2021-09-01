@@ -72,8 +72,7 @@ dependencies {
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC3'
 
     // echart support
-    implementation 'com.github.abel533:ECharts:3.0.0.6'
-    implementation 'com.google.code.gson:gson:2.8.1'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     // graphview support
     implementation 'dev.bandb.graphview:graphview:0.8.1'
@@ -83,7 +82,7 @@ dependencies {
     implementation 'com.github.LightSun:android-drag-FlowLayout:1.8.8'
 
     // spinner
-    implementation 'com.github.arcadefire:nice-spinner:1.4.4'
+    implementation 'com.jaredrummler:material-spinner:1.3.1'
 
     // ActionBarEx
     implementation project(':actionbarex')

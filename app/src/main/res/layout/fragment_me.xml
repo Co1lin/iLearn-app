@@ -21,6 +21,7 @@
             android:layout_marginStart="2dp"
             android:contentDescription="User Icon"
             android:scaleType="fitXY"
+            app:tint="?colorOnPrimary"
             android:src="@drawable/ic_profile_24" />
         <TextView
             android:id="@+id/name_profile"
@@ -28,8 +29,8 @@
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_gravity="center_vertical"
-            android:textStyle="bold"
-            android:textSize="16dp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            android:textColor="?colorOnPrimary"
             android:text="登录帐号"
             android:gravity="center" >
         </TextView>
@@ -61,12 +62,21 @@
             android:orientation="vertical">
 
             <com.google.android.material.card.MaterialCardView
+                app:cardElevation="0dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.tea.ilearn.utils.EchartsView
-                    android:layout_marginTop="16dp"
-                    android:id="@+id/bar_chart"
+                <TextView
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="本周学习点"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/line_chart"
+                    android:layout_marginBottom="8dp"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:layout_gravity="center" />
@@ -74,6 +84,7 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
+                app:cardElevation="0dp"
                 android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -94,6 +105,7 @@
                             android:layout_gravity="center_horizontal"
                             android:src="@drawable/ic_cache_24"
                             android:background="?attr/selectableItemBackgroundBorderless"
+                            app:tint="@color/md_teal_600"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                         <TextView
@@ -114,6 +126,7 @@
                             android:layout_gravity="center_horizontal"
                             android:src="@drawable/ic_history_24"
                             android:background="?attr/selectableItemBackgroundBorderless"
+                            app:tint="@color/md_indigo_500"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                         <TextView
@@ -149,6 +162,7 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
+                app:cardElevation="0dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp">
@@ -171,7 +185,7 @@
                         android:layout_height="1dp"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:background="?customColorValue" />
+                        android:background="?android:colorBackground" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/cache_switch"
@@ -184,6 +198,7 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
+                app:cardElevation="0dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp">
@@ -233,7 +248,7 @@
                         android:layout_height="1dp"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:background="?customColorValue" />
+                        android:background="?android:colorBackground" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
@@ -275,7 +290,7 @@
                         android:layout_height="1dp"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:background="?customColorValue" />
+                        android:background="?android:colorBackground" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
@@ -289,7 +304,7 @@
                             android:layout_gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingStart="8dp"
-                            android:paddingEnd="8dp">
+                            android:paddingEnd="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -302,6 +317,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentRight="true"
+                                android:textColor="@color/md_brown_300"
                                 android:text="1.0.0"
                                 android:textAppearance="?attr/textAppearanceBody2"></TextView>
                         </RelativeLayout>
