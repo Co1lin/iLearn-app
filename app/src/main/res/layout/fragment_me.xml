@@ -137,7 +137,6 @@
                             android:layout_gravity="center_horizontal"
                             android:src="@drawable/ic_star_24"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            app:tint="@color/md_yellow_600"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                         <TextView
@@ -227,7 +226,6 @@
                                 android:layout_alignParentRight="true"
                                 android:layout_alignParentBottom="true"
                                 android:background="?attr/selectableItemBackgroundBorderless"
-                                app:tint="?colorOnPrimary"
                                 android:layout_marginEnd="8dp"
                                 android:src="@drawable/ic_refresh_24" />
                         </RelativeLayout>
@@ -270,7 +268,6 @@
                                 android:layout_alignParentRight="true"
                                 android:layout_alignParentBottom="true"
                                 android:background="?attr/selectableItemBackgroundBorderless"
-                                app:tint="?colorOnPrimary"
                                 android:layout_marginEnd="8dp"
                                 android:src="@drawable/ic_share_square_24" />
                         </RelativeLayout>
@@ -308,6 +305,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentRight="true"
+                                android:textColor="@color/md_brown_300"
                                 android:text="1.0.0"
                                 android:textAppearance="?attr/textAppearanceBody2"></TextView>
                         </RelativeLayout>
