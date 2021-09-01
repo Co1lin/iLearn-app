@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import rxhttp.wrapper.param.RxHttp;
 import rxhttp.wrapper.param.RxHttpFormParam;
+import rxhttp.wrapper.param.RxHttpJsonParam;
 import rxhttp.wrapper.param.RxHttpNoBodyParam;
 
 /**
@@ -29,8 +30,9 @@ public abstract class APIRequest {
     protected Map<String, ?> loginParams;
     protected String tokenName;
     protected String tokenValue;
+    protected boolean authHeader;
     protected String loginFailedMessage;
-    protected Class<?> loginResponseClass;
+    protected ResponseDefiner loginRequestDefiner;
 
     public APIRequest(
             String _baseUrl,
@@ -38,6 +40,7 @@ public abstract class APIRequest {
             String _genericPath,
             Map<String, ?> _loginParams,
             String _tokenName,
+            boolean _authHeader,
             String _loginFailedMessage,
             Class<?> _loginResponseClass
     ) {
@@ -47,8 +50,9 @@ public abstract class APIRequest {
         loginParams = _loginParams;
         tokenName = _tokenName;
         tokenValue = "123";
+        authHeader = _authHeader;
         loginFailedMessage = _loginFailedMessage;
-        loginResponseClass = _loginResponseClass;
+        loginRequestDefiner = p -> p.asResponse(_loginResponseClass);
         listen();
     }
 
@@ -106,33 +110,39 @@ public abstract class APIRequest {
 
     protected abstract void onRefreshSuccess(Object response);
 
-    public boolean syncRefresh() {
+    public boolean syncRefresh(Handler handler) {
         synchronized(lastRefreshSuccess) {
             if (System.currentTimeMillis() - lastRefreshSuccess < minRefreshIntervalMillis)
                 return true;
             Log.i("APIRequest.refresh", "refreshing");
             AtomicBoolean success = new AtomicBoolean(false);
-            RxHttp.postForm(baseUrl + refreshPath)
-                    .setSync()
-                    .addAll(loginParams)
-                    .asClass(loginResponseClass)
-                    .timeout(3, TimeUnit.SECONDS)
-                    .subscribe(response -> {
-                        onRefreshSuccess(response);
-                        success.set(true);
-                        lastRefreshSuccess = System.currentTimeMillis();
-                        Log.i("APIRequest.refresh", ": onRefreshSuccess completed");
-                    }, throwable -> {
-                        Log.e("APIRequest.refresh", "login error: " + throwable.toString());
-                    });
+            RxHttpFormParam p = RxHttp.postForm(baseUrl + refreshPath).setSync();
+            if (authHeader)
+                p.addHeader(tokenName, tokenValue);
+            else
+                p.addAll(loginParams);
+            loginRequestDefiner.define(p)
+            .timeout(3, TimeUnit.SECONDS)
+            .subscribe(response -> {
+                onRefreshSuccess(response);
+                success.set(true);
+                lastRefreshSuccess = System.currentTimeMillis();
+                if (handler != null)
+                    Message.obtain(handler, 0, "login success").sendToTarget();
+                Log.i("APIRequest.refresh", ": onRefreshSuccess completed");
+            }, throwable -> {
+                if (handler != null)
+                    Message.obtain(handler, 1, "login failed").sendToTarget();
+                Log.e("APIRequest.refresh", "login error: " + throwable.toString());
+            });
             return success.get();
         }
     }
 
-    public void asyncRefresh() {
+    public void asyncRefresh(Handler handler) {
         synchronized(lastRefreshSuccess) {
             new Thread(() -> {
-                syncRefresh();
+                syncRefresh(handler);
             }).start();
         }
     }
@@ -145,7 +155,7 @@ public abstract class APIRequest {
      *                          define the type of "data" field in Response<T>
      * @param handler           Handler to be sent the object of responseClass
      */
-    public void Request(
+    protected void Request(
             RxHttp _p,
             Map<String, Object> params,
             ResponseDefiner responseDefiner,
@@ -160,7 +170,10 @@ public abstract class APIRequest {
                 loginFailed.set(false);
                 // BUG: new a RxHTTP to avoid unfixed bug of RxHttp
                 RxHttp p = getSyncRxHttp(_p);
-                params.put(tokenName, tokenValue);
+                if (authHeader)
+                    p.addHeader(tokenName, tokenValue);
+                else
+                    params.put(tokenName, tokenValue);
                 paramAddAll(p, params);
                 Log.i("APIRequest.Request",
                         p.getParam().getMethod().toString() + p.getParam().getUrl());
@@ -170,7 +183,7 @@ public abstract class APIRequest {
                     .retry(maxRetries, throwable -> {
                         Log.i("APIRequest.Request", "retry: " + throwable.getMessage() + p.getParam().getUrl());
                         if (throwable.getMessage().equals(loginFailedMessage)) {
-                            syncRefresh();
+                            syncRefresh(null);
                             loginFailed.set(true);
                             return false;
                         }
@@ -254,7 +267,7 @@ public abstract class APIRequest {
      * @param handler           Handler to be sent the object of responseClass
      * @param priority          Priority of this request in the blocking queue
      */
-    public void POST(
+    public void POSTForm(
             String path,
             Map<String, Object> params,
             ResponseDefiner responseDefiner,
@@ -270,17 +283,42 @@ public abstract class APIRequest {
         ));
     }
 
-    public void POST(
+    public void POSTForm(
             String path,
             Map<String, Object> params,
             ResponseDefiner responseDefiner,
             Handler handler
     ) {
-        POST(path, params, responseDefiner, handler, 0);
+        POSTForm(path, params, responseDefiner, handler, 0);
+    }
+
+    public void POSTJson(
+            String path,
+            Map<String, Object> params,
+            ResponseDefiner responseDefiner,
+            Handler handler,
+            int priority
+    ) {
+        addTask(new Task(
+                RxHttp.postJson(baseUrl + genericPath + path),
+                params,
+                responseDefiner,
+                handler,
+                priority
+        ));
+    }
+
+    public void POSTJson(
+            String path,
+            Map<String, Object> params,
+            ResponseDefiner responseDefiner,
+            Handler handler
+    ) {
+        POSTJson(path, params, responseDefiner, handler, 0);
     }
 
     public boolean syncDetectOnline() {
-        return syncRefresh();
+        return syncRefresh(null);
     }
 
     public void asyncDetectOnline(Handler handler) {
@@ -296,6 +334,9 @@ public abstract class APIRequest {
         else if (_p instanceof RxHttpFormParam) {
             return new RxHttpFormParam( ((RxHttpFormParam) _p).getParam() ).setSync().removeAllBody();
         }
+        else if (_p instanceof RxHttpJsonParam) {
+            return new RxHttpJsonParam( ((RxHttpJsonParam) _p).getParam() ).setSync().removeAllQuery();
+        }
         throw new IllegalArgumentException("_p is instance of " + _p.getClass() + " which is not supported");
     }
 
@@ -305,6 +346,9 @@ public abstract class APIRequest {
         else if (p instanceof RxHttpFormParam) {
             return ((RxHttpFormParam) p).add(key, value);
         }
+        else if (p instanceof RxHttpJsonParam) {
+            return ((RxHttpJsonParam) p).add(key, value);
+        }
         throw new IllegalArgumentException("p is instance of " + p.getClass() + " which is not supported");
     }
 
@@ -312,6 +356,9 @@ public abstract class APIRequest {
         if (p instanceof RxHttpNoBodyParam)
             return ((RxHttpNoBodyParam) p).addAll(params);
         else if (p instanceof RxHttpFormParam) {
+            return ((RxHttpFormParam) p).addAll(params);
+        }
+        else if (p instanceof RxHttpJsonParam) {
             return ((RxHttpFormParam) p).addAll(params);
         }
         throw new IllegalArgumentException("p is instance of " + p.getClass() + " which is not supported");

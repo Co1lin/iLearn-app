@@ -21,6 +21,7 @@ public class EduKG extends APIRequest {
                     put("password", "abc123456");
                 }},
                 "id",
+                false,
                 "请先登录",
                 LoginResponse.class
         );
@@ -80,7 +81,7 @@ public class EduKG extends APIRequest {
     }
 
     public void qAWithSubject(String course, String question, Handler handler) {
-        POST("/inputQuestion",
+        POSTForm("/inputQuestion",
                 new HashMap<String, Object>() {{
                     put("course", course);
                     put("inputQuestion", question);
@@ -97,7 +98,7 @@ public class EduKG extends APIRequest {
     }
 
     public void getNamedEntities(String course, String queryString, Handler handler) {
-        POST("/linkInstance",
+        POSTForm("/linkInstance",
             new HashMap<String, Object>(){{
                 put("course", course);
                 put("context", queryString);
