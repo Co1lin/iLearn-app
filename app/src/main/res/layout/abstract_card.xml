@@ -24,6 +24,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
+                android:textColor="?colorOnPrimary"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
             <CheckBox
                 android:visibility="gone"
@@ -50,8 +51,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text=""
-                android:textAppearance="?attr/textAppearanceBody2"
-                android:textColor="?android:attr/textColorSecondary" />
+                android:textColor="?colorOnPrimary"
+                android:textAppearance="?attr/textAppearanceBody2" />
 
             <TextView
                 android:id="@+id/entity_subject"
@@ -62,8 +63,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text=""
-                android:textAppearance="?attr/textAppearanceBody2"
-                android:textColor="?android:attr/textColorSecondary" />
+                android:textColor="?colorOnPrimary"
+                android:textAppearance="?attr/textAppearanceBody2" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
