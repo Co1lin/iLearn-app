@@ -104,7 +104,7 @@ public class Backend extends APIRequest {
     protected void checkPassword(String password, Handler handler) {
 
     }
-
+    // TODO reset password by email? ask TA
 
 
 }
