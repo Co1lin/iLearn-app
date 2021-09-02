@@ -26,7 +26,7 @@
     },
     {
       "id": "3:8898722406224917968",
-      "lastPropertyId": "9:3066170685302677632",
+      "lastPropertyId": "10:6787514593622173339",
       "name": "EduKGEntityDetail",
       "properties": [
         {
@@ -58,11 +58,6 @@
           "type": 9
         },
         {
-          "id": "6:8471921589127721082",
-          "name": "course",
-          "type": 9
-        },
-        {
           "id": "7:7798697764591647040",
           "name": "category",
           "type": 9
@@ -78,14 +73,25 @@
           "name": "viewed",
           "type": 1,
           "flags": 4
+        },
+        {
+          "id": "10:6787514593622173339",
+          "name": "subject",
+          "type": 9
         }
       ],
-      "relations": []
+      "relations": [
+        {
+          "id": "1:631130488093392397",
+          "name": "searchHistories",
+          "targetId": "1:1708470351799440945"
+        }
+      ]
     }
   ],
   "lastEntityId": "3:8898722406224917968",
   "lastIndexId": "3:1455234633446841387",
-  "lastRelationId": "0:0",
+  "lastRelationId": "1:631130488093392397",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
@@ -97,7 +103,8 @@
   ],
   "retiredPropertyUids": [
     4906288161705186355,
-    1703026834862990049
+    1703026834862990049,
+    8471921589127721082
   ],
   "retiredRelationUids": [],
   "version": 1

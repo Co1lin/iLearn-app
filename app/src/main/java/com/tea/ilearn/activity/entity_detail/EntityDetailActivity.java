@@ -1,5 +1,7 @@
 package com.tea.ilearn.activity.entity_detail;
 
+import static java.lang.Thread.sleep;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,15 +18,23 @@ import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail;
+import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
 import com.tea.ilearn.net.edukg.EduKGProperty;
 import com.tea.ilearn.net.edukg.EduKGRelation;
+import com.tea.ilearn.utils.ObjectBox;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import io.objectbox.Box;
+import io.objectbox.query.Query;
 
 public class EntityDetailActivity extends AppCompatActivity {
     private ActivityEntityDetailBinding binding;
     private RecyclerView mRelationRecycler, mPropertyRecycler;
     private RelationListAdapter mRelationAdapter, mPropertyAdapter;
+    private EduKGEntityDetail entityDetail = new EduKGEntityDetail();
+    Box<EduKGEntityDetail> entityBox;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,12 +44,12 @@ public class EntityDetailActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mPropertyRecycler = binding.propertyRecycler;
-        mPropertyAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
+        mPropertyAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<>());
         mPropertyRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
         mPropertyRecycler.setAdapter(mPropertyAdapter);
 
         mRelationRecycler = binding.relationRecycler;
-        mRelationAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<Relation>());
+        mRelationAdapter = new RelationListAdapter(binding.getRoot().getContext(), new ArrayList<>());
         mRelationRecycler.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
         mRelationRecycler.setAdapter(mRelationAdapter);
 
@@ -50,26 +60,36 @@ public class EntityDetailActivity extends AppCompatActivity {
             finish();
         });
 
+        entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
+
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String name = intent.getStringExtra("name");
-//            String id = intent.getStringExtra("id");
             String category = intent.getStringExtra("category");
             String subject = intent.getStringExtra("subject");
+            String uri = intent.getStringExtra("id");
 
             binding.entityName.setText(name);
             binding.entityCategory.setText(category);
             binding.entitySubject.setText(subject);
 
             binding.star.setOnCheckedChangeListener((btn, checked) -> {
-                if (binding.star.isChecked()) {
+                if (binding.star.isChecked())
                     Toast.makeText(binding.getRoot().getContext(), "收藏成功", Toast.LENGTH_SHORT).show();
-                }
-                else {
+                else
                     Toast.makeText(binding.getRoot().getContext(), "已取消收藏", Toast.LENGTH_SHORT).show();
-                }
-                // TODO save current "star" status in database
+                new Thread(() -> {
+                    getEntityDetail(uri);
+                    entityDetail.setStared(binding.star.isChecked());
+                    entityBox.put(entityDetail);
+                }).start();
             });
+
+            getEntityDetail(uri);
+            entityDetail.setViewed(true);
+            binding.star.setChecked(entityDetail.isStared());
+            entityBox.put(entityDetail);
+
             binding.share.setOnClickListener($ -> {
                 // TODO share related sdk
             });
@@ -83,7 +103,7 @@ public class EntityDetailActivity extends AppCompatActivity {
 
             boolean loaded = false; // TODO get info from database (base on id?)
             if (!loaded) {
-                StaticHandler handler = new StaticHandler(binding.entityDescription, mRelationAdapter, mPropertyAdapter, subject, category);
+                StaticHandler handler = new StaticHandler(binding.entityDescription, mRelationAdapter, mPropertyAdapter, subject, category, entityBox);
                 EduKG.getInst().getEntityDetails(subject, name, handler);
                 // TODO save to database (including the loaded status)
             }
@@ -93,18 +113,43 @@ public class EntityDetailActivity extends AppCompatActivity {
         }
     }
 
-    static class StaticHandler extends Handler {
+    private EduKGEntityDetail getEntityDetail(String uri) {
+        synchronized (entityDetail) {
+            while (entityDetail.getUri() == null) {
+                Query<EduKGEntityDetail> query = entityBox.query()
+                        .equal(EduKGEntityDetail_.uri, uri).build();
+                List<EduKGEntityDetail> entitiesRes = query.find();
+                query.close();
+                if (entitiesRes == null || entitiesRes.size() == 0) {
+                    try {
+                        sleep(100);
+                    } catch (InterruptedException e) {
+                    }
+                } else {
+                    entityDetail = entitiesRes.get(0);
+                    break;
+                }
+            }
+            return entityDetail;
+        }
+    }
+
+    class StaticHandler extends Handler {
         private TextView entityDescription;
         private RelationListAdapter mRelationAdapter;
         private RelationListAdapter mPropertyAdapter;
+        private Box<EduKGEntityDetail> entityBox;
         String subject, category;
 
-        StaticHandler(TextView entityDescription, RelationListAdapter mRelationAdapter, RelationListAdapter mPropertyAdapter, String subject, String category) {
+        StaticHandler(TextView entityDescription, RelationListAdapter mRelationAdapter,
+                      RelationListAdapter mPropertyAdapter, String subject, String category,
+                      Box<EduKGEntityDetail> entityBox) {
             this.entityDescription = entityDescription;
             this.mRelationAdapter = mRelationAdapter;
             this.mPropertyAdapter = mPropertyAdapter;
             this.subject = subject;
             this.category = category;
+            this.entityBox = entityBox;
         }
 
         @Override
@@ -115,7 +160,7 @@ public class EntityDetailActivity extends AppCompatActivity {
             if (detail != null) {
                 if (detail.getRelations() != null) {
                     for (EduKGRelation r : detail.getRelations())
-                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection()));
+                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(), subject, category, r.getObject()));
                 }
                 if (detail.getProperties() != null) {
                     for (EduKGProperty p : detail.getProperties()) {
@@ -125,7 +170,18 @@ public class EntityDetailActivity extends AppCompatActivity {
                             mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
                     }
                 }
-            }
+
+                new Thread(() -> {
+                    getEntityDetail(detail.getUri());
+                    if (detail.getRelations() != null) {
+                        entityDetail.setRelations(detail.getRelations());
+                    }
+                    if (detail.getProperties() != null) {
+                        entityDetail.setProperties(detail.getProperties());
+                    }
+                    entityBox.put(entityDetail);
+                }).start();
+            } // end if
         }
 
     }

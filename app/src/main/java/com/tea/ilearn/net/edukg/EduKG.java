@@ -23,7 +23,7 @@ public class EduKG extends APIRequest {
                 "id",
                 false,
                 "请先登录",
-                LoginResponse.class
+                p -> p.asClass(LoginResponse.class)
         );
     }
     private static EduKG instance = new EduKG();

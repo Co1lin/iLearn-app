@@ -29,6 +29,7 @@ import com.tea.ilearn.utils.RandChinese;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -182,67 +183,87 @@ public class HomeFragment extends Fragment {
             this.expectedNum.countDown();
             if (this.expectedNum.getCount() == 0)
                 loadingBar.setVisibility(View.INVISIBLE);
-            List<Entity> entities = (List<Entity>) msg.obj;
+            if (msg.what == 0 && msg.obj != null) {
+                List<Entity> entities = (List<Entity>) msg.obj;
 
-            Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
-            Box<EduKGEntityDetail> entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
+                Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
+                Box<EduKGEntityDetail> entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
 
-            Query<SearchHistory> historyQuery = historyBox.query()
-                    .equal(SearchHistory_.keyword, keyword).build();
-            List<SearchHistory> historiesRes = historyQuery.find();
-            SearchHistory history;
-            if (historiesRes == null || historiesRes.size() == 0) {
-                history = new SearchHistory(keyword);
-                historyBox.put(history);
-            }
-            else {
-                history = historiesRes.get(0);
-                history.entities.clear(); // TODO colin: check
-            }
-            if (entities != null) {
-                // add to adapter to update UI
-                for (Entity e : entities) {
-                    mInfoAdapter.add(new Info(
-                            0,
-                            e.getLabel(),
-                            subject,
-                            false, // false by default
-                            false,
-                            e.getCategory(),
-                            e.getUri()
-                    ));
+                Query<SearchHistory> historyQuery = historyBox.query()
+                        .equal(SearchHistory_.keyword, keyword).build();
+                List<SearchHistory> historiesRes = historyQuery.find();
+                historyQuery.close();
+                SearchHistory history;
+                if (historiesRes == null || historiesRes.size() == 0) {
+                    history = new SearchHistory(keyword);
+                    historyBox.put(history);
+                } else {
+                    history = historiesRes.get(0);
+                    history.entities.clear(); // TODO colin: check
                 }
-                AtomicInteger idx = new AtomicInteger(mInfoAdapter.getItemCount());
-                // store to DB
-                new Thread(() -> {
+                if (entities != null) {
+                    // remove duplicate entities with different categories
+                    HashMap<String, ArrayList<String>> uriToCategories = new HashMap<>();
                     for (Entity e : entities) {
-                        Query<EduKGEntityDetail> query = entityBox.query()
-                                .equal(EduKGEntityDetail_.uri, e.getUri()).build();
-                        List<EduKGEntityDetail> entitiesRes = query.find();
-                        query.close();
-                        if (entitiesRes != null) {
-                            // already exists in DB, update UI
-                            EduKGEntityDetail record = entitiesRes.get(0);
-                            mInfoAdapter.modify(idx.get(), record.isStared(), record.isViewed());
+                        ArrayList<String> categories = uriToCategories.getOrDefault(
+                                e.getUri(), new ArrayList<>()
+                        );
+                        categories.add(e.getCategory());
+                        uriToCategories.put(e.getUri(), categories);
+                    }
+                    HashMap<String, ArrayList<String>> notVisited =
+                            (HashMap<String, ArrayList<String>>) uriToCategories.clone();
+                    // add to adapter to update UI
+                    AtomicInteger idx = new AtomicInteger(mInfoAdapter.getItemCount());
+                    for (Entity e : entities) {
+                        if (notVisited.get(e.getUri()) != null) {
+                            mInfoAdapter.add(new Info(
+                                    0,
+                                    e.getLabel(),
+                                    subject,
+                                    false, // false by default
+                                    false,
+                                    e.getUri(),
+                                    uriToCategories.get(e.getUri())
+                            ));
+                            notVisited.remove(e.getUri());
                         }
-                        else {
-                            EduKGEntityDetail detail = new EduKGEntityDetail();
-                            detail.setLabel(e.getLabel())
-                                    .setCategory(e.getCategory())
-                                    .setUri(e.getUri())
-                                    .setSubject(subject);
-                            history.entities.add(detail);
+                    }
+                    // store to DB
+                    for (Entity e : entities) {
+                        if (uriToCategories.get(e.getUri()) != null) {
+                            Query<EduKGEntityDetail> query = entityBox.query()
+                                    .equal(EduKGEntityDetail_.uri, e.getUri()).build();
+                            List<EduKGEntityDetail> entitiesRes = query.find();
+                            query.close();
+                            if (entitiesRes != null && entitiesRes.size() > 0) {
+                                // already exists in DB, update UI
+                                EduKGEntityDetail record = entitiesRes.get(0);
+                                mInfoAdapter.modify(idx.get(), record.isStared(), record.isViewed());
+                            } else {
+                                // store a new entity to DB
+                                EduKGEntityDetail detail = new EduKGEntityDetail();
+                                detail.setLabel(e.getLabel())
+                                        .setUri(e.getUri())
+                                        .setCategory(uriToCategories.get(e.getUri()))
+                                        .setSubject(subject);
+                                history.entities.add(detail);
+                            }
+                            idx.incrementAndGet();
+                            uriToCategories.remove(e.getUri());
                         }
-                        idx.incrementAndGet();
                     } // end for
                     history.entities.applyChangesToDb();
-                }).start();
-            } else {
-                // TODO empty UI
-                new Thread(() -> {
-                    SearchHistory emptyHistory = new SearchHistory(keyword);
-                    historyBox.put(emptyHistory);
-                }).start();
+                } else {
+                    // TODO empty UI
+                    new Thread(() -> {  // store history with no entity
+                        SearchHistory emptyHistory = new SearchHistory(keyword);
+                        historyBox.put(emptyHistory);
+                    }).start();
+                }
+            }
+            else { // msg.what = 1
+
             }
         }
     }

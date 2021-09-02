@@ -22,6 +22,11 @@ public class EduKGRelation {
         else return objectLabel;
     }
 
+    public String getObject() {
+        if (object == null) return subject;
+        else return object;
+    }
+
     public int getDirection() {
         if (object == null) return 1;
         else return 0;

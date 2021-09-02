@@ -22,7 +22,6 @@ import com.tea.ilearn.ui.exercise.ExerciseFragment;
 import com.tea.ilearn.ui.home.HomeFragment;
 import com.tea.ilearn.ui.link.LinkFragment;
 import com.tea.ilearn.ui.me.MeFragment;
-import com.tea.ilearn.utils.ObjectBox;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
@@ -40,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ObjectBox.init(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         viewPager = binding.pager;

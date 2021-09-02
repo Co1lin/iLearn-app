@@ -31,7 +31,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
 
         void bind(Info info) {
             binding.entityName.setText(info.name);
-            binding.entityCategory.setText(info.category);
+            binding.entityCategory.setText(info.getCategory());
             binding.entitySubject.setText(info.subject);
 
             if (info.loaded) {
@@ -40,7 +40,14 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                 int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
                 binding.getRoot().setCardBackgroundColor(color);
             }
+            else {
+                TypedValue typedValue = new TypedValue();
+                binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.colorSurface, typedValue, true);
+                int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
+                binding.getRoot().setCardBackgroundColor(color);
+            }
             binding.getRoot().setOnClickListener(view -> {
+                info.loaded = true;
                 TypedValue typedValue = new TypedValue();
                 binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.customColorValue, typedValue, true);
                 int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
@@ -50,7 +57,8 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                 intent.setAction(Intent.ACTION_SEARCH);
                 intent.putExtra("name", info.name);
                 intent.putExtra("id", info.id);
-                intent.putExtra("category", info.category);
+                intent.putExtra("category", info.getCategory());
+                intent.putStringArrayListExtra("categories", info.categories);
                 intent.putExtra("subject", info.subject);
                 binding.getRoot().getContext().startActivity(intent);
 

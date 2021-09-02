@@ -3,11 +3,13 @@ package com.tea.ilearn.net.edukg;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.tea.ilearn.model.Category;
 import com.tea.ilearn.model.SearchHistory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import io.objectbox.annotation.Backlink;
 import io.objectbox.annotation.Convert;
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
@@ -34,6 +36,8 @@ public class EduKGEntityDetail {
     String label;
     String subject;
     String category;
+    @Backlink(to = "entities")
+    public ToMany<Category> categories;
     boolean stared;
     boolean viewed;
 
@@ -113,6 +117,11 @@ public class EduKGEntityDetail {
         return this;
     }
 
+    public EduKGEntityDetail setCategory(ArrayList<String> categories) {
+        this.category = String.join(" ", categories);
+        return this;
+    }
+
     public EduKGEntityDetail setStared(boolean stared) {
         this.stared = stared;
         return this;
@@ -131,5 +140,13 @@ public class EduKGEntityDetail {
     public EduKGEntityDetail setLabel(String label) {
         this.label = label;
         return this;
+    }
+
+    public void setRelations(ArrayList<EduKGRelation> relations) {
+        this.relations = relations;
+    }
+
+    public void setProperties(ArrayList<EduKGProperty> properties) {
+        this.properties = properties;
     }
 }

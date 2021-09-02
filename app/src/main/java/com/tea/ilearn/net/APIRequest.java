@@ -42,7 +42,7 @@ public abstract class APIRequest {
             String _tokenName,
             boolean _authHeader,
             String _loginFailedMessage,
-            Class<?> _loginResponseClass
+            ResponseDefiner _loginRequestDefiner
     ) {
         baseUrl = _baseUrl;
         refreshPath = _refreshPath;
@@ -52,7 +52,7 @@ public abstract class APIRequest {
         tokenValue = "123";
         authHeader = _authHeader;
         loginFailedMessage = _loginFailedMessage;
-        loginRequestDefiner = p -> p.asResponse(_loginResponseClass);
+        loginRequestDefiner = _loginRequestDefiner;
         listen();
     }
 

@@ -39,6 +39,7 @@ public class RelationListAdapter extends RecyclerView.Adapter {
                 intent.putExtra("name", relation.name);
                 intent.putExtra("subject", relation.subject);
                 intent.putExtra("category", relation.category);
+                intent.putExtra("id", relation.uri);
                 binding.getRoot().getContext().startActivity(intent);
             });
         }

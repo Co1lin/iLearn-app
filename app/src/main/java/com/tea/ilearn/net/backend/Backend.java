@@ -25,7 +25,7 @@ public class Backend extends APIRequest {
                 "Authorization",
                 true,
                 "login failed, password incorrect",
-                LoginResponse.class
+                p -> p.asClass(LoginResponse.class)
         );
     }
 

@@ -7,6 +7,7 @@ public class Relation {
     String name;
     String subject;
     String category;
+    String uri;
 
     public Relation(String type, String name, int dir) {
         this.dir = dir;
@@ -14,11 +15,12 @@ public class Relation {
         this.name = name;
     }
 
-    public Relation(String type, String name, int dir, String subject, String category) {
+    public Relation(String type, String name, int dir, String subject, String category, String uri) {
         this.dir = dir;
         this.type = type;
         this.name = name;
         this.subject = subject;
         this.category = category;
+        this.uri = uri;
     }
 }

@@ -26,7 +26,7 @@
     },
     {
       "id": "3:8898722406224917968",
-      "lastPropertyId": "9:3066170685302677632",
+      "lastPropertyId": "10:6787514593622173339",
       "name": "EduKGEntityDetail",
       "properties": [
         {
@@ -58,11 +58,6 @@
           "type": 9
         },
         {
-          "id": "6:8471921589127721082",
-          "name": "course",
-          "type": 9
-        },
-        {
           "id": "7:7798697764591647040",
           "name": "category",
           "type": 9
@@ -78,6 +73,11 @@
           "name": "viewed",
           "type": 1,
           "flags": 4
+        },
+        {
+          "id": "10:6787514593622173339",
+          "name": "subject",
+          "type": 9
         }
       ],
       "relations": [
@@ -87,11 +87,44 @@
           "targetId": "1:1708470351799440945"
         }
       ]
+    },
+    {
+      "id": "4:6840651699450986122",
+      "lastPropertyId": "3:8192582334756352504",
+      "name": "Category",
+      "properties": [
+        {
+          "id": "1:3689020332802059917",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6989641515657912729",
+          "name": "name",
+          "indexId": "4:1038902829307716625",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:8192582334756352504",
+          "name": "num",
+          "type": 5,
+          "flags": 4
+        }
+      ],
+      "relations": [
+        {
+          "id": "2:8848712912095567751",
+          "name": "entities",
+          "targetId": "3:8898722406224917968"
+        }
+      ]
     }
   ],
-  "lastEntityId": "3:8898722406224917968",
-  "lastIndexId": "3:1455234633446841387",
-  "lastRelationId": "1:631130488093392397",
+  "lastEntityId": "4:6840651699450986122",
+  "lastIndexId": "4:1038902829307716625",
+  "lastRelationId": "2:8848712912095567751",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
@@ -103,7 +136,8 @@
   ],
   "retiredPropertyUids": [
     4906288161705186355,
-    1703026834862990049
+    1703026834862990049,
+    8471921589127721082
   ],
   "retiredRelationUids": [],
   "version": 1
