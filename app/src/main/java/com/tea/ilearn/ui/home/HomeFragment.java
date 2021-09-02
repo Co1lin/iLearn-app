@@ -20,6 +20,7 @@ import com.tea.ilearn.databinding.FragmentHomeBinding;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.Entity;
 import com.tea.ilearn.utils.ACAdapter;
+import com.tea.ilearn.utils.RandChinese;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,7 +113,22 @@ public class HomeFragment extends Fragment {
         mInfoRecycler.setLayoutManager(new LinearLayoutManager(root.getContext()));
         mInfoRecycler.setAdapter(mInfoAdapter);
 
+        initList();
+
         return root;
+    }
+
+    private void initList() {
+        int initNum = 5;
+        List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
+        searchSubjectNum = new CountDownLatch(subjects.size() * initNum);
+        for (int i = 0; i < 5; ++i) {
+            char c = RandChinese.gen();
+            for (String sub : subjects) {
+                StaticHandler handler = new StaticHandler(mInfoAdapter, sub, searchSubjectNum, loadingBar);
+                EduKG.getInst().fuzzySearchEntityWithCourse(sub, String.valueOf(c), handler);
+            }
+        }
     }
 
     private void search() {
@@ -127,8 +143,7 @@ public class HomeFragment extends Fragment {
             List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
             searchSubjectNum = new CountDownLatch(subjects.size());
             for (String sub : subjects) {
-                StaticHandler handler = new StaticHandler(
-                        mInfoAdapter, sub, searchSubjectNum, loadingBar);
+                StaticHandler handler = new StaticHandler(mInfoAdapter, sub, searchSubjectNum, loadingBar);
                 EduKG.getInst().fuzzySearchEntityWithCourse(sub, query, handler);
             }
         }
