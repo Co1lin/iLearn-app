@@ -7,7 +7,6 @@ import java.util.ArrayList;
 public class EntityDetail {
     public class Property {
         String predicate;
-        //@SerializedName("predicateLabel")
         String predicateLabel;
         String object;
 
@@ -15,9 +14,7 @@ public class EntityDetail {
 
         public String getObject() { return object; }
     }
-    @SerializedName("property")
-    ArrayList<Property> properties = new ArrayList<>();
-    String label;
+
     public class Relation {
         String predicate;
         @SerializedName("predicate_label")
@@ -43,8 +40,57 @@ public class EntityDetail {
             else return 0;
         }
     }
+
     @SerializedName("content")
     ArrayList<Relation> relations = new ArrayList<>();
+    @SerializedName("property")
+    ArrayList<Property> properties = new ArrayList<>();
+    String label;
+    String course;
+    String category;
+    String uri;
+    boolean stared;
+    boolean viewed;
+
+    public String getCourse() {
+        return course;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public boolean isStared() {
+        return stared;
+    }
+
+    public boolean isViewed() {
+        return viewed;
+    }
+
+    public EntityDetail setCourse(String course) {
+        this.course = course;
+        return this;
+    }
+
+    public EntityDetail setCategory(String category) {
+        this.category = category;
+        return this;
+    }
+
+    public EntityDetail setStared(boolean stared) {
+        this.stared = stared;
+        return this;
+    }
+
+    public EntityDetail setUri(String uri) {
+        this.uri = uri;
+        return this;
+    }
 
     public ArrayList<Property> getProperties() {
         return properties;

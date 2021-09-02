@@ -16,16 +16,4 @@ public class Entity {
     public String getUri() {
         return uri;
     }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
 }
