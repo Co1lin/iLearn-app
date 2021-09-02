@@ -83,7 +83,7 @@ public class EntityDetailActivity extends AppCompatActivity {
             if (!loaded) {
                 StaticHandler handler = new StaticHandler(binding.entityDescription, mRelationAdapter, mPropertyAdapter, subject, category);
                 EduKG.getInst().getEntityDetails(subject, name, handler);
-                // TODO save to database
+                // TODO save to database (including the loaded status)
             }
             else {
                 // TODO load from database (star, properties, relations)

@@ -53,9 +53,12 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                 intent.putExtra("category", info.category);
                 intent.putExtra("subject", info.subject);
                 binding.getRoot().getContext().startActivity(intent);
+
+                // loaded state already changed when step into entity detail page
             });
 
             // binding.star.setChecked(info.star); // TODO resume may change this
+            // binding.star.setOnClickListener();
         }
     }
 
@@ -73,6 +76,14 @@ public class InfoListAdapter extends RecyclerView.Adapter {
     public void clear() {
         mInfoList.clear();
         notifyDataSetChanged();
+    }
+
+    public void modify(int position, boolean star, boolean loaded) {
+        Info info = mInfoList.get(position);
+        info.star = star;
+        info.loaded = loaded;
+        mInfoList.set(position, info);
+        notifyItemChanged(position);
     }
 
     public <U extends Comparable<? super U>> void applySortAndFilter(Function<? super Info, ? extends U> f, boolean reverse) {
