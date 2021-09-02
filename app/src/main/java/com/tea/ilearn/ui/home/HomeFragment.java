@@ -18,6 +18,7 @@ import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
 import com.tea.ilearn.model.SearchHistory;
+import com.tea.ilearn.model.SearchHistory_;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
@@ -182,8 +183,22 @@ public class HomeFragment extends Fragment {
             if (this.expectedNum.getCount() == 0)
                 loadingBar.setVisibility(View.INVISIBLE);
             List<Entity> entities = (List<Entity>) msg.obj;
+
             Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
             Box<EduKGEntityDetail> entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
+
+            Query<SearchHistory> historyQuery = historyBox.query()
+                    .equal(SearchHistory_.keyword, keyword).build();
+            List<SearchHistory> historiesRes = historyQuery.find();
+            SearchHistory history;
+            if (historiesRes == null || historiesRes.size() == 0) {
+                history = new SearchHistory(keyword);
+                historyBox.put(history);
+            }
+            else {
+                history = historiesRes.get(0);
+                history.entities.clear(); // TODO colin: check
+            }
             if (entities != null) {
                 // add to adapter to update UI
                 for (Entity e : entities) {
@@ -203,12 +218,12 @@ public class HomeFragment extends Fragment {
                     for (Entity e : entities) {
                         Query<EduKGEntityDetail> query = entityBox.query()
                                 .equal(EduKGEntityDetail_.uri, e.getUri()).build();
-                        List<EduKGEntityDetail> results = query.find();
+                        List<EduKGEntityDetail> entitiesRes = query.find();
                         query.close();
-                        if (results != null) {
-                            // already exists in DB
-                            EduKGEntityDetail record = results.get(0);
-                            // TODO // mInfoAdapter.modify(idx.get(), record.isStared(), record.isViewed());
+                        if (entitiesRes != null) {
+                            // already exists in DB, update UI
+                            EduKGEntityDetail record = entitiesRes.get(0);
+                            mInfoAdapter.modify(idx.get(), record.isStared(), record.isViewed());
                         }
                         else {
                             EduKGEntityDetail detail = new EduKGEntityDetail();
@@ -216,15 +231,18 @@ public class HomeFragment extends Fragment {
                                     .setCategory(e.getCategory())
                                     .setUri(e.getUri())
                                     .setSubject(subject);
-                            entityBox.put(detail);
+                            history.entities.add(detail);
                         }
                         idx.incrementAndGet();
-                    }
+                    } // end for
+                    history.entities.applyChangesToDb();
                 }).start();
             } else {
                 // TODO empty UI
-                SearchHistory history = new SearchHistory(keyword);
-                historyBox.put(history);
+                new Thread(() -> {
+                    SearchHistory emptyHistory = new SearchHistory(keyword);
+                    historyBox.put(emptyHistory);
+                }).start();
             }
         }
     }
