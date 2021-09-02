@@ -38,6 +38,9 @@ android {
     }
 }
 
+apply plugin: 'com.android.application'
+apply plugin: 'io.objectbox' // Apply last.
+
 dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.3.1'
