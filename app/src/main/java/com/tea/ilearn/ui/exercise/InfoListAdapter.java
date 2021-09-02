@@ -1,4 +1,4 @@
-package com.tea.ilearn.ui.home;
+package com.tea.ilearn.ui.exercise;
 
 import android.content.Context;
 import android.content.Intent;

@@ -1,6 +1,7 @@
 package com.tea.ilearn.activity.entity_detail;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -33,11 +34,12 @@ public class RelationListAdapter extends RecyclerView.Adapter {
             }
 
             binding.getRoot().setOnClickListener(view -> {
-                // TODO how to get category and subject info?
-//                Intent intent = new Intent (binding.getRoot().getContext(), EntityDetailActivity.class);
-//                intent.setAction(Intent.ACTION_SEARCH);
-//                intent.putExtra("name", relation.name);
-//                binding.getRoot().getContext().startActivity(intent);
+                Intent intent = new Intent (binding.getRoot().getContext(), EntityDetailActivity.class);
+                intent.setAction(Intent.ACTION_SEARCH);
+                intent.putExtra("name", relation.name);
+                intent.putExtra("subject", relation.subject);
+                intent.putExtra("category", relation.category);
+                binding.getRoot().getContext().startActivity(intent);
             });
         }
     }

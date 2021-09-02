@@ -20,5 +20,17 @@ public class SearchHistory {
 
     @Backlink(to = "searchHistories")
     public ToMany<EduKGEntityDetail> entities;
+
+    public SearchHistory(long id, String keyword, ToMany<EduKGEntityDetail> entities) {
+        this.id = id;
+        this.keyword = keyword;
+        this.entities = entities;
+    }
+
+    public SearchHistory() {}
+
+    public SearchHistory(String keyword) {
+        this.keyword = keyword;
+    }
 }
 

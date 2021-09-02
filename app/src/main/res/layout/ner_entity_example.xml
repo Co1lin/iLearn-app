@@ -6,7 +6,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:height="48dp"
-    android:backgroundTint="@color/teal_200"
+    android:backgroundTint="?colorSecondary"
     app:chipCornerRadius="10dp"
     app:chipEndPadding="2dp"
     app:chipStartPadding="0dp" />

@@ -32,7 +32,7 @@ public class EduKGEntityDetail {
     @SerializedName("property")
     ArrayList<EduKGProperty> properties;
     String label;
-    String course;
+    String subject;
     String category;
     boolean stared;
     boolean viewed;
@@ -71,8 +71,8 @@ public class EduKGEntityDetail {
         }
     }
 
-    public String getCourse() {
-        return course;
+    public String getSubject() {
+        return subject;
     }
 
     public String getCategory() {
@@ -103,8 +103,8 @@ public class EduKGEntityDetail {
         return viewed;
     }
 
-    public EduKGEntityDetail setCourse(String course) {
-        this.course = course;
+    public EduKGEntityDetail setSubject(String subject) {
+        this.subject = subject;
         return this;
     }
 

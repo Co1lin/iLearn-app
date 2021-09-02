@@ -17,15 +17,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
+import com.tea.ilearn.model.SearchHistory;
 import com.tea.ilearn.net.edukg.EduKG;
+import com.tea.ilearn.net.edukg.EduKGEntityDetail;
+import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
 import com.tea.ilearn.net.edukg.Entity;
 import com.tea.ilearn.utils.ACAdapter;
+import com.tea.ilearn.utils.ObjectBox;
+import com.tea.ilearn.utils.RandChinese;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import io.objectbox.Box;
+import io.objectbox.query.Query;
 import per.goweii.actionbarex.common.ActionBarSearch;
 import per.goweii.actionbarex.common.AutoComplTextView;
 
@@ -112,7 +120,23 @@ public class HomeFragment extends Fragment {
         mInfoRecycler.setLayoutManager(new LinearLayoutManager(root.getContext()));
         mInfoRecycler.setAdapter(mInfoAdapter);
 
+        initList();
+
         return root;
+    }
+
+    private void initList() {
+        int initNum = 0; // TODO 0 for EDUKG FUCK
+        List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
+        searchSubjectNum = new CountDownLatch(subjects.size() * initNum);
+        for (int i = 0; i < initNum; ++i) {
+            char c = RandChinese.gen();
+            String query = String.valueOf(c);
+            for (String sub : subjects) {
+                StaticHandler handler = new StaticHandler(mInfoAdapter, sub, query, searchSubjectNum, loadingBar);
+                EduKG.getInst().fuzzySearchEntityWithCourse(sub, query, handler);
+            }
+        }
     }
 
     private void search() {
@@ -139,6 +163,7 @@ public class HomeFragment extends Fragment {
         private View loadingBar;
         private String subject;
         private CountDownLatch expectedNum;
+        private String keyword;
 
         StaticHandler(InfoListAdapter mInfoAdapter, String subject,
                       String keyword, CountDownLatch _latch, View _loadingBar) {
@@ -146,6 +171,7 @@ public class HomeFragment extends Fragment {
             this.subject = subject;
             this.expectedNum = _latch;
             this.loadingBar = _loadingBar;
+            this.keyword = keyword;
         }
 
         @Override
@@ -156,21 +182,49 @@ public class HomeFragment extends Fragment {
             if (this.expectedNum.getCount() == 0)
                 loadingBar.setVisibility(View.INVISIBLE);
             List<Entity> entities = (List<Entity>) msg.obj;
+            Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
+            Box<EduKGEntityDetail> entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
             if (entities != null) {
-
+                // add to adapter to update UI
                 for (Entity e : entities) {
                     mInfoAdapter.add(new Info(
                             0,
                             e.getLabel(),
                             subject,
-                            false, // TODO from database
-                            false, // TODO from database
+                            false, // false by default
+                            false,
                             e.getCategory(),
                             e.getUri()
                     ));
                 }
+                AtomicInteger idx = new AtomicInteger(mInfoAdapter.getItemCount());
+                // store to DB
+                new Thread(() -> {
+                    for (Entity e : entities) {
+                        Query<EduKGEntityDetail> query = entityBox.query()
+                                .equal(EduKGEntityDetail_.uri, e.getUri()).build();
+                        List<EduKGEntityDetail> results = query.find();
+                        query.close();
+                        if (results != null) {
+                            // already exists in DB
+                            EduKGEntityDetail record = results.get(0);
+                            // TODO // mInfoAdapter.modify(idx.get(), record.isStared(), record.isViewed());
+                        }
+                        else {
+                            EduKGEntityDetail detail = new EduKGEntityDetail();
+                            detail.setLabel(e.getLabel())
+                                    .setCategory(e.getCategory())
+                                    .setUri(e.getUri())
+                                    .setSubject(subject);
+                            entityBox.put(detail);
+                        }
+                        idx.incrementAndGet();
+                    }
+                }).start();
             } else {
-                // TODO empty hint (may be a new type of viewholder)
+                // TODO empty UI
+                SearchHistory history = new SearchHistory(keyword);
+                historyBox.put(history);
             }
         }
     }

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +34,12 @@ public class ExerciseFragment extends Fragment {
         binding.answer.setText("标准答案: "+answer);
 
         binding.star.setOnClickListener($ -> {
+            if (binding.star.isChecked()) {
+                Toast.makeText(root.getContext(), "收藏成功", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(root.getContext(), "已取消收藏", Toast.LENGTH_SHORT).show();
+            }
             // TODO save to dababase
         });
         binding.share.setOnClickListener($ -> {

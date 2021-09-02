@@ -20,9 +20,17 @@ android:layout_height="match_parent">
         app:ab_statusBarVisible="gone"
         app:ab_titleBarHeight="48dp"
         app:abc_titleText="小艾 AI"
-        app:abc_titleTextColor="@color/white"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/recycler_chat"/>
+        app:abc_titleTextColor="?colorOnSecondary"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/separate_bar"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintTop_toBottomOf="@id/title_bar"
+        android:background="?colorSurface" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_chat"
@@ -31,7 +39,7 @@ android:layout_height="match_parent">
         android:layout_marginBottom="16dp"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/text_chat_indicator"
-        app:layout_constraintTop_toBottomOf="@id/title_bar"/>
+        app:layout_constraintTop_toBottomOf="@id/separate_bar"/>
 
     <TextView
         android:id="@+id/text_chat_indicator"
@@ -51,6 +59,7 @@ android:layout_height="match_parent">
 
     <per.goweii.actionbarex.common.ActionBarSearch
         android:id="@+id/send_bar"
+        android:paddingStart="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/transparent"
@@ -61,16 +70,14 @@ android:layout_height="match_parent">
         app:ab_statusBarMode="unchanged"
         app:ab_statusBarVisible="gone"
         app:ab_titleBarHeight="48dp"
-        app:abs_leftIconColor="?colorPrimary"
-        app:abs_leftIconRes="@mipmap/back"
         app:abs_rightIconColor="?colorPrimary"
         app:abs_rightIconRes="@drawable/ic_send"
         app:abs_titleBgRes="@drawable/search_bar_title_et_bg"
-        app:abs_titleHintColor="#aaaaaa"
+        app:abs_titleHintColor="?android:colorBackground"
         app:abs_titleHintText="请输入..."
-        app:abs_titleMarginVertical="8dp"
+        app:abs_titleMarginVertical="0dp"
         app:abs_titlePaddingHorizontal="16dp"
-        app:abs_titleTextColor="#232323"
+        app:abs_titleTextColor="?colorOnSecondary"
         app:abs_titleTextSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="@id/text_chat_indicator"
