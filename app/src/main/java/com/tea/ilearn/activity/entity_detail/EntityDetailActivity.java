@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,7 +51,7 @@ public class EntityDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String name = intent.getStringExtra("name");
-            String id = intent.getStringExtra("id");
+//            String id = intent.getStringExtra("id");
             String category = intent.getStringExtra("category");
             String subject = intent.getStringExtra("subject");
 
@@ -59,6 +60,12 @@ public class EntityDetailActivity extends AppCompatActivity {
             binding.entitySubject.setText(subject);
 
             binding.star.setOnCheckedChangeListener((btn, checked) -> {
+                if (binding.star.isChecked()) {
+                    Toast.makeText(binding.getRoot().getContext(), "收藏成功", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(binding.getRoot().getContext(), "已取消收藏", Toast.LENGTH_SHORT).show();
+                }
                 // TODO save current "star" status in database
             });
             binding.share.setOnClickListener($ -> {
@@ -74,7 +81,7 @@ public class EntityDetailActivity extends AppCompatActivity {
 
             boolean loaded = false; // TODO get info from database (base on id?)
             if (!loaded) {
-                StaticHandler handler = new StaticHandler(binding.entityDescription, mRelationAdapter, mPropertyAdapter);
+                StaticHandler handler = new StaticHandler(binding.entityDescription, mRelationAdapter, mPropertyAdapter, subject, category);
                 EduKG.getInst().getEntityDetails(subject, name, handler);
                 // TODO save to database
             }
@@ -88,11 +95,14 @@ public class EntityDetailActivity extends AppCompatActivity {
         private TextView entityDescription;
         private RelationListAdapter mRelationAdapter;
         private RelationListAdapter mPropertyAdapter;
+        String subject, category;
 
-        StaticHandler(TextView entityDescription, RelationListAdapter mRelationAdapter, RelationListAdapter mPropertyAdapter) {
+        StaticHandler(TextView entityDescription, RelationListAdapter mRelationAdapter, RelationListAdapter mPropertyAdapter, String subject, String category) {
             this.entityDescription = entityDescription;
             this.mRelationAdapter = mRelationAdapter;
             this.mPropertyAdapter = mPropertyAdapter;
+            this.subject = subject;
+            this.category = category;
         }
 
         @Override
@@ -101,14 +111,14 @@ public class EntityDetailActivity extends AppCompatActivity {
             EntityDetail detail = (EntityDetail) msg.obj;
             if (detail != null) {
                 entityDescription.setText("实体描述，这里还不知道放啥"); // TODO
-                if (detail.getRelations() != null) {
-                    for (EntityDetail.Relation r : detail.getRelations()) {
-                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection())); // TODO 格式调整
-                    }
-                }
                 if (detail.getProperties() != null) {
                     for (EntityDetail.Property p : detail.getProperties()) {
-                        mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2)); // TODO 格式调整
+                        mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2)); // TODO 文字格式调整
+                    }
+                }
+                if (detail.getRelations() != null) {
+                    for (EntityDetail.Relation r : detail.getRelations()) {
+                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(), subject, category)); // TODO 文字格式调整
                     }
                 }
             } else {
