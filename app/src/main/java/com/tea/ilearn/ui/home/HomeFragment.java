@@ -119,7 +119,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void initList() {
-        int initNum = 5; // TODO 0 for EDUKG FUCK
+        int initNum = 0; // TODO 0 for EDUKG FUCK
         List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
         searchSubjectNum = new CountDownLatch(subjects.size() * initNum);
         for (int i = 0; i < initNum; ++i) {

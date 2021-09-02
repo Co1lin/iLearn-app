@@ -95,7 +95,7 @@ public abstract class APIRequest {
     PriorityBlockingQueue<Task> queue = new PriorityBlockingQueue<>();
 
     protected static final int maxRetries = 2;
-    protected static final int timeoutSeconds = 8;
+    protected static final int timeoutSeconds = 60;
     protected static final int retryIntervalSeconds = 2;
     // login / refresh token
     protected static final int maxLoginRetries = 2;
