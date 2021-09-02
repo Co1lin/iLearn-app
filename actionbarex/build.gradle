@@ -1,0 +1,16 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 31
+    defaultConfig {
+        minSdkVersion 28
+        targetSdkVersion 31
+        versionCode 1
+        versionName "1.0"
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    api 'com.github.goweii:StatusBarCompat:1.2.1'
+}

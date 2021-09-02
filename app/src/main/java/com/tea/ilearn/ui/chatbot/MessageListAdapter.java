@@ -4,71 +4,63 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.tea.ilearn.R;
+import com.tea.ilearn.databinding.ChatMeBinding;
+import com.tea.ilearn.databinding.ChatOtherBinding;
 
 import java.util.List;
 
 public class MessageListAdapter extends RecyclerView.Adapter {
 
     private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
-        TextView messageText, timeText, nameText;
-        ImageView profileImage;
+        ChatOtherBinding binding;
 
-        ReceivedMessageHolder(View itemView) {
-            super(itemView);
-            messageText = itemView.findViewById(R.id.text_chat_message_other);
-            nameText = itemView.findViewById(R.id.text_chat_user_other);
-            profileImage = itemView.findViewById(R.id.image_chat_profile_other);
+        ReceivedMessageHolder(ChatOtherBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
-        void bind(Message message) {
-            messageText.setText(message.text);
-            nameText.setText("小艾");
+        void bind(ChatMessage chatMessage) {
+            binding.textChatMessageOther.setText(chatMessage.text);
         }
     }
 
     private class SentMessageHolder extends RecyclerView.ViewHolder {
-        TextView messageText, timeText;
+        ChatMeBinding binding;
 
-        SentMessageHolder(View itemView) {
-            super(itemView);
-
-            messageText = itemView.findViewById(R.id.text_chat_message_me);
+        SentMessageHolder(ChatMeBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
-        void bind(Message message) {
-            messageText.setText(message.text);
+        void bind(ChatMessage chatMessage) {
+            binding.textChatMessageMe.setText(chatMessage.text);
         }
     }
 
-    private Context mContext;
-    private List<Message> mMessageList;
+    private List<ChatMessage> mChatMessageList;
 
-    public MessageListAdapter(Context context, List<Message> messageList) {
-        mContext = context;
-        mMessageList = messageList;
+    public MessageListAdapter(Context context, List<ChatMessage> chatMessageList) {
+        mChatMessageList = chatMessageList;
     }
 
-    public void add(Message m) {
-        mMessageList.add(m);
-        notifyItemInserted(mMessageList.size() - 1);
+    public void add(ChatMessage m) {
+        mChatMessageList.add(m);
+        notifyItemInserted(mChatMessageList.size() - 1);
     }
 
     @Override
     public int getItemCount() {
-        return mMessageList.size();
+        return mChatMessageList.size();
     }
 
     // Determines the appropriate ViewType according to the sender of the message.
     @Override
     public int getItemViewType(int position) {
-        Message message = mMessageList.get(position);
-        return message.who;
+        ChatMessage chatMessage = mChatMessageList.get(position);
+        return chatMessage.who;
     }
 
     // Inflates the appropriate layout according to the ViewType.
@@ -77,13 +69,9 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         View view;
 
         if (viewType == 0) {
-            view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.chat_me, parent, false);
-            return new SentMessageHolder(view);
+            return new SentMessageHolder(ChatMeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         } else if (viewType == 1) {
-            view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.chat_other, parent, false);
-            return new ReceivedMessageHolder(view);
+            return new ReceivedMessageHolder(ChatOtherBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }
 
         return null;
@@ -92,14 +80,15 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     // Passes the message object to a ViewHolder so that the contents can be bound to UI.
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Message message = mMessageList.get(position);
+        ChatMessage chatMessage = mChatMessageList.get(position);
 
         switch (holder.getItemViewType()) {
             case 0:
-                ((SentMessageHolder) holder).bind(message);
+                ((SentMessageHolder) holder).bind(chatMessage);
                 break;
             case 1:
-                ((ReceivedMessageHolder) holder).bind(message);
+                ((ReceivedMessageHolder) holder).bind(chatMessage);
+                break;
         }
     }
 }

@@ -1,138 +1,191 @@
 package com.tea.ilearn.ui.home;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.AdapterView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.abel533.echarts.code.X;
-import com.github.abel533.echarts.series.Bar;
+import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
+import com.tea.ilearn.databinding.FragmentHomeBinding;
+import com.tea.ilearn.net.edukg.EduKG;
+import com.tea.ilearn.net.edukg.Entity;
+import com.tea.ilearn.utils.ACAdapter;
+import com.tea.ilearn.utils.RandChinese;
 
-import com.github.abel533.echarts.axis.CategoryAxis;
-import com.github.abel533.echarts.axis.ValueAxis;
-import com.github.abel533.echarts.json.GsonOption;
-import com.tea.ilearn.utils.EchartsView;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
-import dev.bandb.graphview.AbstractGraphAdapter;
-import dev.bandb.graphview.graph.Graph;
-import dev.bandb.graphview.graph.Node;
-import dev.bandb.graphview.layouts.layered.SugiyamaArrowEdgeDecoration;
-import dev.bandb.graphview.layouts.layered.SugiyamaConfiguration;
-import dev.bandb.graphview.layouts.layered.SugiyamaLayoutManager;
+import per.goweii.actionbarex.common.ActionBarSearch;
+import per.goweii.actionbarex.common.AutoComplTextView;
 
 public class HomeFragment extends Fragment {
-    private EchartsView barChart;
-    private RecyclerView graphView;
-    private AbstractGraphAdapter adapter;
+    private FragmentHomeBinding binding;
+    private ActionBarSearch searchBar;
+    private AutoComplTextView acTextView;
+    private View loadingBar;
+    private View root;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_home, container, false);
-    }
+    private RecyclerView mInfoRecycler;
+    private InfoListAdapter mInfoAdapter;
+
+    private CountDownLatch searchSubjectNum = new CountDownLatch(0);
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        root = binding.getRoot();
+        searchBar = binding.searchBar;
+        loadingBar = searchBar.getForegroundLayer();
+        acTextView = searchBar.getEditTextView();
 
-        barChart = getView().findViewById(R.id.bar_chart);
-        barChart.setWebViewClient(new WebViewClient(){
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                refreshBarChart();
-            }
-
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
+        searchBar.setOnRightIconClickListener(view -> search());
+        // bind enter key
+        searchBar.getEditTextView().setOnKeyListener((view, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
+                search();
                 return true;
             }
+            return false;
+        });
+        // auto completion
+        ArrayList<String> COUNTRIES = new ArrayList<>(Arrays.asList("Belgium", "France", "Italy", "Germany", "Spain", "Sp11", "Sp22"));
+        ACAdapter<String> historyAdapter = new ACAdapter<>(
+                getContext(), R.layout.autocompletion_item,
+                R.id.ac_text, R.id.image_button_del, COUNTRIES,
+                acTextView);
+        acTextView.setAdapter(historyAdapter);
+        acTextView.setDropDownAnchor(searchBar.getId());
+        acTextView.setThreshold(1); // default 2, minimum 1
+        acTextView.setOnFocusChangeListener((view, hasFocus) -> {
+            AutoComplTextView acTView = (AutoComplTextView) view;
+            if (hasFocus)
+                acTView.showDropDown();
         });
 
-        graphView = getView().findViewById(R.id.graph_view);
+        // ================================================================================
 
-        SugiyamaConfiguration configuration = new SugiyamaConfiguration.Builder()
-                .setNodeSeparation(100)
-                .setLevelSeparation(100)
-                .build();
-        graphView.setLayoutManager(new SugiyamaLayoutManager(getContext(), configuration));
-
-        graphView.addItemDecoration(new SugiyamaArrowEdgeDecoration());
-
-        Graph graph = new Graph();
-        Node node1 = new Node("key");
-        Node node2 = new Node("Child 1");
-        Node node3 = new Node("Child 2");
-        Node node4 = new Node("Father");
-        Node node5 = new Node("Mother");
-        Node node6 = new Node("GrandPa");
-        Node node7 = new Node("GrandMa");
-
-        graph.addEdge(node1, node2);
-        graph.addEdge(node1, node3);
-        graph.addEdge(node4, node1);
-        graph.addEdge(node5, node1);
-        graph.addEdge(node6, node1);
-        graph.addEdge(node7, node1);
-
-        adapter = new AbstractGraphAdapter<NodeHolder>() {
-            @Override
-            public NodeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
-                return new NodeHolder(view);
+        binding.sortName.setOnClickListener(view -> {
+            binding.sortCategoryUp.setVisibility(View.VISIBLE);
+            binding.sortCategoryDown.setVisibility(View.VISIBLE);
+            if (binding.sortNameUp.getVisibility() == View.VISIBLE && binding.sortNameDown.getVisibility() == View.INVISIBLE) {
+                binding.sortNameUp.setVisibility(View.INVISIBLE);
+                binding.sortNameDown.setVisibility(View.VISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getName, true);
             }
-
-            @Override
-            public void onBindViewHolder(NodeHolder holder, int position) {
-                holder.mText.setText(getNodeData(position).toString());
+            else {
+                binding.sortNameUp.setVisibility(View.VISIBLE);
+                binding.sortNameDown.setVisibility(View.INVISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getName, false);
             }
-        };
-        adapter.submitGraph(graph);
-        graphView.setAdapter(adapter);
+            mInfoRecycler.scrollToPosition(0);
+        });
+
+        binding.sortCategory.setOnClickListener(view -> {
+            binding.sortNameUp.setVisibility(View.VISIBLE);
+            binding.sortNameDown.setVisibility(View.VISIBLE);
+            if (binding.sortCategoryUp.getVisibility() == View.VISIBLE && binding.sortCategoryDown.getVisibility() == View.INVISIBLE) {
+                binding.sortCategoryUp.setVisibility(View.INVISIBLE);
+                binding.sortCategoryDown.setVisibility(View.VISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getCategory, true);
+            }
+            else {
+                binding.sortCategoryUp.setVisibility(View.VISIBLE);
+                binding.sortCategoryDown.setVisibility(View.INVISIBLE);
+                mInfoAdapter.applySortAndFilter(Info::getCategory, false);
+            }
+            mInfoRecycler.scrollToPosition(0);
+        });
+
+        mInfoRecycler = binding.infoRecycler;
+        mInfoAdapter = new InfoListAdapter(root.getContext(), new ArrayList<Info>());
+        mInfoRecycler.setLayoutManager(new LinearLayoutManager(root.getContext()));
+        mInfoRecycler.setAdapter(mInfoAdapter);
+
+        initList();
+
+        return root;
     }
 
-    void refreshBarChart() {
-        GsonOption option = new GsonOption();
-        option.xAxis(new CategoryAxis().data("周一", "周二", "周三", "周四", "周五", "周六", "周日"));
-        option.yAxis(new ValueAxis());
-        option.title().text("本周学习点").x(X.center);
-
-        Bar bar = new Bar();
-        bar.itemStyle().normal().label().show(true).position("inside");
-        bar.data(120, 200, 150, 80, 70, 110, 130);
-
-        option.series(bar);
-
-        barChart.refreshEchartsWithOption(option);
+    private void initList() {
+        int initNum = 5; // TODO 0 for EDUKG FUCK
+        List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
+        searchSubjectNum = new CountDownLatch(subjects.size() * initNum);
+        for (int i = 0; i < initNum; ++i) {
+            char c = RandChinese.gen();
+            for (String sub : subjects) {
+                StaticHandler handler = new StaticHandler(mInfoAdapter, sub, searchSubjectNum, loadingBar);
+                EduKG.getInst().fuzzySearchEntityWithCourse(sub, String.valueOf(c), handler);
+            }
+        }
     }
 
-    private class NodeHolder extends RecyclerView.ViewHolder {
-        TextView mText;
+    private void search() {
+        if (searchSubjectNum.getCount() == 0) {
+            String query = searchBar.getEditTextView().getText().toString();
+            loadingBar.setVisibility(View.VISIBLE);
+            mInfoAdapter.clear();
+            binding.sortCategoryUp.setVisibility(View.VISIBLE);
+            binding.sortCategoryDown.setVisibility(View.VISIBLE);
+            binding.sortNameUp.setVisibility(View.VISIBLE);
+            binding.sortNameDown.setVisibility(View.VISIBLE);
+            List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
+            searchSubjectNum = new CountDownLatch(subjects.size());
+            for (String sub : subjects) {
+                StaticHandler handler = new StaticHandler(mInfoAdapter, sub, searchSubjectNum, loadingBar);
+                EduKG.getInst().fuzzySearchEntityWithCourse(sub, query, handler);
+            }
+        }
+    }
 
-        NodeHolder(View itemView) {
-            super(itemView);
+    static class StaticHandler extends Handler {
+        private InfoListAdapter mInfoAdapter;
+        private View loadingBar;
+        private String subject;
+        private CountDownLatch expectedNum;
 
-            mText = itemView.findViewById(R.id.text);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int pos = getBindingAdapterPosition();
-                    Log.v("MYDEBUG", "Clicked on " + adapter.getNodeData(pos).toString());
-                    // TODO new intent here, nodes[pos] is clicked
+        StaticHandler(InfoListAdapter mInfoAdapter, String subject,
+                      CountDownLatch _latch, View _loadingBar) {
+            this.mInfoAdapter = mInfoAdapter;
+            this.subject = subject;
+            this.expectedNum = _latch;
+            this.loadingBar = _loadingBar;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            Log.i("HomeFragment/handleMessage", "msg.what: " + msg.what);
+            this.expectedNum.countDown();
+            if (this.expectedNum.getCount() == 0)
+                loadingBar.setVisibility(View.INVISIBLE);
+            List<Entity> entities = (List<Entity>) msg.obj;
+            if (entities != null) {
+                for (Entity e : entities) {
+                    mInfoAdapter.add(new Info(
+                            0,
+                            e.getLabel(),
+                            subject,
+                            false, // TODO from database
+                            false, // TODO from database
+                            e.getCategory(),
+                            e.getUri()
+                    ));
                 }
-            });
+            } else {
+                // TODO empty hint (may be a new type of viewholder)
+            }
         }
     }
 }

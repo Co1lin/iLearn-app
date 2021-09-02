@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="32dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.account.SignupActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/email_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:errorEnabled="true"
+            android:hint="邮箱"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/username_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:errorEnabled="true"
+            android:hint="用户名"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/password_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:endIconMode="password_toggle"
+            app:errorEnabled="true"
+            android:hint="密码"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/password"
+                android:inputType="textPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/signup"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:text="注册" />
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+            <Button
+                android:id="@+id/tosignin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="已有帐号？点我登录"
+                style="@style/Widget.MaterialComponents.Button.TextButton" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <CheckBox
+            android:id="@+id/agree"
+            android:text=""
+            android:textSize="12dp"
+            android:padding="4dp"
+            android:minWidth="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:text="我已阅读并同意"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textSize="11dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/service_term"
+            android:text="服务条款"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textSize="12dp"
+            android:padding="4dp"
+            android:minWidth="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:text="和"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textSize="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/privacy_policy"
+            android:text="隐私政策"
+            android:padding="4dp"
+            android:minWidth="0dp"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textSize="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

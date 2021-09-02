@@ -1,139 +1,143 @@
 package com.tea.ilearn;
 
-import android.app.SearchManager;
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
+import android.graphics.Rect;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.SearchView;
-import android.widget.Spinner;
-import android.widget.Toast;
-import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
-import com.google.android.material.bottomappbar.BottomAppBar;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.tea.ilearn.databinding.ActivityMainBinding;
+import com.tea.ilearn.ui.chatbot.ChatbotFragment;
+import com.tea.ilearn.ui.exercise.ExerciseFragment;
+import com.tea.ilearn.ui.home.HomeFragment;
+import com.tea.ilearn.ui.link.LinkFragment;
+import com.tea.ilearn.ui.me.MeFragment;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
-import net.yslibrary.android.keyboardvisibilityevent.Unregistrar;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private SearchView searchView;
-    private LinearLayout searchBox;
-    private RadioButton searchButton;
-    private RadioGroup searchGroup;
-
-    View fab, bottomAppBar, frame;
-    CoordinatorLayout.LayoutParams params;
+    private ViewPager2 viewPager;
+    private FragmentStateAdapter pagerAdapter;
+    private BottomNavigationView navView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getSupportActionBar().hide();
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        viewPager = binding.pager;
+        navView = binding.navView;
+        List<Fragment> fragments = new ArrayList<Fragment>() {{
+            add(new ExerciseFragment());
+            add(new ChatbotFragment());
+            add(new HomeFragment());
+            add(new LinkFragment());
+            add(new MeFragment());
+        }};
+        viewPager.setUserInputEnabled(false);
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        navView.setBackground(null);
-        navView.getMenu().getItem(2).setEnabled(false);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home,
-                R.id.navigation_chatbot,
-                R.id.navigation_notifications,
-                R.id.navigation_test
-        ).build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = findViewById(R.id.search_view);
-        searchBox = findViewById(R.id.search_box);
-        searchButton = findViewById(R.id.search_entity);
-        searchGroup = findViewById(R.id.search_group);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-        MainActivity that = this;
-        searchGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        pagerAdapter = new ScreenSlidePagerAdapter(this, fragments);
+        viewPager.setAdapter(pagerAdapter);
+        setDefaultView(2);
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-                RadioButton btn = (RadioButton)searchGroup.findViewById(checkedId);
-            }
-        });
-        searchBox.setVisibility(View.INVISIBLE);
-        searchButton.setChecked(true);
-
-        int searchCloseButtonId = searchView.getContext().getResources()
-                .getIdentifier("android:id/search_close_btn", null, null);
-        ImageView closeButton = (ImageView) this.searchView.findViewById(searchCloseButtonId);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchView.setQuery("",false);
-                searchBox.setVisibility(View.INVISIBLE);
-                searchButton.setChecked(true);
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                navView.getMenu().getItem(position).setChecked(true);
             }
         });
 
-        fab = findViewById(R.id.fab);
-        bottomAppBar = findViewById(R.id.bottomAppBar);
-        frame = findViewById(R.id.nav_host_fragment_activity_main);
-        params = new CoordinatorLayout.LayoutParams(-1, -1);
+        viewPager.setOffscreenPageLimit(6);
 
-        final ViewTreeObserver observer= fab.getViewTreeObserver();
-        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                params.setMargins(0, 0, 0, fab.getHeight());
-                frame.setLayoutParams(params);
+        navView.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case(R.id.navigation_exercise):
+                    viewPager.setCurrentItem(0, true);
+                    break;
+                case(R.id.navigation_chatbot):
+                    viewPager.setCurrentItem(1, true);
+                    break;
+                case(R.id.navigation_home):
+                    viewPager.setCurrentItem(2, true);
+                    break;
+                case(R.id.navigation_link):
+                    viewPager.setCurrentItem(3, true);
+                    break;
+                case(R.id.navigation_me):
+                    viewPager.setCurrentItem(4, true);
+                    break;
             }
+            return true;
         });
 
-        KeyboardVisibilityEvent.setEventListener(
-                this,
-                new KeyboardVisibilityEventListener() {
-                    @Override
-                    public void onVisibilityChanged(boolean isOpen) {
-                        if (isOpen) {
-                            findViewById(R.id.fab).setVisibility(View.GONE);
-                            findViewById(R.id.bottomAppBar).setVisibility(View.GONE);
-                        }
-                        else {
-                            findViewById(R.id.fab).setVisibility(View.VISIBLE);
-                            findViewById(R.id.bottomAppBar).setVisibility(View.VISIBLE);
-                        }
-                    }
-                }
-        );
+        KeyboardVisibilityEvent.setEventListener(this, isOpen -> {
+            if (isOpen)
+                navView.setVisibility(View.GONE);
+            else
+                navView.setVisibility(View.VISIBLE);
+        });
     }
 
-    public void doSearch(View v) {
-        searchBox.setVisibility(View.VISIBLE);
-        searchView.setIconified(false);
+    private void setDefaultView(int position) {
+        viewPager.setCurrentItem(position, false);
+        navView.getMenu().getItem(position).setChecked(true);
+    }
+
+    private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
+
+        private List<Fragment> fragments;
+
+        public ScreenSlidePagerAdapter(FragmentActivity fragmentActivity,
+                                       List<Fragment> _fragments) {
+            super(fragmentActivity);
+            fragments = _fragments;
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            return fragments.get(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return fragments.size();
+        }
+    }
+
+    /**
+     * Ref <a href="https://stackoverflow.com/a/28939113">EditText, clear focus on touch outside</a>
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if (v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+        }
+        return super.dispatchTouchEvent( event );
     }
 }

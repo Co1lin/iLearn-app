@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.me.MeFragment" >
+
+    <LinearLayout
+        android:id="@+id/profile"
+        android:layout_margin="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <ImageView
+            android:id="@+id/image_profile"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="2dp"
+            android:contentDescription="User Icon"
+            android:scaleType="fitXY"
+            app:tint="?colorOnPrimary"
+            android:src="@drawable/ic_profile_24" />
+        <TextView
+            android:id="@+id/name_profile"
+            android:layout_marginStart="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            android:textColor="?colorOnPrimary"
+            android:text="登录帐号"
+            android:gravity="center" >
+        </TextView>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/place_holder"
+        app:layout_constraintTop_toBottomOf="@id/profile"
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/top_corner"
+        android:paddingTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/place_holder">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                app:cardElevation="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="本周学习点"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/line_chart"
+                    android:layout_marginBottom="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                app:cardElevation="0dp"
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:padding="8dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <ImageButton
+                            android:padding="4dp"
+                            android:layout_gravity="center_horizontal"
+                            android:src="@drawable/ic_cache_24"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            app:tint="@color/md_teal_600"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:layout_gravity="center_horizontal"
+                            android:text="离线缓存"
+                            android:textAppearance="?attr/textAppearanceBody2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <ImageButton
+                            android:padding="4dp"
+                            android:layout_gravity="center_horizontal"
+                            android:src="@drawable/ic_history_24"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            app:tint="@color/md_indigo_500"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:layout_gravity="center_horizontal"
+                            android:text="浏览记录"
+                            android:textAppearance="?attr/textAppearanceBody2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <ImageButton
+                            android:padding="4dp"
+                            android:layout_gravity="center_horizontal"
+                            android:src="@drawable/ic_star_24"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:layout_gravity="center_horizontal"
+                            android:text="我的收藏"
+                            android:textAppearance="?attr/textAppearanceBody2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                app:cardElevation="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/dark_mode_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:checked="false"
+                        android:paddingStart="8dp"
+                        android:text="@string/dark_mode" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="?android:colorBackground" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/cache_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:checked="false"
+                        android:paddingStart="8dp"
+                        android:text="应用缓存" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                app:cardElevation="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        app:cardCornerRadius="0dp">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentBottom="true"
+                                android:gravity="center_vertical"
+                                android:text="手动同步数据"
+                                android:textAppearance="?attr/textAppearanceBody2" />
+
+                            <ImageButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_alignParentBottom="true"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:layout_marginEnd="8dp"
+                                android:src="@drawable/ic_refresh_24" />
+                        </RelativeLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="?android:colorBackground" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        app:cardCornerRadius="0dp">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentBottom="true"
+                                android:gravity="center_vertical"
+                                android:text="分享iLearn"
+                                android:textAppearance="?attr/textAppearanceBody2" />
+
+                            <ImageButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_alignParentBottom="true"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:layout_marginEnd="8dp"
+                                android:src="@drawable/ic_share_square_24" />
+                        </RelativeLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="?android:colorBackground" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:clickable="true"
+                        app:cardCornerRadius="0dp">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentLeft="true"
+                                android:text="iLearn版本"
+                                android:textAppearance="?attr/textAppearanceBody2"></TextView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:textColor="@color/md_brown_300"
+                                android:text="1.0.0"
+                                android:textAppearance="?attr/textAppearanceBody2"></TextView>
+                        </RelativeLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="48dp" />
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
