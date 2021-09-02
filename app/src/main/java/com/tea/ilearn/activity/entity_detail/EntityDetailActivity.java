@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
 import com.tea.ilearn.net.edukg.EduKG;
-import com.tea.ilearn.net.edukg.EntityDetail;
+import com.tea.ilearn.net.edukg.EduKGEntityDetail;
+import com.tea.ilearn.net.edukg.EduKGProperty;
+import com.tea.ilearn.net.edukg.EduKGRelation;
 
 import java.util.ArrayList;
 
@@ -98,16 +100,16 @@ public class EntityDetailActivity extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            EntityDetail detail = (EntityDetail) msg.obj;
+            EduKGEntityDetail detail = (EduKGEntityDetail) msg.obj;
             if (detail != null) {
                 entityDescription.setText("实体描述，这里还不知道放啥"); // TODO
                 if (detail.getRelations() != null) {
-                    for (EntityDetail.Relation r : detail.getRelations()) {
+                    for (EduKGRelation r : detail.getRelations()) {
                         mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection())); // TODO 格式调整
                     }
                 }
                 if (detail.getProperties() != null) {
-                    for (EntityDetail.Property p : detail.getProperties()) {
+                    for (EduKGProperty p : detail.getProperties()) {
                         mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2)); // TODO 格式调整
                     }
                 }

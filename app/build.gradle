@@ -64,12 +64,12 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp'
     implementation 'com.squareup.okhttp3:logging-interceptor'
 
-    implementation 'com.github.liujingxing.rxhttp:rxhttp:2.6.5'
-    annotationProcessor 'com.github.liujingxing.rxhttp:rxhttp-compiler:2.6.5'
+    implementation 'com.github.liujingxing.rxhttp:rxhttp:2.6.7'
+    annotationProcessor 'com.github.liujingxing.rxhttp:rxhttp-compiler:2.6.7'
     //rxjava3
     implementation 'io.reactivex.rxjava3:rxjava:3.0.6'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'com.github.liujingxing.rxlife:rxlife-rxjava3:2.1.0'
+    implementation 'com.github.liujingxing.rxlife:rxlife-rxjava3:2.2.0'
     
     // keyboard appear/hide event handler
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC3'

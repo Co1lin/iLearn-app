@@ -65,7 +65,7 @@ public class EduKG extends APIRequest {
                 put("course", course);
                 put("name", entityName);
             }},
-            p -> p.asEduKGResponse(EntityDetail.class),
+            p -> p.asEduKGResponse(EduKGEntityDetail.class),
             handler
         );
     }
