@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
 import com.tea.ilearn.net.edukg.EduKG;
@@ -119,10 +118,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void initList() {
-        int initNum = 5;
-        List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
+        int initNum = 0; // TODO 0 for EDUKG FUCK
+        List<String> subjects = Arrays.asList("biology"); // TODO change to tablayout items
         searchSubjectNum = new CountDownLatch(subjects.size() * initNum);
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < initNum; ++i) {
             char c = RandChinese.gen();
             for (String sub : subjects) {
                 StaticHandler handler = new StaticHandler(mInfoAdapter, sub, searchSubjectNum, loadingBar);
@@ -140,7 +139,7 @@ public class HomeFragment extends Fragment {
             binding.sortCategoryDown.setVisibility(View.VISIBLE);
             binding.sortNameUp.setVisibility(View.VISIBLE);
             binding.sortNameDown.setVisibility(View.VISIBLE);
-            List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
+            List<String> subjects = Arrays.asList("biology"); // TODO change to tablayout items
             searchSubjectNum = new CountDownLatch(subjects.size());
             for (String sub : subjects) {
                 StaticHandler handler = new StaticHandler(mInfoAdapter, sub, searchSubjectNum, loadingBar);

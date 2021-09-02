@@ -5,10 +5,20 @@ public class Relation {
     int dir; // 0 for left, 1 for right, 2 for property
     String type;
     String name;
+    String subject;
+    String category;
 
     public Relation(String type, String name, int dir) {
         this.dir = dir;
         this.type = type;
         this.name = name;
+    }
+
+    public Relation(String type, String name, int dir, String subject, String category) {
+        this.dir = dir;
+        this.type = type;
+        this.name = name;
+        this.subject = subject;
+        this.category = category;
     }
 }
