@@ -8,6 +8,7 @@
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/loading_bar"
+        app:trackThickness="2dp"
         android:indeterminate="true"
         android:layout_gravity="bottom"
         android:layout_width="match_parent"
