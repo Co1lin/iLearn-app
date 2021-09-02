@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             add(new LinkFragment());
             add(new MeFragment());
         }};
+        viewPager.setUserInputEnabled(false);
 
         pagerAdapter = new ScreenSlidePagerAdapter(this, fragments);
         viewPager.setAdapter(pagerAdapter);

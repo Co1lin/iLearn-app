@@ -109,20 +109,22 @@ public class EntityDetailActivity extends AppCompatActivity {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             EntityDetail detail = (EntityDetail) msg.obj;
+            entityDescription.setText("实体描述仍在标注中...");
             if (detail != null) {
-                entityDescription.setText("实体描述，这里还不知道放啥"); // TODO
-                if (detail.getProperties() != null) {
-                    for (EntityDetail.Property p : detail.getProperties()) {
-                        mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2)); // TODO 文字格式调整
-                    }
-                }
                 if (detail.getRelations() != null) {
                     for (EntityDetail.Relation r : detail.getRelations()) {
-                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(), subject, category)); // TODO 文字格式调整
+                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection()));
                     }
                 }
-            } else {
-                // TODO empty content in entity detail
+                if (detail.getProperties() != null) {
+                    for (EntityDetail.Property p : detail.getProperties()) {
+                        if (p.getPredicateLabel().equals("描述")) {
+                            entityDescription.setText("实体描述: "+p.getObject());
+                        } else {
+                            mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
+                        }
+                    }
+                }
             }
         }
     }
