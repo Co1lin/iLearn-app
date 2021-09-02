@@ -128,7 +128,7 @@ public class HomeFragment extends Fragment {
             searchSubjectNum = new CountDownLatch(subjects.size());
             for (String sub : subjects) {
                 StaticHandler handler = new StaticHandler(
-                        mInfoAdapter, sub, searchSubjectNum, loadingBar);
+                        mInfoAdapter, sub, query, searchSubjectNum, loadingBar);
                 EduKG.getInst().fuzzySearchEntityWithCourse(sub, query, handler);
             }
         }
@@ -141,7 +141,7 @@ public class HomeFragment extends Fragment {
         private CountDownLatch expectedNum;
 
         StaticHandler(InfoListAdapter mInfoAdapter, String subject,
-                      CountDownLatch _latch, View _loadingBar) {
+                      String keyword, CountDownLatch _latch, View _loadingBar) {
             this.mInfoAdapter = mInfoAdapter;
             this.subject = subject;
             this.expectedNum = _latch;
@@ -157,6 +157,7 @@ public class HomeFragment extends Fragment {
                 loadingBar.setVisibility(View.INVISIBLE);
             List<Entity> entities = (List<Entity>) msg.obj;
             if (entities != null) {
+
                 for (Entity e : entities) {
                     mInfoAdapter.add(new Info(
                             0,

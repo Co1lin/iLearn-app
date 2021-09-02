@@ -3,6 +3,7 @@ package com.tea.ilearn.net.edukg;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.tea.ilearn.model.SearchHistory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import io.objectbox.annotation.Id;
 import io.objectbox.annotation.Index;
 import io.objectbox.annotation.Unique;
 import io.objectbox.converter.PropertyConverter;
+import io.objectbox.relation.ToMany;
 
 @Entity
 public class EduKGEntityDetail {
@@ -20,6 +22,8 @@ public class EduKGEntityDetail {
     public long id;
     @Index @Unique
     String uri;
+
+    public ToMany<SearchHistory> searchHistories;
 
     @Convert(converter = EduKGRelationsConverter.class, dbType = String.class)
     @SerializedName("content")

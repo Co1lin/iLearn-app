@@ -25,32 +25,79 @@
       "relations": []
     },
     {
-      "id": "2:1424950325250164999",
-      "lastPropertyId": "2:4906288161705186355",
-      "name": "EntityDetailDB",
+      "id": "3:8898722406224917968",
+      "lastPropertyId": "9:3066170685302677632",
+      "name": "EduKGEntityDetail",
       "properties": [
         {
-          "id": "1:1703026834862990049",
+          "id": "1:5838628213155278303",
           "name": "id",
           "type": 6,
           "flags": 1
+        },
+        {
+          "id": "2:1068526000191538234",
+          "name": "uri",
+          "indexId": "3:1455234633446841387",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:9135691608341880787",
+          "name": "relations",
+          "type": 9
+        },
+        {
+          "id": "4:4139767317061761337",
+          "name": "properties",
+          "type": 9
+        },
+        {
+          "id": "5:6888154607326385982",
+          "name": "label",
+          "type": 9
+        },
+        {
+          "id": "6:8471921589127721082",
+          "name": "course",
+          "type": 9
+        },
+        {
+          "id": "7:7798697764591647040",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "8:6993127501199202525",
+          "name": "stared",
+          "type": 1,
+          "flags": 4
+        },
+        {
+          "id": "9:3066170685302677632",
+          "name": "viewed",
+          "type": 1,
+          "flags": 4
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "2:1424950325250164999",
-  "lastIndexId": "2:3358288530906098755",
+  "lastEntityId": "3:8898722406224917968",
+  "lastIndexId": "3:1455234633446841387",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
+  "retiredEntityUids": [
+    1424950325250164999
+  ],
   "retiredIndexUids": [
     3358288530906098755
   ],
   "retiredPropertyUids": [
-    4906288161705186355
+    4906288161705186355,
+    1703026834862990049
   ],
   "retiredRelationUids": [],
   "version": 1

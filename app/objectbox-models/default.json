@@ -80,12 +80,18 @@
           "flags": 4
         }
       ],
-      "relations": []
+      "relations": [
+        {
+          "id": "1:631130488093392397",
+          "name": "searchHistories",
+          "targetId": "1:1708470351799440945"
+        }
+      ]
     }
   ],
   "lastEntityId": "3:8898722406224917968",
   "lastIndexId": "3:1455234633446841387",
-  "lastRelationId": "0:0",
+  "lastRelationId": "1:631130488093392397",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
