@@ -54,8 +54,6 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                 intent.putExtra("subject", info.subject);
                 binding.getRoot().getContext().startActivity(intent);
             });
-
-            // binding.star.setChecked(info.star); // TODO resume may change this
         }
     }
 

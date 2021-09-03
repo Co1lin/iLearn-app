@@ -64,9 +64,6 @@ public class InfoListAdapter extends RecyclerView.Adapter {
 
                 // loaded state already changed when step into entity detail page
             });
-
-            // binding.star.setChecked(info.star); // TODO resume may change this
-            // binding.star.setOnClickListener();
         }
     }
 

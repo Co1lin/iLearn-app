@@ -154,7 +154,7 @@
     },
     {
       "id": "6:1492375767478050399",
-      "lastPropertyId": "2:3758404147956337816",
+      "lastPropertyId": "3:700807021925874127",
       "name": "UserStatistics",
       "properties": [
         {
@@ -167,6 +167,11 @@
           "id": "2:3758404147956337816",
           "name": "firstDate",
           "type": 10
+        },
+        {
+          "id": "3:700807021925874127",
+          "name": "entitiesViewed",
+          "type": 9
         }
       ],
       "relations": []
