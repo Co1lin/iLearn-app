@@ -178,12 +178,12 @@ public abstract class APIRequest {
                     params.put(tokenName, tokenValue);
                 paramAddAll(p, params);
                 Log.i("APIRequest.Request",
-                        p.getParam().getMethod().toString() + p.getParam().getUrl());
+                        p.getParam().getMethod().toString() + " " + p.getParam().getUrl());
                 responseDefiner
                     .define(p)
                     .timeout(timeoutSeconds, TimeUnit.SECONDS)
                     .retry(maxRetries, throwable -> {
-                        Log.i("APIRequest.Request", "retry: " + throwable.getMessage() + p.getParam().getUrl());
+                        Log.i("APIRequest.Request", "retry: " + throwable.getMessage() + " " + p.getParam().getUrl());
                         if (throwable.getMessage().equals(loginFailedMessage)) {
                             syncRefresh(null);
                             loginFailed.set(true);

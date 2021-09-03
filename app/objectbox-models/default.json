@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:1708470351799440945",
-      "lastPropertyId": "2:848891987891014970",
+      "lastPropertyId": "3:3766034624570727434",
       "name": "SearchHistory",
       "properties": [
         {
@@ -19,7 +19,14 @@
           "name": "keyword",
           "indexId": "1:1394991308182446862",
           "type": 9,
-          "flags": 2080
+          "flags": 2048
+        },
+        {
+          "id": "3:3766034624570727434",
+          "name": "subject",
+          "indexId": "6:3394431842432502856",
+          "type": 9,
+          "flags": 2048
         }
       ],
       "relations": []
@@ -154,7 +161,7 @@
     },
     {
       "id": "6:1492375767478050399",
-      "lastPropertyId": "2:3758404147956337816",
+      "lastPropertyId": "3:105032656148028867",
       "name": "UserStatistics",
       "properties": [
         {
@@ -167,13 +174,18 @@
           "id": "2:3758404147956337816",
           "name": "firstDate",
           "type": 10
+        },
+        {
+          "id": "3:105032656148028867",
+          "name": "entitiesViewed",
+          "type": 9
         }
       ],
       "relations": []
     }
   ],
   "lastEntityId": "6:1492375767478050399",
-  "lastIndexId": "5:4807677119589930556",
+  "lastIndexId": "6:3394431842432502856",
   "lastRelationId": "2:8848712912095567751",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

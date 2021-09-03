@@ -28,6 +28,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
+import com.tea.ilearn.model.Account;
 import com.tea.ilearn.net.backend.Backend;
 
 import java.util.ArrayList;
@@ -109,20 +110,47 @@ public class MeFragment extends Fragment {
         lineChart.setData(lineData);
         lineChart.invalidate();
 
-        // TODO: login test
-        StaticHandler handler = new StaticHandler();
-        Backend.getInst().login("colin", "colin", handler);
+        // TODO: register and login
+        LoginHandler loginHandler = new LoginHandler();
+        RegisterHandler registerHandler = new RegisterHandler();
+        Backend.getInst().register("coln@lin.sldf", "cnkjllj", "olin", registerHandler);
+        Backend.getInst().login("cnkjllj", "olin", loginHandler);
 
         return root;
     }
 
-    static class StaticHandler extends Handler {
+    static class RegisterHandler extends Handler {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            Log.i("me", String.valueOf(msg.what));
+            Log.i("MeFragment/registerHandler", String.valueOf(msg.what));
+            if (msg.what == 0 && msg.obj != null) {
+                Account account = (Account) msg.obj;
+                // TODO
+            }
+            else {  // register failed
+                if (((String) msg.obj).contains("duplicated")) {
+                    // TODO
+                }
+            }
+        }
+    }
+
+    static class LoginHandler extends Handler {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            Log.i("MeFragment/registerHandler", String.valueOf(msg.what));
+            if (msg.what == 0 && msg.obj != null) {
+                Account account = (Account) msg.obj;
+                // TODO
+            }
+            else {  // register failed
+                if (((String) msg.obj).contains("login failed")) {
+                    // TODO: incorrect username or password
+                }
+            }
         }
     }
 }
-// TODO left padding of the text
-// TODO issue in dark mode
+// TODO edit text color issue in dark mode

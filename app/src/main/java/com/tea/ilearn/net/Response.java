@@ -1,7 +1,10 @@
 package com.tea.ilearn.net;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Response<T> {
     private int     code;
+    @SerializedName(value = "msg", alternate = "message")
     private String  msg;
     private T       data;
 

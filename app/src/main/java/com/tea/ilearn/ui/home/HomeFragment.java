@@ -55,8 +55,14 @@ public class HomeFragment extends Fragment {
             Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
             List<SearchHistory> searchHistories = historyBox.getAll();
             ArrayList<String> histories = new ArrayList<>();
-            for (SearchHistory searchHistory : searchHistories)
-                histories.add(searchHistory.getKeyword());
+            HashMap<String, Boolean> added = new HashMap<>();
+            for (SearchHistory searchHistory : searchHistories) {
+                String keyword = searchHistory.getKeyword();
+                if (added.get(keyword) != null) {
+                    histories.add(keyword);
+                    added.put(keyword, true);
+                }
+            }
             getActivity().runOnUiThread(() -> {
                 ACAdapter<String> historyAdapter = new ACAdapter<>(
                         getContext(), R.layout.autocompletion_item,
@@ -197,12 +203,12 @@ public class HomeFragment extends Fragment {
             Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
             Box<EduKGEntityDetail> entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
             Query<SearchHistory> historyQuery = historyBox.query()
-                    .equal(SearchHistory_.keyword, keyword).build();
+                    .equal(SearchHistory_.keyword, keyword).equal(SearchHistory_.subject, subject).build();
             List<SearchHistory> historiesRes = historyQuery.find();
             historyQuery.close();
             SearchHistory history;
             if (historiesRes == null || historiesRes.size() == 0) {
-                history = new SearchHistory(keyword);
+                history = new SearchHistory().setKeyword(keyword).setSubject(subject);
                 historyBox.put(history);
             } else {
                 history = historiesRes.get(0);
@@ -270,7 +276,7 @@ public class HomeFragment extends Fragment {
                 } else {
                     // TODO empty UI
                     new Thread(() -> {  // store history with no entity
-                        SearchHistory emptyHistory = new SearchHistory(keyword);
+                        SearchHistory emptyHistory = new SearchHistory().setKeyword(keyword).setSubject(subject);
                         historyBox.put(emptyHistory);
                     }).start();
                 }

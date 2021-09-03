@@ -6,6 +6,7 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 
 import com.tea.ilearn.model.Account;
+import com.tea.ilearn.model.UserStatistics;
 import com.tea.ilearn.net.APIRequest;
 import com.tea.ilearn.utils.ObjectBox;
 
@@ -64,20 +65,12 @@ public class Backend extends APIRequest {
         }
     }
 
-    public void login(String username, String password, Handler handler) {
-        loginParams = new HashMap<String, Object>(){{
-            put("username", username);
-            put("password", password);
-        }};
-        asyncRefresh(handler);
-    }
-
-    class RegisterCallbackHandler extends Handler {
+    class LoggedInCallbackHandler extends Handler {
         Handler originalHandler;
         String username;
         String password;
 
-        public RegisterCallbackHandler(Handler originalHandler,
+        public LoggedInCallbackHandler(Handler originalHandler,
                                        String username, String password) {
             this.originalHandler = originalHandler;
             this.username = username;
@@ -103,8 +96,16 @@ public class Backend extends APIRequest {
                 accountBox.put(account);
                 msg.obj = account;  // send account to frontend
             }
-            Message.obtain(originalHandler, msg.what, msg.obj);
+            Message.obtain(originalHandler, msg.what, msg.obj).sendToTarget();
         }
+    }
+
+    public void login(String username, String password, Handler handler) {
+        loginParams = new HashMap<String, Object>(){{
+            put("username", username);
+            put("password", password);
+        }};
+        asyncRefresh(new LoggedInCallbackHandler(handler, username, password));
     }
 
     public void register(String email, String username,
@@ -116,7 +117,7 @@ public class Backend extends APIRequest {
                     put("password", password);
                 }},
                 p -> p.asResponse(TokenResponse.class),
-                new RegisterCallbackHandler(handler, username, password)
+                new LoggedInCallbackHandler(handler, username, password)
         );
     }
 
@@ -152,4 +153,127 @@ public class Backend extends APIRequest {
                 handler);
     }
     // TODO reset password by email? ask TA
+
+    // personal data
+    public void getPersonalData(Handler handler) {
+        Handler callbackHandler = new GetPersonalDataCallback(handler);
+        getUserStatistics(callbackHandler);
+        getSearchHistories(callbackHandler);
+        getEntities(callbackHandler);
+        getCategories(callbackHandler);
+    }
+
+    static class GetPersonalDataCallback extends Handler {
+        Handler originalHandler;
+
+        public GetPersonalDataCallback(Handler originalHandler) {
+            this.originalHandler = originalHandler;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+        }
+    }
+
+    // user statistics
+    public void uploadUserStatistics(Handler handler) {
+        new Thread(() -> {
+            Box<UserStatistics> userStatisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
+            List<UserStatistics> res = userStatisticsBox.getAll();
+            if (res != null && res.size() > 0) {
+                UserStatistics statistics = res.get(0);
+                POSTJson("/users/viewed",
+                        new HashMap<String, Object>(){{
+                            put("first_date", statistics.getFirstDate());
+                            put("entities_viewed", statistics.getEntitiesViewed());
+                        }},
+                        p -> p.asResponse(UserStatistics.class),
+                        handler);
+            }
+        }).start();
+    }
+
+    public void getUserStatistics(Handler handler) {
+        Handler callbackHandler = new GetUserStatisticsCallback(handler);
+    }
+
+    static class GetUserStatisticsCallback extends Handler {
+        Handler originalHandler;
+
+        public GetUserStatisticsCallback(Handler originalHandler) {
+            this.originalHandler = originalHandler;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+        }
+    }
+
+    // search histories
+    public void uploadSearchHistories(Handler handler) {
+
+    }
+
+    public void getSearchHistories(Handler handler) {
+        Handler callbackHandler = new GetUserStatisticsCallback(handler);
+    }
+
+    static class GetSearchHistoriesCallback extends Handler {
+        Handler originalHandler;
+
+        public GetSearchHistoriesCallback(Handler originalHandler) {
+            this.originalHandler = originalHandler;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+        }
+    }
+
+    // "viewed" entities
+    public void uploadEntities(Handler handler) {
+
+    }
+
+    public void getEntities(Handler handler) {
+        Handler callbackHandler = new GetEntitiesCallback(handler);
+    }
+
+    static class GetEntitiesCallback extends Handler {
+        Handler originalHandler;
+
+        public GetEntitiesCallback(Handler originalHandler) {
+            this.originalHandler = originalHandler;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+        }
+    }
+
+    // categories
+    public void uploadCategories(Handler handler) {
+
+    }
+
+    public void getCategories(Handler handler) {
+        Handler callbackHandler = new GetEntitiesCallback(handler);
+    }
+
+    static class GetCategoriesCallback extends Handler {
+        Handler originalHandler;
+
+        public GetCategoriesCallback(Handler originalHandler) {
+            this.originalHandler = originalHandler;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+        }
+    }
 }

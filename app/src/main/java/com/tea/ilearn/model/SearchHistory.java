@@ -6,7 +6,6 @@ import io.objectbox.annotation.Backlink;
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
 import io.objectbox.annotation.Index;
-import io.objectbox.annotation.Unique;
 import io.objectbox.relation.ToMany;
 
 @Entity
@@ -15,8 +14,10 @@ public class SearchHistory {
     public long id;
 
     @Index
-    @Unique
     String keyword;
+
+    @Index
+    String subject;
 
     @Backlink(to = "searchHistories")
     public ToMany<EduKGEntityDetail> entities;
@@ -29,16 +30,21 @@ public class SearchHistory {
 
     public SearchHistory() {}
 
-    public SearchHistory(String keyword) {
-        this.keyword = keyword;
-    }
-
     public String getKeyword() {
         return keyword;
     }
 
+    public String getSubject() {
+        return subject;
+    }
+
     public SearchHistory setKeyword(String keyword) {
         this.keyword = keyword;
+        return this;
+    }
+
+    public SearchHistory setSubject(String subject) {
+        this.subject = subject;
         return this;
     }
 }
