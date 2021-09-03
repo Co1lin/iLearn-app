@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import rxhttp.wrapper.param.RxHttp;
 import rxhttp.wrapper.param.RxHttpFormParam;
@@ -128,12 +129,12 @@ public abstract class APIRequest {
                 success.set(true);
                 lastRefreshSuccess = System.currentTimeMillis();
                 if (handler != null)
-                    Message.obtain(handler, 0, "login success").sendToTarget();
+                    Message.obtain(handler, 0, response).sendToTarget();
                 Log.i("APIRequest.refresh", ": onRefreshSuccess completed");
             }, throwable -> {
                 if (handler != null)
-                    Message.obtain(handler, 1, "login failed").sendToTarget();
-                Log.e("APIRequest.refresh", "login error: " +  throwable.toString() + loginParams.get("password"));
+                    Message.obtain(handler, 1, throwable.getMessage()).sendToTarget();
+                Log.e("APIRequest.refresh", "login error: " + throwable.getMessage());
             });
             return success.get();
         }
@@ -164,6 +165,7 @@ public abstract class APIRequest {
         new Thread(() -> {
             AtomicBoolean loginFailed = new AtomicBoolean(false);
             AtomicBoolean messageSent = new AtomicBoolean(false);
+            AtomicReference<String> lastErrorMessage = new AtomicReference<>();
             int loopCounter = 0;
             do {
                 loopCounter++;
@@ -195,12 +197,14 @@ public abstract class APIRequest {
                         Message.obtain(handler, 0, respObj).sendToTarget();
                         messageSent.set(true);
                     }, throwable -> {
-                        if (!throwable.getMessage().equals(loginFailedMessage))
-                            Log.e("APIRequest.Request", "error: " + throwable.getMessage() + p.getParam().getUrl());
+                        if (!throwable.getMessage().equals(loginFailedMessage)) {
+                            Log.e("APIRequest.Request", "error: " + throwable.getMessage() + " " + p.getParam().getUrl());
+                            lastErrorMessage.set(throwable.getMessage());
+                        }
                     });
             } while (loginFailed.get() && loopCounter < maxLoginRetries);
             if (!messageSent.get())
-                Message.obtain(handler, 1).sendToTarget();  // send failure message
+                Message.obtain(handler, 1, lastErrorMessage).sendToTarget();  // send failure message
         }).start();
     }
 

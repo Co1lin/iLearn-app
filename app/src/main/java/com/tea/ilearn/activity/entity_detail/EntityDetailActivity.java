@@ -85,7 +85,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             binding.entityCategory.setText(category);
             binding.entitySubject.setText(subject);
 
-            binding.star.setOnCheckedChangeListener((btn, checked) -> {
+            binding.star.setOnClickListener($ -> {
                 if (binding.star.isChecked())
                     Toast.makeText(binding.getRoot().getContext(), "收藏成功", Toast.LENGTH_SHORT).show();
                 else
@@ -167,7 +167,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             super.handleMessage(msg);
             EduKGEntityDetail detail = (EduKGEntityDetail) msg.obj;
             entityDescription.setText("实体描述仍在标注中...");
-            if (detail != null) {
+            if (msg.what == 0 && detail != null) {
                 if (detail.getRelations() != null) {
                     for (EduKGRelation r : detail.getRelations())
                         mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(), subject, category, r.getObject()));
@@ -186,8 +186,14 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     getEntityDetail(detail.getUri());
                     if (detail.getRelations() != null && detail.getRelations().size() > 0) {
                         entityDetail.setRelations(detail.getRelations());
-                        // TODO colin: store entities in relations
-
+                        // store entities in relations to DB
+                        for (EduKGRelation relation : detail.getRelations()) {
+                            try {
+                                entityBox.put(new EduKGEntityDetail()
+                                        .setLabel(relation.getObjectLabel())
+                                        .setUri(relation.getObject()));
+                            } catch (Exception e) { /* duplicated */ }
+                        } // end for
                     }
                     if (detail.getProperties() != null && detail.getProperties().size() > 0) {
                         entityDetail.setProperties(detail.getProperties());
