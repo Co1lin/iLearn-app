@@ -22,7 +22,6 @@ import com.sina.weibo.sdk.common.UiError;
 import com.sina.weibo.sdk.openapi.IWBAPI;
 import com.sina.weibo.sdk.openapi.WBAPIFactory;
 import com.sina.weibo.sdk.share.WbShareCallback;
-import com.tea.ilearn.Constant;
 import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
 import com.tea.ilearn.model.Category;
@@ -221,7 +220,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
     private IWBAPI mWBAPI;
 
     private void initSDK() {
-        AuthInfo authInfo = new AuthInfo(this, Constant.WeiboSDK.APP_KEY, Constant.WeiboSDK.REDIRECT_URL, Constant.WeiboSDK.SCOPE);
+        AuthInfo authInfo = new AuthInfo(this, "83638447", "", "");
         mWBAPI = WBAPIFactory.createWBAPI(this);
         mWBAPI.registerApp(this, authInfo);
     }

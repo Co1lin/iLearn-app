@@ -133,7 +133,7 @@ public abstract class APIRequest {
             }, throwable -> {
                 if (handler != null)
                     Message.obtain(handler, 1, "login failed").sendToTarget();
-                Log.e("APIRequest.refresh", "login error: " + throwable.toString());
+                Log.e("APIRequest.refresh", "login error: " +  throwable.toString() + loginParams.get("password"));
             });
             return success.get();
         }
