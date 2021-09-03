@@ -144,7 +144,12 @@ public class Backend extends APIRequest {
     }
 
     public void checkPassword(String password, Handler handler) {
-
+        POSTJson("/users/checkpassword",
+                new HashMap<String, Object>(){{
+                    put("password", password);
+                }},
+                p -> p.asClass(SimpleResponse.class),
+                handler);
     }
     // TODO reset password by email? ask TA
 }

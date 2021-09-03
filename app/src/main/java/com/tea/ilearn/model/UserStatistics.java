@@ -13,6 +13,7 @@ public class UserStatistics {
 
     Date firstDate;
 
+
     ArrayList<Integer> entitiesViewed = new ArrayList<>();
 
     public UserStatistics setFirstDate(Date firstDate) {
