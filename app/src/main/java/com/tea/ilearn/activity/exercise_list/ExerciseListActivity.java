@@ -76,11 +76,15 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
             List<Problem> problems = (List<Problem>) msg.obj;
             if (msg.what == 0 && problems != null && problems.size() != 0) {
                 List<ExerciseFragment> fragments = new ArrayList<>();
+                int numValidProblem = 0;
+                for (Problem p : problems)
+                    if (p.getDescription() != null) ++numValidProblem;
                 int i = 0;
-                for (Problem p : problems) { // TODO these code is slow, acceleration is needed
+                for (Problem p : problems) {
+                    if (p.getDescription() == null) continue;
                     i += 1;
                     ExerciseFragment fragment = new ExerciseFragment(
-                            i+"/"+problems.size(),
+                            i+"/"+numValidProblem,
                             p.getDescription(),
                             p.getChoices(),
                             p.getAnswer(),
