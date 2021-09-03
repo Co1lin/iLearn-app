@@ -31,4 +31,10 @@ public class Constant {
 
         public static final String ERROR_MSG    = "系统错误，请稍后重试或联系客服。";
     }
+
+    public static class WeiboSDK {
+        public static final String APP_KEY      = "83638447";
+        public static final String REDIRECT_URL = "https://api.weibo.com/oauth2/default.html";
+        public static final String SCOPE = "";
+    }
 }

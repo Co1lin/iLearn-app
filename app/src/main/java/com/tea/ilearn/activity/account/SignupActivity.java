@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.florent37.viewtooltip.ViewTooltip;
+import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.ActivitySignupBinding;
 
 public class SignupActivity extends AppCompatActivity {
@@ -34,8 +35,13 @@ public class SignupActivity extends AppCompatActivity {
             // TODO database
         });
 
-//        TODO ?
-//        binding.serviceTerm.setOnClickListener($->{});
-//        binding.privacyPolicy.setOnClickListener($->{});
+//        binding.servicePolicy.setOnClickListener($->{}); // TODO servicePolicy
+        binding.privacyPolicy.setOnClickListener($->{
+            binding.policyDetail.setVisibility(View.VISIBLE);
+            binding.policyText.setText(getResources().getString(R.string.privacy_policy));
+        });
+        binding.closePolicyDetail.setOnClickListener($->{
+            binding.policyDetail.setVisibility(View.GONE);
+        });
     }
 }
