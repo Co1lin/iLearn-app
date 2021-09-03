@@ -5,31 +5,49 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
+import com.tea.ilearn.model.Account;
 import com.tea.ilearn.net.APIRequest;
+import com.tea.ilearn.utils.ObjectBox;
 
 import java.util.HashMap;
+import java.util.List;
 
+import io.objectbox.Box;
 import rxhttp.wrapper.param.RxHttp;
 
 /**
  * Network communication to EduKG
  */
 public class Backend extends APIRequest {
+
+    Box<Account> accountBox;
+
     private Backend() {
         super(
                 "https://api.ilearn.enjoycolin.top",
                 "/login",
                 "",
                 new HashMap<String, Object>(){{
-                    put("username", "colin");
-                    put("password", "colin");
+                    put("username", "");
+                    put("password", "");
                 }},
                 "Authorization",
                 RxHttp.postJson("https://api.ilearn.enjoycolin.top/login"),
                 true,
                 "login failed, password incorrect",
-                p -> p.asClass(LoginResponse.class)
+                p -> p.asResponse(TokenResponse.class)
         );
+        accountBox = ObjectBox.get().boxFor(Account.class);
+        List<Account> accounts = accountBox.getAll();
+        if (accounts != null && accounts.size() > 0) {
+            // restore account info
+            Account account = accounts.get(0);
+            loginParams = new HashMap<String, Object>(){{
+                put("username", account.getUsername());
+                put("password", account.getPassword());
+            }};
+            tokenValue = account.getToken();
+        }
     }
 
     private static Backend instance = new Backend();
@@ -42,7 +60,7 @@ public class Backend extends APIRequest {
     @Override
     protected void onRefreshSuccess(Object response) {
         synchronized (tokenValue) {
-            tokenValue = ((LoginResponse) response).getToken();
+            tokenValue = ((TokenResponse) response).getToken();
         }
     }
 
@@ -55,21 +73,37 @@ public class Backend extends APIRequest {
     }
 
     class RegisterCallbackHandler extends Handler {
-        private Handler originalHandler;
+        Handler originalHandler;
+        String username;
+        String password;
 
-        public RegisterCallbackHandler(Handler _originalHandler) {
-            originalHandler = _originalHandler;
+        public RegisterCallbackHandler(Handler originalHandler,
+                                       String username, String password) {
+            this.originalHandler = originalHandler;
+            this.username = username;
+            this.password = password;
         }
 
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            if (msg.what == 1)
-                Message.obtain(originalHandler, 1, "register failed!").sendToTarget();
-            else {
-                tokenValue = ((LoginResponse) msg.obj).getToken();
-                Message.obtain(originalHandler, 0, msg.obj).sendToTarget();
+            if (msg.what == 0 && msg.obj != null) {
+                // store account info
+                tokenValue = ((TokenResponse) msg.obj).getToken();
+                loginParams = new HashMap<String, Object>(){{
+                    put("username", username);
+                    put("password", password);
+                }};
+                // store account info into db
+                accountBox.removeAll();
+                Account account = new Account()
+                        .setToken(tokenValue)
+                        .setUsername(username)
+                        .setPassword(password);
+                accountBox.put(account);
+                msg.obj = account;  // send account to frontend
             }
+            Message.obtain(originalHandler, msg.what, msg.obj);
         }
     }
 
@@ -81,8 +115,8 @@ public class Backend extends APIRequest {
                     put("username", username);
                     put("password", password);
                 }},
-                p -> p.asResponse(LoginResponse.class),
-                new RegisterCallbackHandler(handler)
+                p -> p.asResponse(TokenResponse.class),
+                new RegisterCallbackHandler(handler, username, password)
         );
     }
 
@@ -101,12 +135,16 @@ public class Backend extends APIRequest {
     }
 
     public void checkUsername(String username, Handler handler) {
-
+        POSTJson("/users/checkbyname",
+                new HashMap<String, Object>(){{
+                    put("username", username);
+                }},
+                p -> p.asString(),
+                handler);
     }
 
     public void checkPassword(String password, Handler handler) {
 
     }
     // TODO reset password by email? ask TA
-
 }

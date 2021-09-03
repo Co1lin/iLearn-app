@@ -39,7 +39,7 @@ public class ExerciseListActivity extends AppCompatActivity {
             String subject = intent.getStringExtra("subject");
             binding.name.setText(name + "相关习题");
             StaticHandler handler = new StaticHandler(getSupportFragmentManager(), binding.exerciseList, subject, binding.progressCircular, binding.notFound);
-            EduKG.getInst().getProblems(name, handler); // TODO Colin getProblems by course api
+            EduKG.getInst().getProblems(name, handler);
         }
     }
 
@@ -61,7 +61,7 @@ public class ExerciseListActivity extends AppCompatActivity {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             List<Problem> problems = (List<Problem>) msg.obj;
-            if (problems != null && problems.size() != 0) {
+            if (msg.what == 0 && problems != null && problems.size() != 0) {
                 List<ExerciseFragment> fragments = new ArrayList<>();
                 int i = 0;
                 for (Problem p : problems) { // TODO these code is slow, acceleration is needed

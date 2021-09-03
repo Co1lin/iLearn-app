@@ -142,5 +142,3 @@ public class ChatbotFragment extends Fragment {
         }
     }
 }
-// TODO colin: adjust color
-// TODO colin: adjust height of bars
