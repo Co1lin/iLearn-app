@@ -10,10 +10,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.sina.weibo.sdk.api.TextObject;
+import com.sina.weibo.sdk.api.WeiboMultiMessage;
+import com.sina.weibo.sdk.auth.AuthInfo;
+import com.sina.weibo.sdk.common.UiError;
+import com.sina.weibo.sdk.openapi.IWBAPI;
+import com.sina.weibo.sdk.openapi.WBAPIFactory;
+import com.sina.weibo.sdk.share.WbShareCallback;
 import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
 import com.tea.ilearn.model.Category;
@@ -31,7 +39,7 @@ import java.util.List;
 import io.objectbox.Box;
 import io.objectbox.query.Query;
 
-public class EntityDetailActivity extends AppCompatActivity {
+public class EntityDetailActivity extends AppCompatActivity implements WbShareCallback {
     private ActivityEntityDetailBinding binding;
     private RecyclerView mRelationRecycler, mPropertyRecycler;
     private RelationListAdapter mRelationAdapter, mPropertyAdapter;
@@ -41,6 +49,8 @@ public class EntityDetailActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        initSDK();
 
         binding = ActivityEntityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -92,6 +102,7 @@ public class EntityDetailActivity extends AppCompatActivity {
             entityBox.put(entityDetail);
 
             binding.share.setOnClickListener($ -> {
+                doWeiboShare();
                 // TODO share related sdk
             });
             binding.relatedExercise.setOnClickListener($ -> {
@@ -208,6 +219,46 @@ public class EntityDetailActivity extends AppCompatActivity {
                 }).start();
             } // end if
         }
+    }
 
+    // ==========================================================================
+
+    private IWBAPI mWBAPI;
+
+    private void initSDK() {
+        AuthInfo authInfo = new AuthInfo(this, "83638447", "", "");
+        mWBAPI = WBAPIFactory.createWBAPI(this);
+        mWBAPI.registerApp(this, authInfo);
+    }
+
+    @Override
+    public void onComplete() {
+        Toast.makeText(this, "分享成功", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onError(UiError error) {
+        Toast.makeText(this, "分享失败:" + error.errorMessage, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCancel() {
+        Toast.makeText(this, "分享取消", Toast.LENGTH_SHORT).show();
+    }
+
+    private void doWeiboShare() {
+        WeiboMultiMessage message = new WeiboMultiMessage();
+        TextObject textObject = new TextObject();
+        textObject.text = "#iLearn# 我今天在iLearn学习了”"+binding.entityName.getText().toString()+"“这个实体，学到了很多东西，快来加入iLearn与我一起学习！";
+        message.textObject = textObject;
+        mWBAPI.shareMessage(message, true);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (mWBAPI != null) {
+            mWBAPI.doResultIntent(data, this);
+        }
     }
 }

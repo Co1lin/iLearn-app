@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.florent37.viewtooltip.ViewTooltip;
+import com.tea.ilearn.R;
 import com.google.android.material.textfield.TextInputLayout;
 import com.tea.ilearn.databinding.ActivitySignupBinding;
 import com.tea.ilearn.model.Account;
@@ -57,9 +58,20 @@ public class SignupActivity extends AppCompatActivity {
             }
         });
 
-//        TODO ?
-//        binding.serviceTerm.setOnClickListener($->{});
-//        binding.privacyPolicy.setOnClickListener($->{});
+        binding.servicePolicy.setOnClickListener($->{
+            binding.policyDetail.setVisibility(View.VISIBLE);
+            binding.policyText.setText(getResources().getString(R.string.service_policy));
+        });
+        binding.closePolicyDetail.setOnClickListener($->{
+            binding.policyDetail.setVisibility(View.GONE);
+        });
+        binding.privacyPolicy.setOnClickListener($->{
+            binding.policyDetail.setVisibility(View.VISIBLE);
+            binding.policyText.setText(getResources().getString(R.string.privacy_policy));
+        });
+        binding.closePolicyDetail.setOnClickListener($->{
+            binding.policyDetail.setVisibility(View.GONE);
+        });
     }
 
 
