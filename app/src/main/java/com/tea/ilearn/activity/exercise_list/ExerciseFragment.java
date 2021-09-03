@@ -52,7 +52,7 @@ public class ExerciseFragment extends Fragment {
         binding.radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             binding.answer.setVisibility(View.VISIBLE);
         });
-        // TODO differ normal exercise and examination
+        // TODO acha: differ normal exercise and examination
 
         return root;
     }

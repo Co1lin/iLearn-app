@@ -145,7 +145,7 @@ public class HomeFragment extends Fragment {
 
     private void initList() {
         int initNum = 0; // TODO 0 for EDUKG FUCK
-        List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
+        List<String> subjects = Constant.EduKG.SUBJECTS; // TODO acha: change to tablayout items
         searchSubjectNum = new CountDownLatch(subjects.size() * initNum);
         for (int i = 0; i < initNum; ++i) {
             char c = RandChinese.gen();
@@ -162,11 +162,12 @@ public class HomeFragment extends Fragment {
             String query = searchBar.getEditTextView().getText().toString();
             loadingBar.setVisibility(View.VISIBLE);
             mInfoAdapter.clear();
+            binding.emptyHint.setVisibility(View.GONE);
             binding.sortCategoryUp.setVisibility(View.VISIBLE);
             binding.sortCategoryDown.setVisibility(View.VISIBLE);
             binding.sortNameUp.setVisibility(View.VISIBLE);
             binding.sortNameDown.setVisibility(View.VISIBLE);
-            List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
+            List<String> subjects = Constant.EduKG.SUBJECTS; // TODO acha: change to tablayout items
             searchSubjectNum = new CountDownLatch(subjects.size());
             for (String sub : subjects) {
                 StaticHandler handler = new StaticHandler(
@@ -216,9 +217,9 @@ public class HomeFragment extends Fragment {
             }
             updateACAdapter();
 
-            if (msg.what == 0 && msg.obj != null) {
+            if (msg.what == 0) {
                 List<Entity> entities = (List<Entity>) msg.obj;
-                if (entities != null) {
+                if (entities != null && entities.size() != 0) {
                     // remove duplicate entities with different categories
                     HashMap<String, ArrayList<String>> uriToCategories = new HashMap<>();
                     for (Entity e : entities) {
@@ -273,16 +274,19 @@ public class HomeFragment extends Fragment {
                         }
                     } // end for
                     history.entities.applyChangesToDb();
-                } else {
+                }
+                else {
                     // TODO empty UI
                     new Thread(() -> {  // store history with no entity
                         SearchHistory emptyHistory = new SearchHistory().setKeyword(keyword).setSubject(subject);
                         historyBox.put(emptyHistory);
                     }).start();
+                    binding.emptyHint.setVisibility(View.VISIBLE);
                 }
             }
             else { // msg.what = 1
-
+                // TODO acha: no network hint
+                // TODO acha: load from database
             }
         }
     }

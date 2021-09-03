@@ -72,7 +72,7 @@ public class MeFragment extends Fragment {
 
         LineChart lineChart = binding.lineChart;
         List<String> key = Arrays.asList("周一", "周二", "周三", "周四", "周五", "周六", "周日");
-        List<Integer> value = Arrays.asList(120, 200, 150, 80, 10, 110, 130); // TODO real value here
+        List<Integer> value = Arrays.asList(120, 200, 150, 80, 10, 110, 130); // TODO colin: true value here
         List<Entry> entries = new ArrayList<Entry>();
         for (int i = 0; i < key.size(); ++i) {
             entries.add(new Entry(i, value.get(i)));
@@ -152,5 +152,9 @@ public class MeFragment extends Fragment {
             }
         }
     }
+<<<<<<< HEAD
 }
 // TODO edit text color issue in dark mode
+=======
+}
+>>>>>>> dev

@@ -125,4 +125,18 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
     </androidx.recyclerview.widget.RecyclerView>
 
+    <TextView
+        android:id="@+id/empty_hint"
+        android:text="未找到相关实体"
+        android:textAppearance="?attr/textAppearanceBody2"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/info_recycler"
+        app:layout_constraintBottom_toBottomOf="@id/info_recycler"
+        app:layout_constraintStart_toStartOf="@id/info_recycler"
+        app:layout_constraintEnd_toEndOf="@id/info_recycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp" >
+    </TextView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

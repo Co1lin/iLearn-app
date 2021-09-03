@@ -52,7 +52,7 @@ public class ExerciseFragment extends Fragment {
             int initNum = 5;
             loadLatch = new CountDownLatch(initNum);
             binding.progressCircular.setVisibility(View.VISIBLE);
-            // TODO
+            // TODO acha&pty: suggest (exercise set) initNum times
         }
     }
 }

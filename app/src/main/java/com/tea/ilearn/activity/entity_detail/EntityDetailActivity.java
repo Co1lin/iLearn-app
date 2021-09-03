@@ -103,7 +103,6 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
 
             binding.share.setOnClickListener($ -> {
                 doWeiboShare();
-                // TODO share related sdk
             });
             binding.relatedExercise.setOnClickListener($ -> {
                 Intent inten = new Intent (binding.getRoot().getContext(), ExerciseListActivity.class);

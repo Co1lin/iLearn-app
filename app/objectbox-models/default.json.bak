@@ -154,7 +154,11 @@
     },
     {
       "id": "6:1492375767478050399",
+<<<<<<< HEAD
       "lastPropertyId": "3:105032656148028867",
+=======
+      "lastPropertyId": "2:3758404147956337816",
+>>>>>>> dev
       "name": "UserStatistics",
       "properties": [
         {
@@ -167,11 +171,14 @@
           "id": "2:3758404147956337816",
           "name": "firstDate",
           "type": 10
+<<<<<<< HEAD
         },
         {
           "id": "3:105032656148028867",
           "name": "entitiesViewed",
           "type": 9
+=======
+>>>>>>> dev
         }
       ],
       "relations": []
