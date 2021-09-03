@@ -14,10 +14,6 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="privacy_policy">
-        使用SDK名称：友盟SDK
-        \n服务类型：社会分享
-        \n收集个人信息类型：设备信息（IMEI/MAC/Android ID/IDFA/OpenUDID/GUID/SIM卡IMSI/地理位置等)
-        \n隐私权政策链接：https://www.umeng.com/page/policy
-    </string>
+    <string name="service_policy">我们会为您随机提供服务，功能的无法使用是我们的防沉迷政策</string>
+    <string name="privacy_policy">我们使用http为您提供服务，一定会泄漏您的隐私</string>
 </resources>

@@ -35,7 +35,13 @@ public class SignupActivity extends AppCompatActivity {
             // TODO database
         });
 
-//        binding.servicePolicy.setOnClickListener($->{}); // TODO servicePolicy
+        binding.servicePolicy.setOnClickListener($->{
+            binding.policyDetail.setVisibility(View.VISIBLE);
+            binding.policyText.setText(getResources().getString(R.string.service_policy));
+        });
+        binding.closePolicyDetail.setOnClickListener($->{
+            binding.policyDetail.setVisibility(View.GONE);
+        });
         binding.privacyPolicy.setOnClickListener($->{
             binding.policyDetail.setVisibility(View.VISIBLE);
             binding.policyText.setText(getResources().getString(R.string.privacy_policy));

@@ -243,7 +243,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
     private void doWeiboShare() {
         WeiboMultiMessage message = new WeiboMultiMessage();
         TextObject textObject = new TextObject();
-        textObject.text = "这里设置您要分享的内容啦啦啦!";
+        textObject.text = "#iLearn# 我今天在iLearn学习了”"+binding.entityName.getText().toString()+"“这个实体，学到了很多东西，快来加入iLearn与我一起学习！";
         message.textObject = textObject;
         mWBAPI.shareMessage(message, true);
     }
