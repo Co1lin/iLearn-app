@@ -10,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.sina.weibo.sdk.api.TextObject;
+import com.sina.weibo.sdk.api.WeiboMultiMessage;
+import com.sina.weibo.sdk.openapi.IWBAPI;
 import com.tea.ilearn.databinding.ExerciseCardBinding;
 
 public class ExerciseFragment extends Fragment {
@@ -17,6 +20,7 @@ public class ExerciseFragment extends Fragment {
     private String description, pageNumber;
     private String[] choices;
     private String answer;
+    private IWBAPI mWBAPI;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,7 +47,7 @@ public class ExerciseFragment extends Fragment {
             // TODO save to dababase
         });
         binding.share.setOnClickListener($ -> {
-            // TODO sdk related
+            doWeiboShare();
         });
         binding.radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             binding.answer.setVisibility(View.VISIBLE);
@@ -53,11 +57,21 @@ public class ExerciseFragment extends Fragment {
         return root;
     }
 
-    public ExerciseFragment(String pageNumber, String description, String[] choices, String answer) {
+    public ExerciseFragment(String pageNumber, String description, String[] choices, String answer, IWBAPI WBAPI) {
         super();
         this.pageNumber = pageNumber;
         this.description = description;
         this.choices = choices;
         this.answer = answer;
+        this.mWBAPI = WBAPI;
+    }
+
+
+    private void doWeiboShare() {
+        WeiboMultiMessage message = new WeiboMultiMessage();
+        TextObject textObject = new TextObject();
+        textObject.text = "#iLearn# 这题出的真好！快来看看你会做吗？"+description+" A."+choices[0]+" B."+choices[1]+" C."+choices[2]+" D."+choices[3];
+        message.textObject = textObject;
+        mWBAPI.shareMessage(message, true);
     }
 }
