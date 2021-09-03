@@ -14,6 +14,7 @@ import io.objectbox.annotation.Convert;
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
 import io.objectbox.annotation.Index;
+import io.objectbox.annotation.Transient;
 import io.objectbox.annotation.Unique;
 import io.objectbox.converter.PropertyConverter;
 import io.objectbox.relation.ToMany;
@@ -38,6 +39,8 @@ public class EduKGEntityDetail {
     String category;
     @Backlink(to = "entities")
     public ToMany<Category> categories;
+    @Transient
+    ArrayList<String> categoriesBuf;
     boolean stared;
     boolean viewed;
 
@@ -99,6 +102,10 @@ public class EduKGEntityDetail {
         return relations;
     }
 
+    public ArrayList<String> getCategoriesBuf() {
+        return categoriesBuf;
+    }
+
     public boolean isStared() {
         return stared;
     }
@@ -119,6 +126,7 @@ public class EduKGEntityDetail {
 
     public EduKGEntityDetail setCategory(ArrayList<String> categories) {
         this.category = String.join(" ", categories);
+        this.categoriesBuf = categories;
         return this;
     }
 

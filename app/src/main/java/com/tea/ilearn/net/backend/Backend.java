@@ -9,6 +9,8 @@ import com.tea.ilearn.net.APIRequest;
 
 import java.util.HashMap;
 
+import rxhttp.wrapper.param.RxHttp;
+
 /**
  * Network communication to EduKG
  */
@@ -16,13 +18,14 @@ public class Backend extends APIRequest {
     private Backend() {
         super(
                 "https://api.ilearn.enjoycolin.top",
-                "",
+                "/login",
                 "",
                 new HashMap<String, Object>(){{
                     put("username", "colin");
                     put("password", "colin");
                 }},
                 "Authorization",
+                RxHttp.postJson("https://api.ilearn.enjoycolin.top/login"),
                 true,
                 "login failed, password incorrect",
                 p -> p.asClass(LoginResponse.class)
@@ -43,7 +46,7 @@ public class Backend extends APIRequest {
         }
     }
 
-    protected void login(String username, String password, Handler handler) {
+    public void login(String username, String password, Handler handler) {
         loginParams = new HashMap<String, Object>(){{
             put("username", username);
             put("password", password);
@@ -70,7 +73,7 @@ public class Backend extends APIRequest {
         }
     }
 
-    protected void register(String email, String username,
+    public void register(String email, String username,
                             String password, Handler handler) {
         POSTJson("/register",
                 new HashMap<String, Object>(){{
@@ -83,7 +86,7 @@ public class Backend extends APIRequest {
         );
     }
 
-    protected void changePassword(String oldPassword, String newPassword,
+    public void changePassword(String oldPassword, String newPassword,
                                   String username, Handler handler) {
         POSTJson("/users/changepassword",
                 new HashMap<String, Object>(){{
@@ -97,11 +100,11 @@ public class Backend extends APIRequest {
         // TODO callback?
     }
 
-    protected void checkUsername(String username, Handler handler) {
+    public void checkUsername(String username, Handler handler) {
 
     }
 
-    protected void checkPassword(String password, Handler handler) {
+    public void checkPassword(String password, Handler handler) {
 
     }
     // TODO reset password by email? ask TA

@@ -30,6 +30,7 @@ public abstract class APIRequest {
     protected Map<String, ?> loginParams;
     protected String tokenName;
     protected String tokenValue;
+    protected RxHttp loginMethod;
     protected boolean authHeader;
     protected String loginFailedMessage;
     protected ResponseDefiner loginRequestDefiner;
@@ -40,6 +41,7 @@ public abstract class APIRequest {
             String _genericPath,
             Map<String, ?> _loginParams,
             String _tokenName,
+            RxHttp _loginMethod,
             boolean _authHeader,
             String _loginFailedMessage,
             ResponseDefiner _loginRequestDefiner
@@ -50,6 +52,7 @@ public abstract class APIRequest {
         loginParams = _loginParams;
         tokenName = _tokenName;
         tokenValue = "123";
+        loginMethod = _loginMethod;
         authHeader = _authHeader;
         loginFailedMessage = _loginFailedMessage;
         loginRequestDefiner = _loginRequestDefiner;
@@ -116,11 +119,8 @@ public abstract class APIRequest {
                 return true;
             Log.i("APIRequest.refresh", "refreshing");
             AtomicBoolean success = new AtomicBoolean(false);
-            RxHttpFormParam p = RxHttp.postForm(baseUrl + refreshPath).setSync();
-            if (authHeader)
-                p.addHeader(tokenName, tokenValue);
-            else
-                p.addAll(loginParams);
+            RxHttp p = getSyncRxHttp(loginMethod);
+            paramAddAll(p, loginParams);
             loginRequestDefiner.define(p)
             .timeout(3, TimeUnit.SECONDS)
             .subscribe(response -> {
@@ -359,7 +359,7 @@ public abstract class APIRequest {
             return ((RxHttpFormParam) p).addAll(params);
         }
         else if (p instanceof RxHttpJsonParam) {
-            return ((RxHttpFormParam) p).addAll(params);
+            return ((RxHttpJsonParam) p).addAll(params);
         }
         throw new IllegalArgumentException("p is instance of " + p.getClass() + " which is not supported");
     }

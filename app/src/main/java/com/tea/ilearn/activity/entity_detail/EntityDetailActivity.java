@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
+import com.tea.ilearn.model.Category;
+import com.tea.ilearn.model.Category_;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
@@ -84,7 +86,6 @@ public class EntityDetailActivity extends AppCompatActivity {
                     entityBox.put(entityDetail);
                 }).start();
             });
-
             getEntityDetail(uri);
             entityDetail.setViewed(true);
             binding.star.setChecked(entityDetail.isStared());
@@ -100,7 +101,6 @@ public class EntityDetailActivity extends AppCompatActivity {
                 inten.putExtra("subject", subject);
                 binding.getRoot().getContext().startActivity(inten);
             });
-
             boolean loaded = false; // TODO get info from database (base on id?)
             if (!loaded) {
                 StaticHandler handler = new StaticHandler(binding.entityDescription, mRelationAdapter, mPropertyAdapter, subject, category, entityBox);
@@ -123,8 +123,7 @@ public class EntityDetailActivity extends AppCompatActivity {
                 if (entitiesRes == null || entitiesRes.size() == 0) {
                     try {
                         sleep(100);
-                    } catch (InterruptedException e) {
-                    }
+                    } catch (InterruptedException e) {}
                 } else {
                     entityDetail = entitiesRes.get(0);
                     break;
@@ -172,12 +171,32 @@ public class EntityDetailActivity extends AppCompatActivity {
                 }
 
                 new Thread(() -> {
+                    // store info to DB for offline loading
                     getEntityDetail(detail.getUri());
-                    if (detail.getRelations() != null) {
+                    if (detail.getRelations() != null && detail.getRelations().size() > 0) {
                         entityDetail.setRelations(detail.getRelations());
+                        // TODO colin: store entities in relations
+
                     }
-                    if (detail.getProperties() != null) {
+                    if (detail.getProperties() != null && detail.getProperties().size() > 0) {
                         entityDetail.setProperties(detail.getProperties());
+                    }
+                    // store categories
+                    if (entityDetail.getCategoriesBuf() != null && entityDetail.getCategoriesBuf().size() > 0) {
+                        Box<Category> categoryBox = ObjectBox.get().boxFor(Category.class);
+                        for (String categoryName : entityDetail.getCategoriesBuf()) {
+                            Query<Category> query = categoryBox.query()
+                                    .equal(Category_.name, categoryName).build();
+                            List<Category> categoryRes = query.find();
+                            query.close();
+                            Category category;
+                            if (categoryRes == null || categoryRes.size() == 0)
+                                category = new Category().setName(categoryName);
+                            else
+                                category = categoryRes.get(0);
+                            category.increaseNum();
+                            entityDetail.categories.add(category);
+                        }
                     }
                     entityBox.put(entityDetail);
                 }).start();

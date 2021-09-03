@@ -28,7 +28,6 @@ import com.tea.ilearn.utils.ObjectBox;
 import com.tea.ilearn.utils.RandChinese;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -51,6 +50,22 @@ public class HomeFragment extends Fragment {
 
     private CountDownLatch searchSubjectNum = new CountDownLatch(0);
 
+    public void updateACAdapter() {
+        new Thread(() -> {
+            Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
+            List<SearchHistory> searchHistories = historyBox.getAll();
+            ArrayList<String> histories = new ArrayList<>();
+            for (SearchHistory searchHistory : searchHistories)
+                histories.add(searchHistory.getKeyword());
+            getActivity().runOnUiThread(() -> {
+                ACAdapter<String> historyAdapter = new ACAdapter<>(
+                        getContext(), R.layout.autocompletion_item,
+                        R.id.ac_text, R.id.image_button_del, histories, acTextView);
+                acTextView.setAdapter(historyAdapter);
+            });
+        }).start();
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -68,20 +83,15 @@ public class HomeFragment extends Fragment {
             }
             return false;
         });
+
         // auto completion
-        ArrayList<String> COUNTRIES = new ArrayList<>(Arrays.asList("Belgium", "France", "Italy", "Germany", "Spain", "Sp11", "Sp22"));
-        ACAdapter<String> historyAdapter = new ACAdapter<>(
-                getContext(), R.layout.autocompletion_item,
-                R.id.ac_text, R.id.image_button_del, COUNTRIES,
-                acTextView);
-        acTextView.setAdapter(historyAdapter);
         acTextView.setDropDownAnchor(searchBar.getId());
         acTextView.setThreshold(1); // default 2, minimum 1
         acTextView.setOnFocusChangeListener((view, hasFocus) -> {
-            AutoComplTextView acTView = (AutoComplTextView) view;
             if (hasFocus)
-                acTView.showDropDown();
+                acTextView.showDropDown();
         });
+        updateACAdapter();
 
         // ================================================================================
 
@@ -160,7 +170,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    static class StaticHandler extends Handler {
+    class StaticHandler extends Handler {
         private InfoListAdapter mInfoAdapter;
         private View loadingBar;
         private String subject;
@@ -183,24 +193,25 @@ public class HomeFragment extends Fragment {
             this.expectedNum.countDown();
             if (this.expectedNum.getCount() == 0)
                 loadingBar.setVisibility(View.INVISIBLE);
+
+            Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
+            Box<EduKGEntityDetail> entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
+            Query<SearchHistory> historyQuery = historyBox.query()
+                    .equal(SearchHistory_.keyword, keyword).build();
+            List<SearchHistory> historiesRes = historyQuery.find();
+            historyQuery.close();
+            SearchHistory history;
+            if (historiesRes == null || historiesRes.size() == 0) {
+                history = new SearchHistory(keyword);
+                historyBox.put(history);
+            } else {
+                history = historiesRes.get(0);
+                history.entities.clear(); // TODO colin: check
+            }
+            updateACAdapter();
+
             if (msg.what == 0 && msg.obj != null) {
                 List<Entity> entities = (List<Entity>) msg.obj;
-
-                Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
-                Box<EduKGEntityDetail> entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
-
-                Query<SearchHistory> historyQuery = historyBox.query()
-                        .equal(SearchHistory_.keyword, keyword).build();
-                List<SearchHistory> historiesRes = historyQuery.find();
-                historyQuery.close();
-                SearchHistory history;
-                if (historiesRes == null || historiesRes.size() == 0) {
-                    history = new SearchHistory(keyword);
-                    historyBox.put(history);
-                } else {
-                    history = historiesRes.get(0);
-                    history.entities.clear(); // TODO colin: check
-                }
                 if (entities != null) {
                     // remove duplicate entities with different categories
                     HashMap<String, ArrayList<String>> uriToCategories = new HashMap<>();
@@ -236,19 +247,21 @@ public class HomeFragment extends Fragment {
                                     .equal(EduKGEntityDetail_.uri, e.getUri()).build();
                             List<EduKGEntityDetail> entitiesRes = query.find();
                             query.close();
+                            EduKGEntityDetail detail;
                             if (entitiesRes != null && entitiesRes.size() > 0) {
+                                detail = entitiesRes.get(0);
                                 // already exists in DB, update UI
-                                EduKGEntityDetail record = entitiesRes.get(0);
-                                mInfoAdapter.modify(idx.get(), record.isStared(), record.isViewed());
-                            } else {
-                                // store a new entity to DB
-                                EduKGEntityDetail detail = new EduKGEntityDetail();
-                                detail.setLabel(e.getLabel())
-                                        .setUri(e.getUri())
-                                        .setCategory(uriToCategories.get(e.getUri()))
-                                        .setSubject(subject);
-                                history.entities.add(detail);
+                                mInfoAdapter.modify(idx.get(), detail.isStared(), detail.isViewed());
                             }
+                            else // store a new entity to DB
+                                detail = new EduKGEntityDetail();
+                            // history has been cleared
+                            detail.setLabel(e.getLabel())
+                                    .setUri(e.getUri())
+                                    .setCategory(uriToCategories.get(e.getUri()))
+                                    .setSubject(subject);
+                            history.entities.add(detail);
+
                             idx.incrementAndGet();
                             uriToCategories.remove(e.getUri());
                         }

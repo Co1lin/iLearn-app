@@ -2,6 +2,9 @@ package com.tea.ilearn.ui.me;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +25,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
+import com.tea.ilearn.net.backend.Backend;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,7 +94,19 @@ public class MeFragment extends Fragment {
         lineChart.setData(lineData);
         lineChart.invalidate();
 
+        // TODO: login test
+        StaticHandler handler = new StaticHandler();
+        Backend.getInst().login("colin", "colin", handler);
+
         return root;
+    }
+
+    static class StaticHandler extends Handler {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            Log.i("me", String.valueOf(msg.what));
+        }
     }
 }
 // TODO left padding of the text

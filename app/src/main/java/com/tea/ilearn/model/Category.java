@@ -32,11 +32,18 @@ public class Category {
         return entities;
     }
 
-    public void setNum(int num) {
+    public Category setNum(int num) {
         this.num = num;
+        return this;
     }
 
-    public void increaseNum() {
+    public Category setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Category increaseNum() {
         num++;
+        return this;
     }
 }

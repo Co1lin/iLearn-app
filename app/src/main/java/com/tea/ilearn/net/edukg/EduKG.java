@@ -7,6 +7,8 @@ import com.tea.ilearn.net.APIRequest;
 
 import java.util.HashMap;
 
+import rxhttp.wrapper.param.RxHttp;
+
 /**
  * Network communication to EduKG
  */
@@ -21,6 +23,7 @@ public class EduKG extends APIRequest {
                     put("password", "abc123456");
                 }},
                 "id",
+                RxHttp.postForm("http://open.edukg.cn/opedukg/api/typeAuth/user/login"),
                 false,
                 "请先登录",
                 p -> p.asClass(LoginResponse.class)

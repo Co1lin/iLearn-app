@@ -16,7 +16,7 @@ public class SearchHistory {
 
     @Index
     @Unique
-    public String keyword;
+    String keyword;
 
     @Backlink(to = "searchHistories")
     public ToMany<EduKGEntityDetail> entities;
@@ -31,6 +31,15 @@ public class SearchHistory {
 
     public SearchHistory(String keyword) {
         this.keyword = keyword;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public SearchHistory setKeyword(String keyword) {
+        this.keyword = keyword;
+        return this;
     }
 }
 
