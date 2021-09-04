@@ -41,7 +41,7 @@ public class EduKGEntityDetail {
     public ToMany<Category> categories;
     @Transient
     ArrayList<String> categoriesBuf;
-    boolean stared;
+    boolean starred;
     boolean viewed;
 
     public static class EduKGRelationsConverter implements PropertyConverter<ArrayList<EduKGRelation>, String> {
@@ -106,8 +106,8 @@ public class EduKGEntityDetail {
         return categoriesBuf;
     }
 
-    public boolean isStared() {
-        return stared;
+    public boolean isStarred() {
+        return starred;
     }
 
     public boolean isViewed() {
@@ -130,8 +130,8 @@ public class EduKGEntityDetail {
         return this;
     }
 
-    public EduKGEntityDetail setStared(boolean stared) {
-        this.stared = stared;
+    public EduKGEntityDetail setStarred(boolean starred) {
+        this.starred = starred;
         return this;
     }
 

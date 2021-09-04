@@ -92,13 +92,13 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     Toast.makeText(binding.getRoot().getContext(), "已取消收藏", Toast.LENGTH_SHORT).show();
                 new Thread(() -> {
                     getEntityDetail(uri);
-                    entityDetail.setStared(binding.star.isChecked());
+                    entityDetail.setStarred(binding.star.isChecked());
                     entityBox.put(entityDetail);
                 }).start();
             });
             getEntityDetail(uri);
             entityDetail.setViewed(true);
-            binding.star.setChecked(entityDetail.isStared());
+            binding.star.setChecked(entityDetail.isStarred());
             entityBox.put(entityDetail);
 
             binding.share.setOnClickListener($ -> {
