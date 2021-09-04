@@ -7,7 +7,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="#774df2"
-    app:cardCornerRadius="12dp"
+    app:cardCornerRadius="4dp"
     app:cardElevation="0dp"
     app:cardPreventCornerOverlap="false"
     app:cardUseCompatPadding="true" >
@@ -18,6 +18,8 @@
         android:layout_height="wrap_content" >
         <TextView
             android:id="@+id/text"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -28,7 +30,7 @@
         <ImageView
             android:id="@+id/iv_close"
             android:layout_gravity="center_vertical"
-            android:background="@drawable/ic_favorite_filled_24"
+            android:background="@drawable/ic_baseline_close_24"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>

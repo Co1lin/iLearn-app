@@ -5,11 +5,16 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.heaven7.android.dragflowlayout.ClickToDeleteItemListenerImpl;
+import com.heaven7.android.dragflowlayout.DragAdapter;
+import com.heaven7.android.dragflowlayout.DragFlowLayout;
 import com.tea.ilearn.Constant;
+import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
 import com.tea.ilearn.utils.DB_utils;
 
@@ -51,6 +56,34 @@ public class HomeFragment extends Fragment {
         });
         DB_utils.updateACAdapter(getActivity(), getContext(), acTextView);
 
+        binding.flowLayout.setOnItemClickListener(new ClickToDeleteItemListenerImpl(R.id.iv_close){
+            @Override
+            protected void onDeleteSuccess(DragFlowLayout dfl, View child, Object data) {
+            }
+        });
+
+        binding.flowLayout.setDragAdapter(new DragAdapter<String>() {
+            @Override
+            public int getItemLayoutId() {
+                return R.layout.chip;
+            }
+
+            @Override
+            public void onBindData(View itemView, int dragState, String data) {
+                itemView.setTag(data);
+
+                ((TextView) itemView.findViewById(R.id.text)).setText(Constant.EduKG.EN_ZH.get(data));
+                itemView.findViewById(R.id.iv_close).setVisibility(
+                        dragState != DragFlowLayout.DRAG_STATE_IDLE ? View.VISIBLE : View.GONE
+                );
+            }
+
+            @NonNull @Override
+            public String getData(View itemView) {
+                return (String) itemView.getTag();
+            }
+        });
+
         initTabs();
 
         return root;
@@ -65,6 +98,19 @@ public class HomeFragment extends Fragment {
         SubjectListAdapter pagerAdapter = new SubjectListAdapter(getChildFragmentManager(), subjects, fragments);
         binding.viewPager.setAdapter(pagerAdapter);
         binding.subjectTabs.setupWithViewPager(binding.viewPager);
+
+        binding.flowLayout.getDragItemManager().addItems(subjects);
+        binding.editMenu.setOnCheckedChangeListener((btn, checked) -> {
+            if (checked) {
+                binding.editPanel.setVisibility(View.VISIBLE);
+                binding.cover.setVisibility(View.VISIBLE);
+//                binding.flowLayout.beginDrag();
+            } else {
+                binding.flowLayout.finishDrag();
+                binding.cover.setVisibility(View.GONE);
+                binding.editPanel.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void search() {

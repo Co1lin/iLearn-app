@@ -60,6 +60,21 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <TextView
+            android:id="@+id/cover"
+            android:visibility="gone"
+            android:background="?colorSurface"
+            android:gravity="center_vertical"
+            android:text="编辑：选择您喜欢的学科"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:paddingStart="16dp"
+            app:layout_constraintTop_toTopOf="@id/subject_tabs"
+            app:layout_constraintBottom_toBottomOf="@id/subject_tabs"
+            app:layout_constraintStart_toStartOf="@id/subject_tabs"
+            app:layout_constraintEnd_toEndOf="@id/subject_tabs"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.viewpager.widget.ViewPager
@@ -68,5 +83,20 @@
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/tab_bar"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/edit_panel"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tab_bar"
+        android:background="@drawable/bottom_corner"
+        android:orientation="vertical"
+        android:paddingBottom="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.heaven7.android.dragflowlayout.DragFlowLayout
+            android:id="@+id/flow_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
