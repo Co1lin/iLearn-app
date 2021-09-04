@@ -29,7 +29,6 @@ import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 import com.tea.ilearn.model.Account;
-import com.tea.ilearn.model.SearchHistory;
 import com.tea.ilearn.model.UserStatistics;
 import com.tea.ilearn.net.backend.Backend;
 import com.tea.ilearn.utils.ObjectBox;
