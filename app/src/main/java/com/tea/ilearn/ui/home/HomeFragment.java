@@ -119,7 +119,7 @@ public class HomeFragment extends Fragment {
 
         initTabs();
 
-//        ((EntityListFragment)pagerAdapter.getItem(0)).waitForBinding("", acTextView);
+        ((EntityListFragment)pagerAdapter.getItem(0)).waitForBinding("", acTextView);
 
         return root;
     }

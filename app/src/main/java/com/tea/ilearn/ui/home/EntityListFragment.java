@@ -104,7 +104,9 @@ public class EntityListFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-            search(query, acTextView);
+            getActivity().runOnUiThread(() -> {
+                search(query, acTextView);
+            });
         }).start();
     }
 
