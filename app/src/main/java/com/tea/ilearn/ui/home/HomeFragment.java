@@ -9,8 +9,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.tea.ilearn.Constant;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
 import com.tea.ilearn.utils.DB_utils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import per.goweii.actionbarex.common.ActionBarSearch;
 import per.goweii.actionbarex.common.AutoComplTextView;
@@ -47,7 +51,20 @@ public class HomeFragment extends Fragment {
         });
         DB_utils.updateACAdapter(getActivity(), getContext(), acTextView);
 
+        initTabs();
+
         return root;
+    }
+
+    private void initTabs() {
+        List<String> subjects = Constant.EduKG.SUBJECTS; // TODO colin: database ralated (no thread)
+        List<EntityListFragment> fragments = new ArrayList<>();
+        for (String subject : subjects) {
+            fragments.add(new EntityListFragment());
+        }
+        SubjectListAdapter pagerAdapter = new SubjectListAdapter(getChildFragmentManager(), subjects, fragments);
+        binding.viewPager.setAdapter(pagerAdapter);
+        binding.subjectTabs.setupWithViewPager(binding.viewPager);
     }
 
     private void search() {
