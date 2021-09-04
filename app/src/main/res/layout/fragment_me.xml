@@ -66,21 +66,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:text="本周学习点"
-                    android:textAppearance="?attr/textAppearanceBody1"
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content">
 
-                <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/line_chart"
-                    android:layout_marginBottom="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_gravity="center" />
+                    <TextView
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:text="本周学习点"
+                        android:textAppearance="?attr/textAppearanceBody1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/line_chart"
+                        android:layout_marginBottom="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_gravity="center" />
+
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView

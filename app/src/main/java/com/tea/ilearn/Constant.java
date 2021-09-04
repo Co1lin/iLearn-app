@@ -16,7 +16,7 @@ public class Constant {
         public static final String HISTORY      = "history";
         public static final String GEO          = "geo";
         public static final String POLITICS     = "politics";
-        public static final ArrayList<String> SUBJECTS = new ArrayList<>(
+        public static final ArrayList<String> SUBJECTS_EN = new ArrayList<>(
                 Arrays.asList(
                         CHINESE, MATH, ENGLISH,
                         PHYSICS, CHEMISTRY, BIOLOGY,
@@ -31,8 +31,13 @@ public class Constant {
                 )
         );
         public static final Map<String, String> EN_ZH = new HashMap<String, String>(){{
-            for (int i = 0; i < SUBJECTS.size(); ++i) {
-                put(SUBJECTS.get(i), SUBJECTS_ZH.get(i));
+            for (int i = 0; i < SUBJECTS_EN.size(); ++i) {
+                put(SUBJECTS_EN.get(i), SUBJECTS_ZH.get(i));
+            }
+        }};
+        public static final Map<String, String> ZH_EN = new HashMap<String, String>(){{
+            for (int i = 0; i < SUBJECTS_EN.size(); ++i) {
+                put(SUBJECTS_ZH.get(i), SUBJECTS_EN.get(i));
             }
         }};
 

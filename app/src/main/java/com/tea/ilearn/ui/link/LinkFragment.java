@@ -64,7 +64,7 @@ public class LinkFragment extends Fragment {
 
     private void doNER() {
         String text = binding.text.getText().toString();
-        String subject = Constant.EduKG.SUBJECTS.get(binding.courseSpinner.getSelectedIndex());
+        String subject = Constant.EduKG.SUBJECTS_EN.get(binding.courseSpinner.getSelectedIndex());
         StaticHandler handler = new StaticHandler(binding.nerResult, text, subject);
         EduKG.getInst().getNamedEntities(subject, text, handler);
     }

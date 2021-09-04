@@ -13,13 +13,13 @@ import androidx.fragment.app.Fragment;
 import com.heaven7.android.dragflowlayout.ClickToDeleteItemListenerImpl;
 import com.heaven7.android.dragflowlayout.DragAdapter;
 import com.heaven7.android.dragflowlayout.DragFlowLayout;
-import com.heaven7.android.dragflowlayout.IDraggable;
 import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
 import com.tea.ilearn.utils.DB_utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import per.goweii.actionbarex.common.ActionBarSearch;
@@ -60,6 +60,8 @@ public class HomeFragment extends Fragment {
         binding.flowLayout.setOnItemClickListener(new ClickToDeleteItemListenerImpl(R.id.all){
             @Override
             protected void onDeleteSuccess(DragFlowLayout dfl, View child, Object data) {
+                binding.unused.getDragItemManager().addItem(data);
+                binding.unused.beginDrag();
             }
         });
 
@@ -88,6 +90,7 @@ public class HomeFragment extends Fragment {
         binding.unused.setOnItemClickListener(new ClickToDeleteItemListenerImpl(R.id.all){
             @Override
             protected void onDeleteSuccess(DragFlowLayout dfl, View child, Object data) {
+                binding.flowLayout.getDragItemManager().addItem(data);
             }
         });
 
@@ -117,7 +120,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void initTabs() {
-        List<String> subjects = Constant.EduKG.SUBJECTS; // TODO colin: database ralated (no thread)
+        List<String> subjects = Arrays.asList("biology", "chemistry"); // TODO colin: database ralated (no thread)
+
         List<EntityListFragment> fragments = new ArrayList<>();
         for (String subject : subjects) {
             fragments.add(new EntityListFragment());
@@ -126,28 +130,35 @@ public class HomeFragment extends Fragment {
         binding.viewPager.setAdapter(pagerAdapter);
         binding.subjectTabs.setupWithViewPager(binding.viewPager);
 
-        binding.flowLayout.getDragItemManager().addItems(subjects);
-        binding.unused.getDragItemManager().addItems(subjects);
-
         binding.editMenu.setOnCheckedChangeListener((btn, checked) -> {
             if (checked) {
                 binding.editPanel.setVisibility(View.VISIBLE);
                 binding.cover.setVisibility(View.VISIBLE);
+
+                List<String> subs = new ArrayList<>();
+                for (int i = 0; i < binding.subjectTabs.getTabCount(); ++i) {
+                    subs.add(Constant.EduKG.ZH_EN.get(binding.subjectTabs.getTabAt(i).getText().toString()));
+                }
+                binding.flowLayout.getDragItemManager().addItems(subs);
+                for (String subject : Constant.EduKG.SUBJECTS_EN) {
+                    if (!subs.contains(subject))
+                        binding.unused.getDragItemManager().addItems(subject);
+                }
+
+                binding.unused.beginDrag();
+                binding.flowLayout.beginDrag();
             } else {
                 binding.flowLayout.finishDrag();
-                binding.cover.setVisibility(View.GONE);
-                binding.editPanel.setVisibility(View.GONE);
+                binding.flowLayout.finishDrag();
+                binding.cover.setVisibility(View.INVISIBLE);
+                binding.editPanel.setVisibility(View.INVISIBLE);
+                binding.flowLayout.getDragItemManager().clearItems();
+                binding.unused.getDragItemManager().clearItems();
             }
         });
     }
 
     private void search() {
         // TODO  acha
-    }
-
-    private static class NonDrag implements IDraggable {
-        String text;
-        public NonDrag(String text) { this.text = text; }
-        @Override public boolean isDraggable() { return false; }
     }
 }

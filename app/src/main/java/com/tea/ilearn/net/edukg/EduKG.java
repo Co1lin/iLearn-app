@@ -57,7 +57,7 @@ public class EduKG extends APIRequest {
     }
 
     public void fuzzySearchEntityWithAllCourse(String searchKey, Handler handler) {
-        for (String subject: Constant.EduKG.SUBJECTS) {
+        for (String subject: Constant.EduKG.SUBJECTS_EN) {
             fuzzySearchEntityWithCourse(subject, searchKey, handler);
         }
     }
@@ -95,7 +95,7 @@ public class EduKG extends APIRequest {
     }
 
     public void qAWithAllSubjects(String question, Handler handler) {
-        for (String subject: Constant.EduKG.SUBJECTS) {
+        for (String subject: Constant.EduKG.SUBJECTS_EN) {
             qAWithSubject(subject, question, handler);
         }
     }

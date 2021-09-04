@@ -76,14 +76,14 @@ public class ChatbotFragment extends Fragment {
             if (msg.length() >= 4 &&
                     (msg.substring(0, 1).equals("[") && msg.substring(3, 4).equals("]") ||
                             msg.substring(0, 1).equals("【") && msg.substring(3, 4).equals("】")) &&
-                    Constant.EduKG.SUBJECTS.contains(msg.substring(1, 3))) {
+                    Constant.EduKG.SUBJECTS_EN.contains(msg.substring(1, 3))) {
                 // QA with the specific subject when matches [**]
                 EduKG.getInst().qAWithSubject(msg.substring(1, 3), msg.substring(4),
                         new StaticHandler(mMessageAdapter, 1, mMessageRecycler));
             }
             else {
                 EduKG.getInst().qAWithAllSubjects(msg,
-                        new StaticHandler(mMessageAdapter, Constant.EduKG.SUBJECTS.size(), mMessageRecycler));
+                        new StaticHandler(mMessageAdapter, Constant.EduKG.SUBJECTS_EN.size(), mMessageRecycler));
             }
             editText.setText("");
             mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
