@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import com.heaven7.android.dragflowlayout.ClickToDeleteItemListenerImpl;
 import com.heaven7.android.dragflowlayout.DragAdapter;
 import com.heaven7.android.dragflowlayout.DragFlowLayout;
+import com.heaven7.android.dragflowlayout.IDraggable;
 import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
@@ -56,7 +57,7 @@ public class HomeFragment extends Fragment {
         });
         DB_utils.updateACAdapter(getActivity(), getContext(), acTextView);
 
-        binding.flowLayout.setOnItemClickListener(new ClickToDeleteItemListenerImpl(R.id.iv_close){
+        binding.flowLayout.setOnItemClickListener(new ClickToDeleteItemListenerImpl(R.id.all){
             @Override
             protected void onDeleteSuccess(DragFlowLayout dfl, View child, Object data) {
             }
@@ -65,7 +66,7 @@ public class HomeFragment extends Fragment {
         binding.flowLayout.setDragAdapter(new DragAdapter<String>() {
             @Override
             public int getItemLayoutId() {
-                return R.layout.chip;
+                return R.layout.used_chip;
             }
 
             @Override
@@ -74,8 +75,34 @@ public class HomeFragment extends Fragment {
 
                 ((TextView) itemView.findViewById(R.id.text)).setText(Constant.EduKG.EN_ZH.get(data));
                 itemView.findViewById(R.id.iv_close).setVisibility(
-                        dragState != DragFlowLayout.DRAG_STATE_IDLE ? View.VISIBLE : View.GONE
+                        dragState != DragFlowLayout.DRAG_STATE_IDLE ? View.VISIBLE : View.INVISIBLE
                 );
+            }
+
+            @NonNull @Override
+            public String getData(View itemView) {
+                return (String) itemView.getTag();
+            }
+        });
+
+        binding.unused.setOnItemClickListener(new ClickToDeleteItemListenerImpl(R.id.all){
+            @Override
+            protected void onDeleteSuccess(DragFlowLayout dfl, View child, Object data) {
+            }
+        });
+
+        binding.unused.setDragAdapter(new DragAdapter<String>() {
+            @Override
+            public int getItemLayoutId() {
+                return R.layout.unused_chip;
+            }
+
+            @Override
+            public void onBindData(View itemView, int dragState, String data) {
+                itemView.setTag(data);
+
+                ((TextView) itemView.findViewById(R.id.text)).setText(Constant.EduKG.EN_ZH.get(data));
+                itemView.findViewById(R.id.iv_open).setVisibility(View.VISIBLE);
             }
 
             @NonNull @Override
@@ -100,11 +127,12 @@ public class HomeFragment extends Fragment {
         binding.subjectTabs.setupWithViewPager(binding.viewPager);
 
         binding.flowLayout.getDragItemManager().addItems(subjects);
+        binding.unused.getDragItemManager().addItems(subjects);
+
         binding.editMenu.setOnCheckedChangeListener((btn, checked) -> {
             if (checked) {
                 binding.editPanel.setVisibility(View.VISIBLE);
                 binding.cover.setVisibility(View.VISIBLE);
-//                binding.flowLayout.beginDrag();
             } else {
                 binding.flowLayout.finishDrag();
                 binding.cover.setVisibility(View.GONE);
@@ -115,5 +143,11 @@ public class HomeFragment extends Fragment {
 
     private void search() {
         // TODO  acha
+    }
+
+    private static class NonDrag implements IDraggable {
+        String text;
+        public NonDrag(String text) { this.text = text; }
+        @Override public boolean isDraggable() { return false; }
     }
 }

@@ -94,7 +94,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <com.heaven7.android.dragflowlayout.DragFlowLayout
+            android:layout_marginStart="8dp"
             android:id="@+id/flow_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="8dp"
+            android:background="?android:colorBackground" />
+
+        <TextView
+            android:layout_marginStart="16dp"
+            android:text="热门学科"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.heaven7.android.dragflowlayout.DragFlowLayout
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="8dp"
+            android:id="@+id/unused"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>

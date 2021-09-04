@@ -18,9 +18,9 @@
             android:id="@+id/image_profile"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:scaleType="fitXY"
             android:layout_marginStart="2dp"
             android:contentDescription="User Icon"
-            android:scaleType="fitXY"
             app:tint="?colorOnPrimary"
             android:src="@drawable/ic_profile_24" />
         <TextView
