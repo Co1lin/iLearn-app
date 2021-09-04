@@ -29,7 +29,6 @@ import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 import com.tea.ilearn.model.Account;
-import com.tea.ilearn.net.backend.Backend;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,8 +112,8 @@ public class MeFragment extends Fragment {
         // TODO: register and login
         LoginHandler loginHandler = new LoginHandler();
         RegisterHandler registerHandler = new RegisterHandler();
-        Backend.getInst().register("coln@lin.sldf", "cnkjllj", "olin", registerHandler);
-        Backend.getInst().login("cnkjllj", "olin", loginHandler);
+//        Backend.getInst().register("coln@lin.sldf", "cnkjllj", "olin", registerHandler);
+//        Backend.getInst().login("cnkjllj", "olin", loginHandler);
 
         return root;
     }
