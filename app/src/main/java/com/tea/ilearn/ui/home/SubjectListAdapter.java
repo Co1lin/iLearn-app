@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
+import com.tea.ilearn.Constant;
+
 import java.util.List;
 
 public class SubjectListAdapter extends FragmentPagerAdapter {
@@ -29,6 +31,6 @@ public class SubjectListAdapter extends FragmentPagerAdapter {
 
     @Nullable @Override
     public CharSequence getPageTitle(int position) {
-        return subjects.get(position);
+        return Constant.EduKG.EN_ZH.get(subjects.get(position));
     }
 }

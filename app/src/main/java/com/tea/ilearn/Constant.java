@@ -2,6 +2,8 @@ package com.tea.ilearn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Constant {
     public static class EduKG {
@@ -28,6 +30,11 @@ public class Constant {
                         "历史", "地理", "政治"
                 )
         );
+        public static final Map<String, String> EN_ZH = new HashMap<String, String>(){{
+            for (int i = 0; i < SUBJECTS.size(); ++i) {
+                put(SUBJECTS.get(i), SUBJECTS_ZH.get(i));
+            }
+        }};
 
         public static final String ERROR_MSG    = "系统错误，请稍后重试或联系客服。";
     }
