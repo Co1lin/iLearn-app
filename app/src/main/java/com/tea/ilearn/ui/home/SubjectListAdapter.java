@@ -3,14 +3,15 @@ package com.tea.ilearn.ui.home;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
 
 import com.tea.ilearn.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubjectListAdapter extends FragmentPagerAdapter {
+public class SubjectListAdapter extends FragmentStatePagerAdapter {
     public List<String> subjects;
     private List<EntityListFragment> fragmentList;
 
@@ -18,25 +19,17 @@ public class SubjectListAdapter extends FragmentPagerAdapter {
         super(fm);
         this.subjects = subjects;
         fragmentList = new ArrayList<>();
-        for (String subject : subjects) {
-            fragmentList.add(new EntityListFragment());
+        for (String subj : subjects) {
+            fragmentList.add(new EntityListFragment(subj));
         }
     }
 
     public void change(List<String> newSubjects) {
-        List<EntityListFragment> newFragmentList = new ArrayList<>();
-        for (String subj : newSubjects) {
-            boolean flag = true;
-            for (int k = 0; k < subjects.size(); ++k)
-                if (subjects.get(k) == subj) {
-                    newFragmentList.add(fragmentList.get(k));
-                    flag = false;
-                    break;
-                }
-            if (flag) newFragmentList.add(new EntityListFragment());
-        }
         subjects = newSubjects;
-        fragmentList = newFragmentList;
+        fragmentList = new ArrayList<>();
+        for (String subj : newSubjects) {
+            fragmentList.add(new EntityListFragment(subj));
+        }
         notifyDataSetChanged();
     }
 
@@ -53,5 +46,10 @@ public class SubjectListAdapter extends FragmentPagerAdapter {
     @Nullable @Override
     public CharSequence getPageTitle(int position) {
         return Constant.EduKG.EN_ZH.get(subjects.get(position));
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return PagerAdapter.POSITION_NONE;
     }
 }

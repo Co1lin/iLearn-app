@@ -122,10 +122,6 @@ public class HomeFragment extends Fragment {
     private void initTabs() {
         List<String> subjects = Arrays.asList("biology", "chemistry"); // TODO colin: database ralated (no thread)
 
-        List<EntityListFragment> fragments = new ArrayList<>();
-        for (String subject : subjects) {
-            fragments.add(new EntityListFragment());
-        }
         SubjectListAdapter pagerAdapter = new SubjectListAdapter(getChildFragmentManager(), subjects);
         binding.viewPager.setAdapter(pagerAdapter);
         binding.subjectTabs.setupWithViewPager(binding.viewPager);
@@ -153,7 +149,6 @@ public class HomeFragment extends Fragment {
                 binding.cover.setVisibility(View.INVISIBLE);
                 binding.editPanel.setVisibility(View.INVISIBLE);
 
-                // TODO save
                 pagerAdapter.change(binding.flowLayout.getDragItemManager().getItems());
 
                 binding.flowLayout.getDragItemManager().clearItems();

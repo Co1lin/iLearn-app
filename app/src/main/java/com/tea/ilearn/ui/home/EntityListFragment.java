@@ -44,10 +44,10 @@ public class EntityListFragment extends Fragment {
     String query, subject;
     private AutoComplTextView acTextView;
 
-    public EntityListFragment() {
+    public EntityListFragment(String subject) {
         super();
+        this.subject = subject;
 //        this.query;
-//        this.subject;
 //        this.acTextView;
     }
 
@@ -94,6 +94,8 @@ public class EntityListFragment extends Fragment {
         mInfoRecycler.setAdapter(mInfoAdapter);
 
         initList();
+
+        binding.debug.setText(subject);
 
         return root;
     }
