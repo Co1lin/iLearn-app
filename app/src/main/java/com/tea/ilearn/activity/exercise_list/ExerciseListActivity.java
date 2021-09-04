@@ -74,30 +74,34 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             List<Problem> problems = (List<Problem>) msg.obj;
-            if (msg.what == 0 && problems != null && problems.size() != 0) {
-                List<ExerciseFragment> fragments = new ArrayList<>();
-                int numValidProblem = 0;
-                for (Problem p : problems)
-                    if (p.getDescription() != null) ++numValidProblem;
-                int i = 0;
-                for (Problem p : problems) {
-                    if (p.getDescription() == null) continue;
-                    i += 1;
-                    ExerciseFragment fragment = new ExerciseFragment(
-                            i+"/"+numValidProblem,
-                            p.getDescription(),
-                            p.getChoices(),
-                            p.getAnswer(),
-                            mWPAPI
-                    );
-                    fragments.add(fragment);
+            if (msg.what == 0) {
+                if (problems != null && problems.size() != 0) {
+                    List<ExerciseFragment> fragments = new ArrayList<>();
+                    int numValidProblem = 0;
+                    for (Problem p : problems)
+                        if (p.getDescription() != null) ++numValidProblem;
+                    int i = 0;
+                    for (Problem p : problems) {
+                        if (p.getDescription() == null) continue;
+                        i += 1;
+                        ExerciseFragment fragment = new ExerciseFragment(
+                                i+"/"+numValidProblem,
+                                p.getDescription(),
+                                p.getChoices(),
+                                p.getAnswer(),
+                                mWPAPI
+                        );
+                        fragments.add(fragment);
+                    }
+                    ExerciseListAdapter mExerciseAdapter = new ExerciseListAdapter(fm, fragments);
+                    vp.setOffscreenPageLimit(fragments.size());
+                    vp.setPageMargin(10);
+                    vp.setAdapter(mExerciseAdapter);
+                } else {
+                    notfound.setVisibility(View.VISIBLE);
                 }
-                ExerciseListAdapter mExerciseAdapter = new ExerciseListAdapter(fm, fragments);
-                vp.setOffscreenPageLimit(fragments.size());
-                vp.setPageMargin(10);
-                vp.setAdapter(mExerciseAdapter);
-            } else {
-                notfound.setVisibility(View.VISIBLE);
+            } else { // msg.what = 1
+                // TODO load from database
             }
             progress.setVisibility(View.GONE);
         }
