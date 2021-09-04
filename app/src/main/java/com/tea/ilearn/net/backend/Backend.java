@@ -140,7 +140,7 @@ public class Backend extends APIRequest {
                 new HashMap<String, Object>(){{
                     put("username", username);
                 }},
-                p -> p.asString(),
+                p -> p.asResponse(String.class),
                 handler);
     }
 
@@ -149,7 +149,7 @@ public class Backend extends APIRequest {
                 new HashMap<String, Object>(){{
                     put("password", password);
                 }},
-                p -> p.asClass(SimpleResponse.class),
+                p -> p.asResponse(String.class),
                 handler);
     }
     // TODO reset password by email? ask TA

@@ -11,9 +11,7 @@
     <string name="search_problem">搜题</string>
     <string name="input_hint">请输入</string>
     <string name="dark_mode">黑夜模式</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="network_retry">请检查网络连接后重试</string>
     <string name="service_policy">我们会为您随机提供服务，功能的无法使用是我们的防沉迷政策</string>
     <string name="privacy_policy">我们使用http为您提供服务，一定会泄漏您的隐私</string>
 </resources>

@@ -2,9 +2,6 @@ package com.tea.ilearn.ui.me;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +25,6 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
-import com.tea.ilearn.model.Account;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,8 +63,12 @@ public class MeFragment extends Fragment {
             }
         });
 
-        // =======================================================================
+        initLineChart();
 
+        return root;
+    }
+
+    void initLineChart() {
         LineChart lineChart = binding.lineChart;
         List<String> key = Arrays.asList("周一", "周二", "周三", "周四", "周五", "周六", "周日");
         List<Integer> value = Arrays.asList(120, 200, 150, 80, 10, 110, 130); // TODO colin: true value here
@@ -84,7 +84,7 @@ public class MeFragment extends Fragment {
         dataset.setValueTextSize(10);
         dataset.setValueTextColor(color);
         dataset.setDrawFilled(true);
-        dataset.setFillDrawable(ContextCompat.getDrawable(root.getContext(), R.drawable.gradient_fill));
+        dataset.setFillDrawable(ContextCompat.getDrawable(binding.getRoot().getContext(), R.drawable.gradient_fill));
         lineChart.setClipValuesToContent(false);
         lineChart.getXAxis().setTextColor(color);
         typedValue = new TypedValue();
@@ -108,48 +108,5 @@ public class MeFragment extends Fragment {
         lineChart.getAxisLeft().setDrawGridLines(false);
         lineChart.setData(lineData);
         lineChart.invalidate();
-
-        // TODO: register and login
-        LoginHandler loginHandler = new LoginHandler();
-        RegisterHandler registerHandler = new RegisterHandler();
-//        Backend.getInst().register("coln@lin.sldf", "cnkjllj", "olin", registerHandler);
-//        Backend.getInst().login("cnkjllj", "olin", loginHandler);
-
-        return root;
-    }
-
-    static class RegisterHandler extends Handler {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Log.i("MeFragment/registerHandler", String.valueOf(msg.what));
-            if (msg.what == 0 && msg.obj != null) {
-                Account account = (Account) msg.obj;
-                // TODO
-            }
-            else {  // register failed
-                if (((String) msg.obj).contains("duplicated")) {
-                    // TODO
-                }
-            }
-        }
-    }
-
-    static class LoginHandler extends Handler {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Log.i("MeFragment/registerHandler", String.valueOf(msg.what));
-            if (msg.what == 0 && msg.obj != null) {
-                Account account = (Account) msg.obj;
-                // TODO
-            }
-            else {  // register failed
-                if (((String) msg.obj).contains("login failed")) {
-                    // TODO: incorrect username or password
-                }
-            }
-        }
     }
 }
-// TODO edit text color issue in dark mode
