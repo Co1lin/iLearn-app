@@ -126,7 +126,7 @@ public class HomeFragment extends Fragment {
         for (String subject : subjects) {
             fragments.add(new EntityListFragment());
         }
-        SubjectListAdapter pagerAdapter = new SubjectListAdapter(getChildFragmentManager(), subjects, fragments);
+        SubjectListAdapter pagerAdapter = new SubjectListAdapter(getChildFragmentManager(), subjects);
         binding.viewPager.setAdapter(pagerAdapter);
         binding.subjectTabs.setupWithViewPager(binding.viewPager);
 
@@ -152,6 +152,10 @@ public class HomeFragment extends Fragment {
                 binding.flowLayout.finishDrag();
                 binding.cover.setVisibility(View.INVISIBLE);
                 binding.editPanel.setVisibility(View.INVISIBLE);
+
+                // TODO save
+                pagerAdapter.change(binding.flowLayout.getDragItemManager().getItems());
+
                 binding.flowLayout.getDragItemManager().clearItems();
                 binding.unused.getDragItemManager().clearItems();
             }
