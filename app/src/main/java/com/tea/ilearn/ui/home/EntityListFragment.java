@@ -221,7 +221,7 @@ public class EntityListFragment extends Fragment {
                             if (entitiesRes != null && entitiesRes.size() > 0) {
                                 detail = entitiesRes.get(0);
                                 // already exists in DB, update UI
-                                mInfoAdapter.modify(idx.get(), detail.isStared(), detail.isViewed());
+                                mInfoAdapter.modify(idx.get(), detail.isStarred(), detail.isViewed());
                             }
                             else // store a new entity to DB
                                 detail = new EduKGEntityDetail();

@@ -1,5 +1,6 @@
 package com.tea.ilearn.model;
 
+import com.google.gson.annotations.SerializedName;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail;
 
 import io.objectbox.annotation.Backlink;
@@ -13,7 +14,7 @@ public class SearchHistory {
     @Id
     public long id;
 
-    @Index
+    @Index @SerializedName("description")
     String keyword;
 
     @Index

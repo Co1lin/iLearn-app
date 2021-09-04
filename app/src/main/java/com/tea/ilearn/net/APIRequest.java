@@ -265,7 +265,7 @@ public abstract class APIRequest {
     /**
      * POST Request to API with x-www-from-urlencoded body
      * @param path              Relative path to baseUrl
-     * @param params            Map containing key-value pairs to add to GET params
+     * @param params            Map containing key-value pairs to add to post form
      * @param responseDefiner   Object of ResponseDefiner interface to
      *                          define the type of "data" field in Response<T>
      * @param handler           Handler to be sent the object of responseClass
@@ -296,6 +296,15 @@ public abstract class APIRequest {
         POSTForm(path, params, responseDefiner, handler, 0);
     }
 
+    /**
+     * POST Request to API with JSON body
+     * @param path              Relative path to baseUrl
+     * @param params            Map containing key-value pairs to add to post body
+     * @param responseDefiner   Object of ResponseDefiner interface to
+     *                          define the type of "data" field in Response<T>
+     * @param handler           Handler to be sent the object of responseClass
+     * @param priority          Priority of this request in the blocking queue
+     */
     public void POSTJson(
             String path,
             Map<String, Object> params,
@@ -313,6 +322,40 @@ public abstract class APIRequest {
     }
 
     public void POSTJson(
+            String path,
+            Map<String, Object> params,
+            ResponseDefiner responseDefiner,
+            Handler handler
+    ) {
+        POSTJson(path, params, responseDefiner, handler, 0);
+    }
+
+    /**
+     * PUT Request to API with JSON body
+     * @param path              Relative path to baseUrl
+     * @param params            Map containing key-value pairs to add to put body
+     * @param responseDefiner   Object of ResponseDefiner interface to
+     *                          define the type of "data" field in Response<T>
+     * @param handler           Handler to be sent the object of responseClass
+     * @param priority          Priority of this request in the blocking queue
+     */
+    public void PUTJson(
+            String path,
+            Map<String, Object> params,
+            ResponseDefiner responseDefiner,
+            Handler handler,
+            int priority
+    ) {
+        addTask(new Task(
+                RxHttp.putJson(baseUrl + genericPath + path),
+                params,
+                responseDefiner,
+                handler,
+                priority
+        ));
+    }
+
+    public void PUTJson(
             String path,
             Map<String, Object> params,
             ResponseDefiner responseDefiner,
