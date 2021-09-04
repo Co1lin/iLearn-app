@@ -1,12 +1,12 @@
 package com.tea.ilearn.model;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.tea.ilearn.net.edukg.EduKGRelation;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Date;
 
 import io.objectbox.annotation.Convert;
 import io.objectbox.annotation.Entity;
@@ -18,12 +18,14 @@ public class UserStatistics {
     @Id
     public long id;
 
-    Date firstDate;
+    @SerializedName("first_date")
+    String firstDate;
 
+    @SerializedName("entities_viewed")
     @Convert(converter = IntegerArrayConverter.class, dbType = String.class)
     ArrayList<Integer> entitiesViewed = new ArrayList<>();
 
-    public UserStatistics setFirstDate(Date firstDate) {
+    public UserStatistics setFirstDate(String firstDate) {
         this.firstDate = firstDate;
         return this;
     }
@@ -33,7 +35,7 @@ public class UserStatistics {
         return this;
     }
 
-    public Date getFirstDate() {
+    public String getFirstDate() {
         return firstDate;
     }
 

@@ -29,11 +29,19 @@ import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 import com.tea.ilearn.model.Account;
+import com.tea.ilearn.model.SearchHistory;
+import com.tea.ilearn.model.UserStatistics;
 import com.tea.ilearn.net.backend.Backend;
+import com.tea.ilearn.utils.ObjectBox;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+import io.objectbox.Box;
 
 public class MeFragment extends Fragment {
     private FragmentMeBinding binding;
@@ -113,23 +121,37 @@ public class MeFragment extends Fragment {
         // TODO: register and login
         LoginHandler loginHandler = new LoginHandler();
         RegisterHandler registerHandler = new RegisterHandler();
-        Backend.getInst().register("coln@lin.sldf", "cnkjllj", "olin", registerHandler);
-        Backend.getInst().login("cnkjllj", "olin", loginHandler);
+        //Backend.getInst().register("coln@lin.sdf", "dfkkjkghk0j", "olin", registerHandler);
+        Backend.getInst().login("colin", "colin", loginHandler);
 
         return root;
+    }
+
+    static protected void initUser() {
+        Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
+        statisticsBox.removeAll();
+        UserStatistics statistics = new UserStatistics()
+                .setFirstDate(LocalDate.now().toString())
+                .setEntitiesViewed(new ArrayList<>(
+                        Collections.nCopies(7, 0)
+                ));
+        statisticsBox.put(statistics);
+        Backend.getInst().uploadUserStatistics(statistics, new InitUserHandler());
     }
 
     static class RegisterHandler extends Handler {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            Log.i("MeFragment/registerHandler", String.valueOf(msg.what));
+            Log.i("MeFragment/RegisterHandler", String.valueOf(msg.what));
             if (msg.what == 0 && msg.obj != null) {
                 Account account = (Account) msg.obj;
+                initUser();
+
                 // TODO
             }
             else {  // register failed
-                if (((String) msg.obj).contains("duplicated")) {
+                if (((AtomicReference<String>) msg.obj).toString().contains("duplicated")) {
                     // TODO
                 }
             }
@@ -140,7 +162,7 @@ public class MeFragment extends Fragment {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            Log.i("MeFragment/registerHandler", String.valueOf(msg.what));
+            Log.i("MeFragment/LoginHandler", String.valueOf(msg.what));
             if (msg.what == 0 && msg.obj != null) {
                 Account account = (Account) msg.obj;
                 // TODO
@@ -148,6 +170,24 @@ public class MeFragment extends Fragment {
             else {  // register failed
                 if (((String) msg.obj).contains("login failed")) {
                     // TODO: incorrect username or password
+                }
+            }
+        }
+    }
+
+    static class InitUserHandler extends Handler {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            Log.i("MeFragment/InitUserHandler", String.valueOf(msg.what));
+            if (msg.what == 0 && msg.obj != null) {
+                //Account account = (Account) msg.obj;
+
+                // TODO
+            }
+            else {  // register failed
+                if (((String) msg.obj).contains("duplicated")) {
+                    // TODO
                 }
             }
         }

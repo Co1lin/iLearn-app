@@ -6,10 +6,12 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 
 import com.tea.ilearn.model.Account;
+import com.tea.ilearn.model.SearchHistory;
 import com.tea.ilearn.model.UserStatistics;
 import com.tea.ilearn.net.APIRequest;
 import com.tea.ilearn.utils.ObjectBox;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -65,13 +67,13 @@ public class Backend extends APIRequest {
         }
     }
 
-    class LoggedInCallbackHandler extends Handler {
+    class LogInCallbackHandler extends Handler {
         Handler originalHandler;
         String username;
         String password;
 
-        public LoggedInCallbackHandler(Handler originalHandler,
-                                       String username, String password) {
+        public LogInCallbackHandler(Handler originalHandler,
+                                    String username, String password) {
             this.originalHandler = originalHandler;
             this.username = username;
             this.password = password;
@@ -105,7 +107,7 @@ public class Backend extends APIRequest {
             put("username", username);
             put("password", password);
         }};
-        asyncRefresh(new LoggedInCallbackHandler(handler, username, password));
+        asyncRefresh(new LogInCallbackHandler(handler, username, password));
     }
 
     public void register(String email, String username,
@@ -117,7 +119,7 @@ public class Backend extends APIRequest {
                     put("password", password);
                 }},
                 p -> p.asResponse(TokenResponse.class),
-                new LoggedInCallbackHandler(handler, username, password)
+                new LogInCallbackHandler(handler, username, password)
         );
     }
 
@@ -182,20 +184,27 @@ public class Backend extends APIRequest {
             Box<UserStatistics> userStatisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
             List<UserStatistics> res = userStatisticsBox.getAll();
             if (res != null && res.size() > 0) {
-                UserStatistics statistics = res.get(0);
-                POSTJson("/users/viewed",
-                        new HashMap<String, Object>(){{
-                            put("first_date", statistics.getFirstDate());
-                            put("entities_viewed", statistics.getEntitiesViewed());
-                        }},
-                        p -> p.asResponse(UserStatistics.class),
-                        handler);
+                uploadUserStatistics(res.get(0), handler);
             }
         }).start();
     }
 
+    public void uploadUserStatistics(UserStatistics statistics, Handler handler) {
+        POSTJson("/users/viewed",
+                new HashMap<String, Object>(){{
+                    put("first_date", statistics.getFirstDate());
+                    put("entities_viewed", statistics.getEntitiesViewed());
+                }},
+                p -> p.asResponse(String.class),
+                handler);
+    }
+
     public void getUserStatistics(Handler handler) {
         Handler callbackHandler = new GetUserStatisticsCallback(handler);
+        GET("/users/viewed",
+                new HashMap<>(),
+                p -> p.asResponse(UserStatistics.class),
+                callbackHandler);
     }
 
     static class GetUserStatisticsCallback extends Handler {
@@ -208,16 +217,35 @@ public class Backend extends APIRequest {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
+            if (msg.what == 1 || msg.obj == null)
+                Message.obtain(originalHandler, 1, null).sendToTarget();
+            else {  // store to DB and send to frontend
+                UserStatistics statistics = (UserStatistics) msg.obj;
+                Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
+                statisticsBox.removeAll();
+                statisticsBox.put(statistics);
+                Message.obtain(originalHandler,0, statistics).sendToTarget();
+            }
         }
     }
 
     // search histories
-    public void uploadSearchHistories(Handler handler) {
-
+    public void uploadSearchHistories(SearchHistory history, Handler handler) {
+        PUTJson("/history/put",
+                new HashMap<String, Object>() {{
+                    put("description", history.getKeyword());
+                    put("subject", history.getSubject());
+                }},
+                p -> p.asResponse(String.class),
+                handler);
     }
 
     public void getSearchHistories(Handler handler) {
-        Handler callbackHandler = new GetUserStatisticsCallback(handler);
+        Handler callbackHandler = new GetSearchHistoriesCallback(handler);
+        GET("/history/get",
+                new HashMap<>(),
+                p -> p.asResponseList(SearchHistory.class),
+                callbackHandler);
     }
 
     static class GetSearchHistoriesCallback extends Handler {
@@ -230,6 +258,15 @@ public class Backend extends APIRequest {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
+            if (msg.what == 1 || msg.obj == null)
+                Message.obtain(originalHandler, 1, null).sendToTarget();
+            else {
+                ArrayList<SearchHistory> histories = (ArrayList<SearchHistory>) msg.obj;
+                Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
+                historyBox.removeAll();
+                historyBox.put(histories);
+                Message.obtain(originalHandler, 0, msg.obj).sendToTarget();
+            }
         }
     }
 
