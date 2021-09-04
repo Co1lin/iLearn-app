@@ -177,7 +177,7 @@ public class HomeFragment extends Fragment {
 
     private void search() {
         int pos = binding.subjectTabs.getSelectedTabPosition();
-        Log.d("MYDEBUG", String.valueOf(pos)+" "+pagerAdapter.getCount());
+        Log.d("MYDEBUG", pos + " " +pagerAdapter.getCount());
         ((EntityListFragment)pagerAdapter.getItem(pos)).search(getQuery(), acTextView);
     }
 }

@@ -240,7 +240,6 @@ public class Backend extends APIRequest {
         PUTJson("/history/put",
                 new HashMap<String, Object>() {{
                     put("description", history.getKeyword());
-                    put("subject", history.getSubject());
                 }},
                 p -> p.asResponse(String.class),
                 handler);

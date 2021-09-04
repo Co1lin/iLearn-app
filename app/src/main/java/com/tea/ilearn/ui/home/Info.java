@@ -19,6 +19,8 @@ class Info {
         this.id = id;
     }
 
+    public Info() {}
+
     public ArrayList<String> getCategories() {
         return categories;
     }
@@ -29,5 +31,60 @@ class Info {
 
     public String getName() {
         return name;
+    }
+
+    public int getKd() {
+        return kd;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public boolean isStar() {
+        return star;
+    }
+
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    public Info setKd(int kd) {
+        this.kd = kd;
+        return this;
+    }
+
+    public Info setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Info setSubject(String subject) {
+        this.subject = subject;
+        return this;
+    }
+
+    public Info setId(String id) {
+        this.id = id;
+        return this;
+    }
+
+    public Info setStar(boolean star) {
+        this.star = star;
+        return this;
+    }
+
+    public Info setLoaded(boolean loaded) {
+        this.loaded = loaded;
+        return this;
+    }
+
+    public Info setCategories(ArrayList<String> categories) {
+        this.categories = categories;
+        return this;
     }
 }

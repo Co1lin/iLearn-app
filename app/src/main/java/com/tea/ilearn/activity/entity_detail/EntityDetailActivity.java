@@ -1,7 +1,5 @@
 package com.tea.ilearn.activity.entity_detail;
 
-import static java.lang.Thread.sleep;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,8 +22,6 @@ import com.sina.weibo.sdk.openapi.WBAPIFactory;
 import com.sina.weibo.sdk.share.WbShareCallback;
 import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
-import com.tea.ilearn.model.Category;
-import com.tea.ilearn.model.Category_;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
@@ -43,8 +39,22 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
     private ActivityEntityDetailBinding binding;
     private RecyclerView mRelationRecycler, mPropertyRecycler;
     private RelationListAdapter mRelationAdapter, mPropertyAdapter;
-    private EduKGEntityDetail entityDetail = new EduKGEntityDetail();
-    Box<EduKGEntityDetail> entityBox;
+    private String name, category, subject, uri;
+    private ArrayList<String> categories;
+    private EduKGEntityDetail detailInDB;
+    private Box<EduKGEntityDetail> entityBox;
+
+    private void waitUntilDetailGot() {
+        // wait until this entity has been stored into DB
+        while (detailInDB == null) {
+            Query<EduKGEntityDetail> query = entityBox.query()
+                    .equal(EduKGEntityDetail_.uri, uri).build();
+            List<EduKGEntityDetail> entitiesRes = query.find();
+            query.close();
+            if (entitiesRes != null && entitiesRes.size() > 0)
+                detailInDB = entitiesRes.get(0);
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,52 +78,71 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
         mPropertyRecycler.setNestedScrollingEnabled(false);
         mRelationRecycler.setNestedScrollingEnabled(false);
 
-        binding.hide.setOnClickListener($ -> {
-            finish();
-        });
+        binding.hide.setOnClickListener($ -> finish());
 
         entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
 
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String name = intent.getStringExtra("name");
-            String category = intent.getStringExtra("category");
-            String subject = intent.getStringExtra("subject");
-            String uri = intent.getStringExtra("id");
+            name = intent.getStringExtra("name");
+            category = intent.getStringExtra("category");
+            subject = intent.getStringExtra("subject");
+            uri = intent.getStringExtra("id");
+            categories = intent.getStringArrayListExtra("categories");
 
-            binding.entityName.setText(name);
-            binding.entityCategory.setText(category);
-            binding.entitySubject.setText(subject);
+            // DB I/O
+            new Thread(() -> {  // detailInDB must not be null after this thread finishes
+                // query the entity from DB
+                Query<EduKGEntityDetail> query = entityBox.query()
+                        .equal(EduKGEntityDetail_.uri, uri).build();
+                List<EduKGEntityDetail> entitiesRes = query.find();
+                query.close();
+                if (entitiesRes != null && entitiesRes.size() > 0) {
+                    // already exists (also already viewed), update status of starred
+                    detailInDB = entitiesRes.get(0);
+                    runOnUiThread(() -> binding.star.setChecked(detailInDB.isStarred()));
+                }
+                else { // new viewed entity, store to DB
+                    detailInDB = new EduKGEntityDetail()
+                            .setCategory(category)
+                            .setCategoriesBuf(categories)
+                            .setSubject(subject)
+                            .setLabel(name)
+                            .setUri(uri)
+                            .setViewed(true);
+                    entityBox.put(detailInDB);
+                }
+            }).start();
 
+            // UI related listener binding associated with the detail entry
             binding.star.setOnClickListener($ -> {
                 if (binding.star.isChecked())
                     Toast.makeText(binding.getRoot().getContext(), "收藏成功", Toast.LENGTH_SHORT).show();
                 else
                     Toast.makeText(binding.getRoot().getContext(), "已取消收藏", Toast.LENGTH_SHORT).show();
                 new Thread(() -> {
-                    getEntityDetail(uri);
-                    entityDetail.setStarred(binding.star.isChecked());
-                    entityBox.put(entityDetail);
+                    waitUntilDetailGot();
+                    detailInDB.setStarred(binding.star.isChecked());
+                    entityBox.put(detailInDB);
                 }).start();
             });
-            getEntityDetail(uri);
-            entityDetail.setViewed(true);
-            binding.star.setChecked(entityDetail.isStarred());
-            entityBox.put(entityDetail);
 
-            binding.share.setOnClickListener($ -> {
-                doWeiboShare();
-            });
+            binding.entityName.setText(name);
+            binding.entityCategory.setText(category);
+            binding.entitySubject.setText(subject);
+
+            binding.share.setOnClickListener($ -> doWeiboShare());
             binding.relatedExercise.setOnClickListener($ -> {
-                Intent inten = new Intent (binding.getRoot().getContext(), ExerciseListActivity.class);
-                inten.setAction(Intent.ACTION_SEARCH);
-                inten.putExtra("name", name);
-                inten.putExtra("subject", subject);
-                binding.getRoot().getContext().startActivity(inten);
+                Intent anotherIntent = new Intent (binding.getRoot().getContext(), ExerciseListActivity.class);
+                anotherIntent.setAction(Intent.ACTION_SEARCH);
+                anotherIntent.putExtra("name", name);
+                anotherIntent.putExtra("subject", subject);
+                binding.getRoot().getContext().startActivity(anotherIntent);
             });
+
             boolean loaded = false; // TODO get info from database (base on id?)
             if (!loaded) {
-                StaticHandler handler = new StaticHandler(binding.entityDescription, mRelationAdapter, mPropertyAdapter, subject, category, entityBox);
+                StaticHandler handler = new StaticHandler(binding.entityDescription);
                 EduKG.getInst().getEntityDetails(subject, name, handler);
                 // TODO save to database (including the loaded status)
             }
@@ -123,57 +152,28 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
         }
     }
 
-    private EduKGEntityDetail getEntityDetail(String uri) {
-        synchronized (entityDetail) {
-            while (entityDetail.getUri() == null) {
-                Query<EduKGEntityDetail> query = entityBox.query()
-                        .equal(EduKGEntityDetail_.uri, uri).build();
-                List<EduKGEntityDetail> entitiesRes = query.find();
-                query.close();
-                if (entitiesRes == null || entitiesRes.size() == 0) {
-                    try {
-                        sleep(100);
-                    } catch (InterruptedException e) {}
-                } else {
-                    entityDetail = entitiesRes.get(0);
-                    break;
-                }
-            }
-            return entityDetail;
-        }
-    }
-
     class StaticHandler extends Handler {
         private TextView entityDescription;
-        private RelationListAdapter mRelationAdapter;
-        private RelationListAdapter mPropertyAdapter;
-        private Box<EduKGEntityDetail> entityBox;
-        String subject, category;
 
-        StaticHandler(TextView entityDescription, RelationListAdapter mRelationAdapter,
-                      RelationListAdapter mPropertyAdapter, String subject, String category,
-                      Box<EduKGEntityDetail> entityBox) {
+        StaticHandler(TextView entityDescription) {
             this.entityDescription = entityDescription;
-            this.mRelationAdapter = mRelationAdapter;
-            this.mPropertyAdapter = mPropertyAdapter;
-            this.subject = subject;
-            this.category = category;
-            this.entityBox = entityBox;
         }
 
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            EduKGEntityDetail detail = (EduKGEntityDetail) msg.obj;
             entityDescription.setText("实体描述仍在标注中...");
             if (msg.what == 0) {
-                if (detail != null) {
-                    if (detail.getRelations() != null) {
-                        for (EduKGRelation r : detail.getRelations())
-                            mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(), subject, category, r.getObject()));
+                EduKGEntityDetail detailFromNet = (EduKGEntityDetail) msg.obj;
+                if (detailFromNet != null) {
+                    if (detailFromNet.getRelations() != null) {
+                        for (EduKGRelation r : detailFromNet.getRelations())
+                            mRelationAdapter.add(new Relation(
+                                    r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(),
+                                    subject, category, categories, r.getObject()));
                     }
-                    if (detail.getProperties() != null) {
-                        for (EduKGProperty p : detail.getProperties()) {
+                    if (detailFromNet.getProperties() != null) {
+                        for (EduKGProperty p : detailFromNet.getProperties()) {
                             if (p.getPredicateLabel().equals("描述"))
                                 entityDescription.setText("实体描述: " + p.getObject());
                             else
@@ -182,46 +182,18 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     }
 
                     new Thread(() -> {
-                        // store info to DB for offline loading
-                        getEntityDetail(detail.getUri());
-                        if (detail.getRelations() != null && detail.getRelations().size() > 0) {
-                            entityDetail.setRelations(detail.getRelations());
-                            // store entities in relations to DB
-                            for (EduKGRelation relation : detail.getRelations()) {
-                                try {
-                                    entityBox.put(new EduKGEntityDetail()
-                                            .setLabel(relation.getObjectLabel())
-                                            .setUri(relation.getObject()));
-                                } catch (Exception e) { /* duplicated */ }
-                            } // end for
-                        }
-                        if (detail.getProperties() != null && detail.getProperties().size() > 0) {
-                            entityDetail.setProperties(detail.getProperties());
-                        }
-                        // store categories
-                        if (entityDetail.getCategoriesBuf() != null && entityDetail.getCategoriesBuf().size() > 0) {
-                            Box<Category> categoryBox = ObjectBox.get().boxFor(Category.class);
-                            for (String categoryName : entityDetail.getCategoriesBuf()) {
-                                Query<Category> query = categoryBox.query()
-                                        .equal(Category_.name, categoryName).build();
-                                List<Category> categoryRes = query.find();
-                                query.close();
-                                Category category;
-                                if (categoryRes == null || categoryRes.size() == 0)
-                                    category = new Category().setName(categoryName);
-                                else
-                                    category = categoryRes.get(0);
-                                category.increaseNum();
-                                entityDetail.categories.add(category);
-                            }
-                        }
-                        entityBox.put(entityDetail);
+                        waitUntilDetailGot();
+                        detailInDB.setRelations(detailFromNet.getRelations())
+                                .setProperties(detailFromNet.getProperties());
+                        entityBox.put(detailInDB);
                     }).start();
-                } else {
-                    // empty ui
                 }
-            } else { // msg.what = 1
-                // TODO load from database
+                else {
+                    // successful API request, but got no entity detail; display hint
+                }
+            }
+            else { // msg.what = 1
+                // TODO load from database and display offline loading hint
             }
         }
     }
