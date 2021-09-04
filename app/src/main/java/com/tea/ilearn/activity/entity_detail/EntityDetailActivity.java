@@ -166,57 +166,63 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             super.handleMessage(msg);
             EduKGEntityDetail detail = (EduKGEntityDetail) msg.obj;
             entityDescription.setText("实体描述仍在标注中...");
-            if (msg.what == 0 && detail != null) {
-                if (detail.getRelations() != null) {
-                    for (EduKGRelation r : detail.getRelations())
-                        mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(), subject, category, r.getObject()));
-                }
-                if (detail.getProperties() != null) {
-                    for (EduKGProperty p : detail.getProperties()) {
-                        if (p.getPredicateLabel().equals("描述"))
-                            entityDescription.setText("实体描述: "+p.getObject());
-                        else
-                            mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
+            if (msg.what == 0) {
+                if (detail != null) {
+                    if (detail.getRelations() != null) {
+                        for (EduKGRelation r : detail.getRelations())
+                            mRelationAdapter.add(new Relation(r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(), subject, category, r.getObject()));
                     }
-                }
-
-                new Thread(() -> {
-                    // store info to DB for offline loading
-                    getEntityDetail(detail.getUri());
-                    if (detail.getRelations() != null && detail.getRelations().size() > 0) {
-                        entityDetail.setRelations(detail.getRelations());
-                        // store entities in relations to DB
-                        for (EduKGRelation relation : detail.getRelations()) {
-                            try {
-                                entityBox.put(new EduKGEntityDetail()
-                                        .setLabel(relation.getObjectLabel())
-                                        .setUri(relation.getObject()));
-                            } catch (Exception e) { /* duplicated */ }
-                        } // end for
-                    }
-                    if (detail.getProperties() != null && detail.getProperties().size() > 0) {
-                        entityDetail.setProperties(detail.getProperties());
-                    }
-                    // store categories
-                    if (entityDetail.getCategoriesBuf() != null && entityDetail.getCategoriesBuf().size() > 0) {
-                        Box<Category> categoryBox = ObjectBox.get().boxFor(Category.class);
-                        for (String categoryName : entityDetail.getCategoriesBuf()) {
-                            Query<Category> query = categoryBox.query()
-                                    .equal(Category_.name, categoryName).build();
-                            List<Category> categoryRes = query.find();
-                            query.close();
-                            Category category;
-                            if (categoryRes == null || categoryRes.size() == 0)
-                                category = new Category().setName(categoryName);
+                    if (detail.getProperties() != null) {
+                        for (EduKGProperty p : detail.getProperties()) {
+                            if (p.getPredicateLabel().equals("描述"))
+                                entityDescription.setText("实体描述: " + p.getObject());
                             else
-                                category = categoryRes.get(0);
-                            category.increaseNum();
-                            entityDetail.categories.add(category);
+                                mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
                         }
                     }
-                    entityBox.put(entityDetail);
-                }).start();
-            } // end if
+
+                    new Thread(() -> {
+                        // store info to DB for offline loading
+                        getEntityDetail(detail.getUri());
+                        if (detail.getRelations() != null && detail.getRelations().size() > 0) {
+                            entityDetail.setRelations(detail.getRelations());
+                            // store entities in relations to DB
+                            for (EduKGRelation relation : detail.getRelations()) {
+                                try {
+                                    entityBox.put(new EduKGEntityDetail()
+                                            .setLabel(relation.getObjectLabel())
+                                            .setUri(relation.getObject()));
+                                } catch (Exception e) { /* duplicated */ }
+                            } // end for
+                        }
+                        if (detail.getProperties() != null && detail.getProperties().size() > 0) {
+                            entityDetail.setProperties(detail.getProperties());
+                        }
+                        // store categories
+                        if (entityDetail.getCategoriesBuf() != null && entityDetail.getCategoriesBuf().size() > 0) {
+                            Box<Category> categoryBox = ObjectBox.get().boxFor(Category.class);
+                            for (String categoryName : entityDetail.getCategoriesBuf()) {
+                                Query<Category> query = categoryBox.query()
+                                        .equal(Category_.name, categoryName).build();
+                                List<Category> categoryRes = query.find();
+                                query.close();
+                                Category category;
+                                if (categoryRes == null || categoryRes.size() == 0)
+                                    category = new Category().setName(categoryName);
+                                else
+                                    category = categoryRes.get(0);
+                                category.increaseNum();
+                                entityDetail.categories.add(category);
+                            }
+                        }
+                        entityBox.put(entityDetail);
+                    }).start();
+                } else {
+                    // empty ui
+                }
+            } else { // msg.what = 1
+                // TODO load from database
+            }
         }
     }
 
