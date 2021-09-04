@@ -23,7 +23,6 @@ import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
 import com.tea.ilearn.net.edukg.Entity;
 import com.tea.ilearn.utils.DB_utils;
 import com.tea.ilearn.utils.ObjectBox;
-import com.tea.ilearn.utils.RandChinese;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,14 +40,11 @@ public class EntityListFragment extends Fragment {
     private RecyclerView mInfoRecycler;
     private InfoListAdapter mInfoAdapter;
     private CountDownLatch searchSubjectNum = new CountDownLatch(0);
-    String query, subject;
-    private AutoComplTextView acTextView;
+    String subject;
 
     public EntityListFragment(String subject) {
         super();
         this.subject = subject;
-//        this.query;
-//        this.acTextView;
     }
 
     @Override
@@ -95,23 +91,21 @@ public class EntityListFragment extends Fragment {
 
         initList();
 
-        binding.debug.setText(subject);
-
         return root;
     }
 
     private void initList() {
-        int initNum = 0; // 3 TODO 0 for EDUKG FUCK
-        searchSubjectNum = new CountDownLatch(initNum);
-        for (int i = 0; i < initNum; ++i) {
-            char c = RandChinese.gen();
-            String query = String.valueOf(c);
-            StaticHandler handler = new StaticHandler(mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar);
-            EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
-        }
+//        int initNum = 0; // 3 TODO 0 for EDUKG FUCK
+//        searchSubjectNum = new CountDownLatch(initNum);
+//        for (int i = 0; i < initNum; ++i) {
+//            char c = RandChinese.gen();
+//            String query = String.valueOf(c);
+//            StaticHandler handler = new StaticHandler(mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar, acTextView);
+//            EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
+//        }
     }
 
-    private void search() {
+    public void search(String query, AutoComplTextView acTextView) {
         if (searchSubjectNum.getCount() == 0) {
             binding.loadingBar.setVisibility(View.VISIBLE);
             mInfoAdapter.clear();
@@ -121,7 +115,7 @@ public class EntityListFragment extends Fragment {
             binding.sortNameUp.setVisibility(View.VISIBLE);
             binding.sortNameDown.setVisibility(View.VISIBLE);
             searchSubjectNum = new CountDownLatch(1);
-            StaticHandler handler = new StaticHandler(mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar);
+            StaticHandler handler = new StaticHandler(mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar, acTextView);
             EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
         }
     }
@@ -132,14 +126,16 @@ public class EntityListFragment extends Fragment {
         private String subject;
         private CountDownLatch expectedNum;
         private String keyword;
+        private AutoComplTextView acTextView;
 
         StaticHandler(InfoListAdapter mInfoAdapter, String subject,
-                      String keyword, CountDownLatch _latch, View _loadingBar) {
+                      String keyword, CountDownLatch _latch, View _loadingBar, AutoComplTextView acTextView) {
             this.mInfoAdapter = mInfoAdapter;
             this.subject = subject;
             this.expectedNum = _latch;
             this.loadingBar = _loadingBar;
             this.keyword = keyword;
+            this.acTextView = acTextView;
         }
 
         @Override

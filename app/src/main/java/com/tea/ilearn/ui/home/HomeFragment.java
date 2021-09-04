@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.tabs.TabLayout;
 import com.heaven7.android.dragflowlayout.ClickToDeleteItemListenerImpl;
 import com.heaven7.android.dragflowlayout.DragAdapter;
 import com.heaven7.android.dragflowlayout.DragFlowLayout;
@@ -28,8 +29,9 @@ import per.goweii.actionbarex.common.AutoComplTextView;
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private ActionBarSearch searchBar;
-    private AutoComplTextView acTextView;
     private View root;
+    private AutoComplTextView acTextView;
+    private SubjectListAdapter pagerAdapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -122,7 +124,8 @@ public class HomeFragment extends Fragment {
     private void initTabs() {
         List<String> subjects = Arrays.asList("biology", "chemistry"); // TODO colin: database ralated (no thread)
 
-        SubjectListAdapter pagerAdapter = new SubjectListAdapter(getChildFragmentManager(), subjects);
+        pagerAdapter = new SubjectListAdapter(getChildFragmentManager(), subjects);
+        binding.viewPager.setOffscreenPageLimit(Constant.EduKG.SUBJECTS_EN.size());
         binding.viewPager.setAdapter(pagerAdapter);
         binding.subjectTabs.setupWithViewPager(binding.viewPager);
 
@@ -153,11 +156,24 @@ public class HomeFragment extends Fragment {
 
                 binding.flowLayout.getDragItemManager().clearItems();
                 binding.unused.getDragItemManager().clearItems();
+
+                search();
             }
+        });
+
+        binding.subjectTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override public void onTabSelected(TabLayout.Tab tab) { search(); }
+            @Override public void onTabUnselected(TabLayout.Tab tab) { }
+            @Override public void onTabReselected(TabLayout.Tab tab) { }
         });
     }
 
+    private String getQuery() {
+        return binding.searchBar.getEditTextView().getText().toString();
+    }
+
     private void search() {
-        // TODO  acha
+        int pos = binding.subjectTabs.getSelectedTabPosition();
+        ((EntityListFragment)pagerAdapter.getItem(pos)).search(getQuery(), acTextView);
     }
 }
