@@ -1,6 +1,7 @@
 package com.tea.ilearn.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -118,6 +119,8 @@ public class HomeFragment extends Fragment {
 
         initTabs();
 
+//        ((EntityListFragment)pagerAdapter.getItem(0)).waitForBinding("", acTextView);
+
         return root;
     }
 
@@ -174,6 +177,7 @@ public class HomeFragment extends Fragment {
 
     private void search() {
         int pos = binding.subjectTabs.getSelectedTabPosition();
+        Log.d("MYDEBUG", String.valueOf(pos)+" "+pagerAdapter.getCount());
         ((EntityListFragment)pagerAdapter.getItem(pos)).search(getQuery(), acTextView);
     }
 }

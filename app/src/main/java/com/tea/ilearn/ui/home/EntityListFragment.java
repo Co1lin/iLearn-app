@@ -1,5 +1,7 @@
 package com.tea.ilearn.ui.home;
 
+import static java.lang.Thread.sleep;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,6 +25,7 @@ import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
 import com.tea.ilearn.net.edukg.Entity;
 import com.tea.ilearn.utils.DB_utils;
 import com.tea.ilearn.utils.ObjectBox;
+import com.tea.ilearn.utils.RandChinese;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,23 +92,36 @@ public class EntityListFragment extends Fragment {
         mInfoRecycler.setLayoutManager(new LinearLayoutManager(root.getContext()));
         mInfoRecycler.setAdapter(mInfoAdapter);
 
-        initList();
-
         return root;
     }
 
-    private void initList() {
-//        int initNum = 0; // 3 TODO 0 for EDUKG FUCK
-//        searchSubjectNum = new CountDownLatch(initNum);
-//        for (int i = 0; i < initNum; ++i) {
-//            char c = RandChinese.gen();
-//            String query = String.valueOf(c);
-//            StaticHandler handler = new StaticHandler(mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar, acTextView);
-//            EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
-//        }
+    public void waitForBinding(String query, AutoComplTextView acTextView) {
+        new Thread(()->{
+            while (binding == null) {
+                try {
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            search(query, acTextView);
+        }).start();
     }
 
     public void search(String query, AutoComplTextView acTextView) {
+        if (query.isEmpty()) {
+            int initNum = 5;
+            binding.loadingBar.setVisibility(View.VISIBLE);
+            searchSubjectNum = new CountDownLatch(initNum);
+            for (int i = 0; i < initNum; ++i) {
+                char c = RandChinese.gen();
+                query = String.valueOf(c);
+                StaticHandler handler = new StaticHandler(mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar, acTextView, false);
+                EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
+            }
+            binding.emptyHint.setVisibility(View.GONE);
+            return;
+        }
         if (searchSubjectNum.getCount() == 0) {
             binding.loadingBar.setVisibility(View.VISIBLE);
             mInfoAdapter.clear();
@@ -115,7 +131,7 @@ public class EntityListFragment extends Fragment {
             binding.sortNameUp.setVisibility(View.VISIBLE);
             binding.sortNameDown.setVisibility(View.VISIBLE);
             searchSubjectNum = new CountDownLatch(1);
-            StaticHandler handler = new StaticHandler(mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar, acTextView);
+            StaticHandler handler = new StaticHandler(mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar, acTextView, true);
             EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
         }
     }
@@ -127,15 +143,17 @@ public class EntityListFragment extends Fragment {
         private CountDownLatch expectedNum;
         private String keyword;
         private AutoComplTextView acTextView;
+        private boolean empty_hint;
 
         StaticHandler(InfoListAdapter mInfoAdapter, String subject,
-                      String keyword, CountDownLatch _latch, View _loadingBar, AutoComplTextView acTextView) {
+                      String keyword, CountDownLatch _latch, View _loadingBar, AutoComplTextView acTextView, boolean empty_hint) {
             this.mInfoAdapter = mInfoAdapter;
             this.subject = subject;
             this.expectedNum = _latch;
             this.loadingBar = _loadingBar;
             this.keyword = keyword;
             this.acTextView = acTextView;
+            this.empty_hint = empty_hint;
         }
 
         @Override
@@ -221,12 +239,12 @@ public class EntityListFragment extends Fragment {
                     history.entities.applyChangesToDb();
                 }
                 else {
-                    // TODO empty UI
                     new Thread(() -> {  // store history with no entity
                         SearchHistory emptyHistory = new SearchHistory().setKeyword(keyword).setSubject(subject);
                         historyBox.put(emptyHistory);
                     }).start();
-                    binding.emptyHint.setVisibility(View.VISIBLE);
+                    if (empty_hint)
+                        binding.emptyHint.setVisibility(View.VISIBLE);
                 }
             }
             else { // msg.what = 1
