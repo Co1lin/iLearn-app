@@ -152,9 +152,5 @@ public class MeFragment extends Fragment {
             }
         }
     }
-<<<<<<< HEAD
 }
 // TODO edit text color issue in dark mode
-=======
-}
->>>>>>> dev
