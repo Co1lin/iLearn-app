@@ -43,6 +43,12 @@ public class SignupActivity extends AppCompatActivity {
         });
 
         binding.signup.setOnClickListener($ -> {
+            if (binding.usernameBox.getError() != null ||
+                    binding.passwordBox.getError() != null ||
+                    binding.emailBox.getError() != null) {
+                Toast.makeText(this, "请检查输入", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (!binding.agree.isChecked()) {
                 ViewTooltip.on(binding.agree)
                         .autoHide(true, 1000)
@@ -161,7 +167,7 @@ public class SignupActivity extends AppCompatActivity {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if (msg.what == 1 && msg.obj != null) {
-                if (((AtomicReference<String>)msg.obj).get().contains("already occupied")) {
+                if (((AtomicReference<String>)(msg.obj)).get().contains("already occupied")) {
                     inputBox.setError("该用户名已被占用");
                 }
             }

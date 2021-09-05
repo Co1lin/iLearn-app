@@ -6,15 +6,16 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
 import com.tea.ilearn.databinding.ActivitySigninBinding;
 import com.tea.ilearn.model.Account;
 import com.tea.ilearn.net.backend.Backend;
@@ -29,23 +30,41 @@ public class SigninActivity extends AppCompatActivity {
         View root = binding.getRoot();
         setContentView(root);
 
-        // TODO validation error base on database (below are error hint examples)
-        /*
-        binding.usernameBox.setError("用户名不存在"); // or 邮箱未注册
-        binding.passwordBox.setError("密码错误");
-        binding.usernameBox.setError(null);
-        binding.passwordBox.setError(null);
-         */
+        binding.username.setOnFocusChangeListener((view, hasFocus) -> {
+            if (!hasFocus) {
+                String username = binding.username.getText().toString();
+                if (username.length() == 0) {
+                    binding.usernameBox.setError("请输入用户名");
+                } else {
+//                    Backend.getInst().checkUsername(username, new CheckUsernameHandler(binding.usernameBox));
+                }
+            } else {
+                binding.usernameBox.setError(null);
+            }
+        });
+
+        binding.password.setOnFocusChangeListener((view, hasFocus) -> {
+            if (!hasFocus) {
+                if (binding.password.getText().toString().length() == 0) {
+                    binding.passwordBox.setError("请输入密码");
+                }
+            } else {
+                binding.passwordBox.setError(null);
+            }
+        });
 
         binding.signin.setOnClickListener($ -> {
-            // TODO empty check ?
-            SigninHandler signinHandler = new SigninHandler();
+            if (binding.usernameBox.getError() != null || binding.passwordBox.getError() != null) {
+                Toast.makeText(this, "请检查输入", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            binding.progressCircular.setVisibility(View.VISIBLE);
+            SigninHandler signinHandler = new SigninHandler(binding, this);
             Backend.getInst().login(
                     binding.username.getText().toString(),
                     binding.password.getText().toString(),
                     signinHandler
             );
-            finish(); // TODO change previous activity's profile image and profile username
         });
 
         binding.tosignup.setOnClickListener($ -> {
@@ -62,17 +81,29 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     static class SigninHandler extends Handler {
+        ActivitySigninBinding binding;
+        AppCompatActivity that;
+
+        SigninHandler(ActivitySigninBinding binding, AppCompatActivity that) {
+            this.binding = binding;
+            this.that = that;
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            Log.i("MeFragment/registerHandler", String.valueOf(msg.what));
+            binding.progressCircular.setVisibility(View.GONE);
             if (msg.what == 0 && msg.obj != null) {
                 Account account = (Account) msg.obj;
-                // TODO
+                Intent intent = new Intent();
+                intent.putExtra("account", (new Gson()).toJson(account));
+                that.setResult(200, intent);
+                that.finish();
             }
-            else {  // register failed
-                if (((String) msg.obj).contains("login failed")) {
-                    // TODO: incorrect username or password
+            else { // signin failed
+                String err = (String)(msg.obj);
+                if (err.contains("login failed")) {
+                    Toast.makeText(that, "用户名或密码错误", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -97,4 +128,22 @@ public class SigninActivity extends AppCompatActivity {
         }
         return super.dispatchTouchEvent( event );
     }
+
+//    static class CheckUsernameHandler extends Handler {
+//        TextInputLayout inputBox;
+//
+//        public CheckUsernameHandler(TextInputLayout inputBox) {
+//            this.inputBox = inputBox;
+//        }
+//
+//        @Override
+//        public void handleMessage(@NonNull Message msg) {
+//            super.handleMessage(msg);
+//            if (msg.what == 1 && msg.obj != null && ((AtomicReference<String>)msg.obj).get().contains("already occupied")) {
+//                // user name exist
+//            } else{
+//                inputBox.setError("用户名不存在");
+//            }
+//        }
+//    }
 }
