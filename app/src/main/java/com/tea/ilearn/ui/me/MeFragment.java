@@ -44,12 +44,13 @@ import io.objectbox.Box;
 
 public class MeFragment extends Fragment {
     private FragmentMeBinding binding;
+    private View root;
     private int numEgg = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentMeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        root = binding.getRoot();
 
         binding.profile.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), SigninActivity.class);
@@ -75,47 +76,7 @@ public class MeFragment extends Fragment {
             }
         });
 
-        // =======================================================================
-
-        LineChart lineChart = binding.lineChart;
-        List<String> key = Arrays.asList("周一", "周二", "周三", "周四", "周五", "周六", "周日");
-        List<Integer> value = Arrays.asList(120, 200, 150, 80, 10, 110, 130); // TODO colin: true value here
-        List<Entry> entries = new ArrayList<Entry>();
-        for (int i = 0; i < key.size(); ++i) {
-            entries.add(new Entry(i, value.get(i)));
-        }
-
-        LineDataSet dataset = new LineDataSet(entries, "本周学习点"); // add entries to dataset
-        TypedValue typedValue = new TypedValue();
-        binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
-        int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
-        dataset.setValueTextSize(10);
-        dataset.setValueTextColor(color);
-        dataset.setDrawFilled(true);
-        dataset.setFillDrawable(ContextCompat.getDrawable(root.getContext(), R.drawable.gradient_fill));
-        lineChart.setClipValuesToContent(false);
-        lineChart.getXAxis().setTextColor(color);
-        typedValue = new TypedValue();
-        binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
-        color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
-        dataset.setColor(color);
-
-        LineData lineData = new LineData(dataset);
-        lineChart.setDragEnabled(false);
-        lineChart.setScaleEnabled(false);
-        lineChart.setScaleXEnabled(false);
-        lineChart.setScaleYEnabled(false);
-        lineChart.setPinchZoom(false);
-        lineChart.getDescription().setEnabled(false);
-        lineChart.getLegend().setEnabled(false);
-        lineChart.getAxisRight().setEnabled(false);
-        lineChart.getAxisLeft().setEnabled(false);
-        lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(key));
-        lineChart.getXAxis().setDrawGridLines(false);
-        lineChart.getAxisLeft().setDrawGridLines(false);
-        lineChart.setData(lineData);
-        lineChart.invalidate();
+        loadStatistics();
 
         // TODO: register and login
         LoginHandler loginHandler = new LoginHandler();
@@ -126,6 +87,56 @@ public class MeFragment extends Fragment {
 //        Backend.getInst().login("colin", "colin", loginHandler);
 
         return root;
+    }
+
+    public void loadStatistics() {
+        new Thread(() -> {
+            List<String> key = Arrays.asList("周一", "周二", "周三", "周四", "周五", "周六", "周日");
+            Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
+            List<UserStatistics> statisticsRes = statisticsBox.getAll();
+            if (statisticsRes != null && statisticsRes.size() > 0) {
+                UserStatistics statistics = statisticsRes.get(0);
+                List<Integer> value = statistics.getEntitiesViewed();
+                List<Entry> entries = new ArrayList<Entry>() {{
+                    for (int i = 0; i < key.size(); ++i)
+                        add(new Entry(i, value.get(i)));
+                }};
+                getActivity().runOnUiThread(() -> {
+                    LineDataSet dataset = new LineDataSet(entries, "本周学习点"); // add entries to dataset
+                    TypedValue typedValue = new TypedValue();
+                    root.getContext().getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
+                    int color = ContextCompat.getColor(root.getContext(), typedValue.resourceId);
+                    dataset.setValueTextSize(10);
+                    dataset.setValueTextColor(color);
+                    dataset.setDrawFilled(true);
+                    dataset.setFillDrawable(ContextCompat.getDrawable(root.getContext(), R.drawable.gradient_fill));
+                    LineChart lineChart = binding.lineChart;
+                    lineChart.setClipValuesToContent(false);
+                    lineChart.getXAxis().setTextColor(color);
+                    typedValue = new TypedValue();
+                    root.getContext().getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+                    color = ContextCompat.getColor(root.getContext(), typedValue.resourceId);
+                    dataset.setColor(color);
+
+                    LineData lineData = new LineData(dataset);
+                    lineChart.setDragEnabled(false);
+                    lineChart.setScaleEnabled(false);
+                    lineChart.setScaleXEnabled(false);
+                    lineChart.setScaleYEnabled(false);
+                    lineChart.setPinchZoom(false);
+                    lineChart.getDescription().setEnabled(false);
+                    lineChart.getLegend().setEnabled(false);
+                    lineChart.getAxisRight().setEnabled(false);
+                    lineChart.getAxisLeft().setEnabled(false);
+                    lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+                    lineChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(key));
+                    lineChart.getXAxis().setDrawGridLines(false);
+                    lineChart.getAxisLeft().setDrawGridLines(false);
+                    lineChart.setData(lineData);
+                    lineChart.invalidate();
+                });
+            }
+        }).start();
     }
 
     static protected void initUser() {

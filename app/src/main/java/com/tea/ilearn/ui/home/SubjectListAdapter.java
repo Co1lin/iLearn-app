@@ -20,7 +20,7 @@ public class SubjectListAdapter extends FragmentStatePagerAdapter {
         this.subjects = subjects;
         fragmentList = new ArrayList<>();
         for (String subj : subjects) {
-            fragmentList.add(new EntityListFragment(subj));
+            fragmentList.add(new EntityListFragment().setSubject(subj));
         }
     }
 
@@ -28,7 +28,7 @@ public class SubjectListAdapter extends FragmentStatePagerAdapter {
         subjects = newSubjects;
         fragmentList = new ArrayList<>();
         for (String subj : newSubjects) {
-            fragmentList.add(new EntityListFragment(subj));
+            fragmentList.add(new EntityListFragment().setSubject(subj));
         }
         notifyDataSetChanged();
     }
