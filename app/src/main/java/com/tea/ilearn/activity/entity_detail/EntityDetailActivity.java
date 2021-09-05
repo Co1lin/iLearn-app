@@ -22,6 +22,7 @@ import com.sina.weibo.sdk.openapi.WBAPIFactory;
 import com.sina.weibo.sdk.share.WbShareCallback;
 import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
+import com.tea.ilearn.model.UserStatistics;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
@@ -90,31 +91,9 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             uri = intent.getStringExtra("id");
             categories = intent.getStringArrayListExtra("categories");
 
-            // DB I/O
-            new Thread(() -> {  // detailInDB must not be null after this thread finishes
-                // query the entity from DB
-                Query<EduKGEntityDetail> query = entityBox.query()
-                        .equal(EduKGEntityDetail_.uri, uri).build();
-                List<EduKGEntityDetail> entitiesRes = query.find();
-                query.close();
-                if (entitiesRes != null && entitiesRes.size() > 0) {
-                    // already exists (also already viewed), update status of starred
-                    detailInDB = entitiesRes.get(0);
-                    runOnUiThread(() -> binding.star.setChecked(detailInDB.isStarred()));
-                }
-                else { // new viewed entity, store to DB
-                    detailInDB = new EduKGEntityDetail()
-                            .setCategory(category)
-                            .setCategoriesBuf(categories)
-                            .setSubject(subject)
-                            .setLabel(name)
-                            .setUri(uri)
-                            .setViewed(true);
-                    entityBox.put(detailInDB);
-                }
-            }).start();
+            initDB();
 
-            // UI related listener binding associated with the detail entry
+            // UI related listeners' binding associated with the detail entry
             binding.star.setOnClickListener($ -> {
                 if (binding.star.isChecked())
                     Toast.makeText(binding.getRoot().getContext(), "收藏成功", Toast.LENGTH_SHORT).show();
@@ -196,6 +175,37 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                 // TODO load from database and display offline loading hint
             }
         }
+    }
+
+    private void initDB() {
+        new Thread(() -> {  // detailInDB must not be null after this thread finishes
+            // query the entity from DB
+            Query<EduKGEntityDetail> query = entityBox.query()
+                    .equal(EduKGEntityDetail_.uri, uri).build();
+            List<EduKGEntityDetail> entitiesRes = query.find();
+            query.close();
+            if (entitiesRes != null && entitiesRes.size() > 0) {
+                // already exists (also already viewed), update status of starred
+                detailInDB = entitiesRes.get(0);
+                runOnUiThread(() -> binding.star.setChecked(detailInDB.isStarred()));
+            }
+            else { // new viewed entity, store to DB
+                detailInDB = new EduKGEntityDetail()
+                        .setCategory(category)
+                        .setCategoriesBuf(categories)
+                        .setSubject(subject)
+                        .setLabel(name)
+                        .setUri(uri)
+                        .setViewed(true);
+                entityBox.put(detailInDB);
+            }
+        }).start();
+        new Thread(() -> {  // update statistics
+            Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
+            List<UserStatistics> statisticsRes = statisticsBox.getAll();
+            if (statisticsRes != null && statisticsRes.size() > 0)
+                statisticsBox.put(statisticsRes.get(0).increaseLastNum());
+        }).start();
     }
 
     // ==========================================================================
