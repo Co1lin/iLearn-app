@@ -3,10 +3,10 @@ package com.tea.ilearn.model;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
-import com.tea.ilearn.net.edukg.EduKGRelation;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import io.objectbox.annotation.Convert;
 import io.objectbox.annotation.Entity;
@@ -23,7 +23,7 @@ public class UserStatistics {
 
     @SerializedName("entities_viewed")
     @Convert(converter = IntegerArrayConverter.class, dbType = String.class)
-    ArrayList<Integer> entitiesViewed = new ArrayList<>();
+    ArrayList<Integer> entitiesViewed = new ArrayList<>(Collections.nCopies(7, 0));
 
     public UserStatistics setFirstDate(String firstDate) {
         this.firstDate = firstDate;
@@ -48,7 +48,7 @@ public class UserStatistics {
         @Override
         public ArrayList<Integer> convertToEntityProperty(String databaseValue) {
             Gson gson = new Gson();
-            Type type = new TypeToken<ArrayList<EduKGRelation>>(){}.getType();
+            Type type = new TypeToken<ArrayList<Integer>>(){}.getType();
             ArrayList<Integer> relations = gson.fromJson(databaseValue, type);
             return relations;
         }

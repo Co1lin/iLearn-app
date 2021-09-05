@@ -34,8 +34,8 @@ import com.tea.ilearn.net.backend.Backend;
 import com.tea.ilearn.utils.ObjectBox;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,6 +51,8 @@ public class MeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentMeBinding.inflate(inflater, container, false);
         root = binding.getRoot();
+
+        loadStatistics();
 
         binding.profile.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), SigninActivity.class);
@@ -76,8 +78,6 @@ public class MeFragment extends Fragment {
             }
         });
 
-        loadStatistics();
-
         // TODO: register and login
         LoginHandler loginHandler = new LoginHandler();
         RegisterHandler registerHandler = new RegisterHandler();
@@ -89,53 +89,92 @@ public class MeFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadStatistics();
+    }
+
     public void loadStatistics() {
         new Thread(() -> {
-            List<String> key = Arrays.asList("周一", "周二", "周三", "周四", "周五", "周六", "周日");
+            // DB
+            LocalDate today = LocalDate.now();
             Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
             List<UserStatistics> statisticsRes = statisticsBox.getAll();
-            if (statisticsRes != null && statisticsRes.size() > 0) {
-                UserStatistics statistics = statisticsRes.get(0);
-                List<Integer> value = statistics.getEntitiesViewed();
-                List<Entry> entries = new ArrayList<Entry>() {{
-                    for (int i = 0; i < key.size(); ++i)
-                        add(new Entry(i, value.get(i)));
-                }};
-                getActivity().runOnUiThread(() -> {
-                    LineDataSet dataset = new LineDataSet(entries, "本周学习点"); // add entries to dataset
-                    TypedValue typedValue = new TypedValue();
-                    root.getContext().getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
-                    int color = ContextCompat.getColor(root.getContext(), typedValue.resourceId);
-                    dataset.setValueTextSize(10);
-                    dataset.setValueTextColor(color);
-                    dataset.setDrawFilled(true);
-                    dataset.setFillDrawable(ContextCompat.getDrawable(root.getContext(), R.drawable.gradient_fill));
-                    LineChart lineChart = binding.lineChart;
-                    lineChart.setClipValuesToContent(false);
-                    lineChart.getXAxis().setTextColor(color);
-                    typedValue = new TypedValue();
-                    root.getContext().getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
-                    color = ContextCompat.getColor(root.getContext(), typedValue.resourceId);
-                    dataset.setColor(color);
-
-                    LineData lineData = new LineData(dataset);
-                    lineChart.setDragEnabled(false);
-                    lineChart.setScaleEnabled(false);
-                    lineChart.setScaleXEnabled(false);
-                    lineChart.setScaleYEnabled(false);
-                    lineChart.setPinchZoom(false);
-                    lineChart.getDescription().setEnabled(false);
-                    lineChart.getLegend().setEnabled(false);
-                    lineChart.getAxisRight().setEnabled(false);
-                    lineChart.getAxisLeft().setEnabled(false);
-                    lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-                    lineChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(key));
-                    lineChart.getXAxis().setDrawGridLines(false);
-                    lineChart.getAxisLeft().setDrawGridLines(false);
-                    lineChart.setData(lineData);
-                    lineChart.invalidate();
-                });
+            UserStatistics statistics;
+            if (statisticsRes == null || statisticsRes.size() == 0) {
+                statistics = new UserStatistics().setFirstDate(today.minusDays(6).toString());
+                statisticsBox.put(statistics);
             }
+            else {
+                // adjust statistics according to the date
+                statistics = statisticsRes.get(0);
+                LocalDate oldFirstDate = LocalDate.parse(statistics.getFirstDate());
+                int deltaDays = (int) oldFirstDate.until(today.minusDays(6), ChronoUnit.DAYS);
+                if (deltaDays > 6) {
+                    statistics = new UserStatistics().setFirstDate(today.minusDays(6).toString());
+                    statisticsBox.put(statistics);
+                }
+                else if (deltaDays > 0) {
+                    ArrayList<Integer> oldStatistics = (ArrayList<Integer>) statistics.getEntitiesViewed().clone();
+                    statistics.setFirstDate(today.minusDays(6).toString())
+                            .setEntitiesViewed(new ArrayList<Integer>(){{
+                                // add (7 - deltaDays) items
+                                for (int oldIndex = deltaDays; oldIndex < 7; oldIndex++)
+                                    add(oldStatistics.get(oldIndex));
+                                for (int i = deltaDays; i < 7; i++)
+                                    add(0);
+                            }}
+                    );
+                    statisticsBox.put(statistics);
+                }
+            }
+            List<Integer> value = statistics.getEntitiesViewed();
+            List<String> key = new ArrayList<String>(){{
+                for (int i = 7; i > 0; i--) {
+                    LocalDate thisDay = today.minusDays(i);
+                    add(thisDay.getMonthValue() + "/" + thisDay.getDayOfMonth());
+                }
+            }};
+            List<Entry> entries = new ArrayList<Entry>() {{
+                for (int i = 0; i < key.size(); ++i)
+                    add(new Entry(i, value.get(i)));
+            }};
+            getActivity().runOnUiThread(() -> {
+                LineDataSet dataset = new LineDataSet(entries, "近一周浏览量"); // add entries to dataset
+                TypedValue typedValue = new TypedValue();
+                root.getContext().getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
+                int color = ContextCompat.getColor(root.getContext(), typedValue.resourceId);
+                dataset.setValueTextSize(10);
+                dataset.setValueTextColor(color);
+                dataset.setDrawFilled(true);
+                dataset.setFillDrawable(ContextCompat.getDrawable(root.getContext(), R.drawable.gradient_fill));
+                LineChart lineChart = binding.lineChart;
+                lineChart.setClipValuesToContent(false);
+                lineChart.getXAxis().setTextColor(color);
+                typedValue = new TypedValue();
+                root.getContext().getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+                color = ContextCompat.getColor(root.getContext(), typedValue.resourceId);
+                dataset.setColor(color);
+
+                LineData lineData = new LineData(dataset);
+                lineChart.setDragEnabled(false);
+                lineChart.setScaleEnabled(false);
+                lineChart.setScaleXEnabled(false);
+                lineChart.setScaleYEnabled(false);
+                lineChart.setPinchZoom(false);
+                lineChart.getDescription().setEnabled(false);
+                lineChart.getLegend().setEnabled(false);
+                lineChart.getAxisRight().setEnabled(false);
+                lineChart.getAxisLeft().setEnabled(false);
+                lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+                lineChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(key));
+                lineChart.getXAxis().setDrawGridLines(false);
+                lineChart.getAxisLeft().setDrawGridLines(false);
+                lineChart.getAxisLeft().setStartAtZero(true);
+                lineChart.setData(lineData);
+                lineChart.invalidate();
+            });
         }).start();
     }
 
