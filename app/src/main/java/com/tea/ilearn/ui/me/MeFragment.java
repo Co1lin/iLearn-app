@@ -2,6 +2,9 @@ package com.tea.ilearn.ui.me;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +27,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.gson.Gson;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
@@ -160,6 +164,12 @@ public class MeFragment extends Fragment {
                 dataset.setValueTextColor(color);
                 dataset.setDrawFilled(true);
                 dataset.setFillDrawable(ContextCompat.getDrawable(root.getContext(), R.drawable.gradient_fill));
+                dataset.setValueFormatter(new ValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value) {
+                        return String.valueOf(Math.round(value));
+                    }
+                });
                 LineChart lineChart = binding.lineChart;
                 lineChart.setClipValuesToContent(false);
                 lineChart.getXAxis().setTextColor(color);
@@ -255,15 +265,3 @@ public class MeFragment extends Fragment {
         }
     }
 }
-
-//     static protected void initUser() {
-//         Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
-//         statisticsBox.removeAll();
-//         UserStatistics statistics = new UserStatistics()
-//                 .setFirstDate(LocalDate.now().toString())
-//                 .setEntitiesViewed(new ArrayList<>(
-//                         Collections.nCopies(7, 0)
-//                 ));
-//         statisticsBox.put(statistics);
-//         Backend.getInst().uploadUserStatistics(statistics, new InitUserHandler());
-//     }

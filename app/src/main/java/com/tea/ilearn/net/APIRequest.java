@@ -52,7 +52,7 @@ public abstract class APIRequest {
         genericPath = _genericPath;
         loginParams = _loginParams;
         tokenName = _tokenName;
-        tokenValue = "123";
+        tokenValue = "abc123";
         loginMethod = _loginMethod;
         authHeader = _authHeader;
         loginFailedMessage = _loginFailedMessage;
@@ -102,8 +102,8 @@ public abstract class APIRequest {
 
     PriorityBlockingQueue<Task> queue = new PriorityBlockingQueue<>();
 
-    protected static final int maxRetries = 2;
-    protected static final int timeoutSeconds = 60;
+    protected static final int maxRetries = 1;
+    protected static final int timeoutSeconds = 30;
     protected static final int retryIntervalSeconds = 2;
     // login / refresh token
     protected static final int maxLoginRetries = 2;
@@ -194,7 +194,8 @@ public abstract class APIRequest {
                         return true;
                     })
                     .subscribe(respObj -> {
-                        Message.obtain(handler, 0, respObj).sendToTarget();
+                        if (handler != null)
+                            Message.obtain(handler, 0, respObj).sendToTarget();
                         messageSent.set(true);
                     }, throwable -> {
                         if (!throwable.getMessage().equals(loginFailedMessage)) {
@@ -203,7 +204,7 @@ public abstract class APIRequest {
                         }
                     });
             } while (loginFailed.get() && loopCounter < maxLoginRetries);
-            if (!messageSent.get())
+            if (handler != null && !messageSent.get())
                 Message.obtain(handler, 1, lastErrorMessage).sendToTarget();  // send failure message
         }).start();
     }

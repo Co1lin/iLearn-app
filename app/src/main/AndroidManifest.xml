@@ -27,6 +27,12 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:host="share"
                       android:scheme="ilearn" />
+                <data android:host="api.ilearn.enjoycolin.top"
+                    android:path="/app"
+                    android:scheme="http" />
+                <data android:host="api.ilearn.enjoycolin.top"
+                    android:path="/app"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity
