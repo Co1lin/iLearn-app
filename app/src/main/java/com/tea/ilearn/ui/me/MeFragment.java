@@ -46,7 +46,7 @@ public class MeFragment extends Fragment {
         ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == 0) { // success
+                    if (result.getResultCode() == 200) { // success
                         Intent data = result.getData();
                         Account account = (new Gson()).fromJson(data.getStringExtra("account"), Account.class);
                         binding.nameProfile.setText(account.getUsername());

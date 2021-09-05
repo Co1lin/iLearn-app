@@ -36,7 +36,10 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(root);
 
         binding.tosignin.setOnClickListener($ -> {
-            finish(); // TODO clear previous signin activity info ?
+            Intent intent = new Intent(this, SigninActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+            startActivity(intent);
+            finish();
         });
 
         binding.signup.setOnClickListener($ -> {
@@ -73,6 +76,16 @@ public class SignupActivity extends AppCompatActivity {
 
             } else {
                 binding.emailBox.setError(null);
+            }
+        });
+
+        binding.password.setOnFocusChangeListener((view, hasFocus) -> {
+            if (!hasFocus) {
+                if (binding.password.getText().toString().length() < 6) {
+                    binding.passwordBox.setError("密码长度至少为6");
+                }
+            } else {
+                binding.passwordBox.setError(null);
             }
         });
 
@@ -131,7 +144,7 @@ public class SignupActivity extends AppCompatActivity {
                 Account account = (Account) msg.obj;
                 Intent intent = new Intent();
                 intent.putExtra("account", (new Gson()).toJson(account));
-                that.setResult(0, intent);
+                that.setResult(200, intent);
                 that.finish();
             }
         }

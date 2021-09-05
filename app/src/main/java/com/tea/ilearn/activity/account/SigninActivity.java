@@ -61,6 +61,22 @@ public class SigninActivity extends AppCompatActivity {
         });
     }
 
+    static class SigninHandler extends Handler {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            Log.i("MeFragment/registerHandler", String.valueOf(msg.what));
+            if (msg.what == 0 && msg.obj != null) {
+                Account account = (Account) msg.obj;
+                // TODO
+            }
+            else {  // register failed
+                if (((String) msg.obj).contains("login failed")) {
+                    // TODO: incorrect username or password
+                }
+            }
+        }
+    }
 
     /**
      * Ref <a href="https://stackoverflow.com/a/28939113">EditText, clear focus on touch outside</a>
@@ -80,22 +96,5 @@ public class SigninActivity extends AppCompatActivity {
             }
         }
         return super.dispatchTouchEvent( event );
-    }
-
-    static class SigninHandler extends Handler {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Log.i("MeFragment/registerHandler", String.valueOf(msg.what));
-            if (msg.what == 0 && msg.obj != null) {
-                Account account = (Account) msg.obj;
-                // TODO
-            }
-            else {  // register failed
-                if (((String) msg.obj).contains("login failed")) {
-                    // TODO: incorrect username or password
-                }
-            }
-        }
     }
 }
