@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -119,9 +120,10 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                 binding.getRoot().getContext().startActivity(anotherIntent);
             });
 
+            binding.progressCircular.setVisibility(View.VISIBLE);
             boolean loaded = false; // TODO get info from database (base on id?)
             if (!loaded) {
-                StaticHandler handler = new StaticHandler(binding.entityDescription);
+                StaticHandler handler = new StaticHandler(binding.entityDescription, binding.progressCircular);
                 EduKG.getInst().getEntityDetails(subject, name, handler);
                 // TODO save to database (including the loaded status)
             }
@@ -133,15 +135,18 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
 
     class StaticHandler extends Handler {
         private TextView entityDescription;
+        private View progress;
 
-        StaticHandler(TextView entityDescription) {
+        StaticHandler(TextView entityDescription, View progress) {
             this.entityDescription = entityDescription;
+            this.progress = progress;
         }
 
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             entityDescription.setText("实体描述仍在标注中...");
+            progress.setVisibility(View.GONE);
             if (msg.what == 0) {
                 EduKGEntityDetail detailFromNet = (EduKGEntityDetail) msg.obj;
                 if (detailFromNet != null) {
