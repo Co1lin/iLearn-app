@@ -1,6 +1,7 @@
 package com.tea.ilearn.activity.account;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.florent37.viewtooltip.ViewTooltip;
+import com.google.gson.Gson;
 import com.tea.ilearn.R;
 import com.google.android.material.textfield.TextInputLayout;
 import com.tea.ilearn.databinding.ActivitySignupBinding;
@@ -36,6 +38,7 @@ public class SignupActivity extends AppCompatActivity {
         binding.tosignin.setOnClickListener($ -> {
             finish(); // TODO clear previous signin activity info ?
         });
+
         binding.signup.setOnClickListener($ -> {
             if (!binding.agree.isChecked()) {
                 ViewTooltip.on(binding.agree)
@@ -47,7 +50,7 @@ public class SignupActivity extends AppCompatActivity {
                 return;
             }
             binding.progressCircular.setVisibility(View.VISIBLE);
-            SignupHandler handler = new SignupHandler(binding, binding.progressCircular);
+            SignupHandler handler = new SignupHandler(binding, this);
             Backend.getInst().register(
                     binding.email.getText().toString(),
                     binding.username.getText().toString(),
@@ -96,17 +99,17 @@ public class SignupActivity extends AppCompatActivity {
 
     static class SignupHandler extends Handler {
         ActivitySignupBinding binding;
-        View view;
+        AppCompatActivity that;
 
-        SignupHandler(ActivitySignupBinding binding, View view) {
+        SignupHandler(ActivitySignupBinding binding, AppCompatActivity that) {
             this.binding = binding;
-            this.view = view;
+            this.that = that;
         }
 
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            view.setVisibility(View.GONE);
+            binding.progressCircular.setVisibility(View.GONE);
             if (msg.what == 1) {
                 String err = ((AtomicReference<String>)msg.obj).get();
                 if (msg.obj != null) {
@@ -126,7 +129,10 @@ public class SignupActivity extends AppCompatActivity {
             }
             else if (msg.obj != null) {
                 Account account = (Account) msg.obj;
-                // TODO: back to me fragment and change username and profile
+                Intent intent = new Intent();
+                intent.putExtra("account", (new Gson()).toJson(account));
+                that.setResult(0, intent);
+                that.finish();
             }
         }
     }

@@ -50,7 +50,9 @@ public class SigninActivity extends AppCompatActivity {
 
         binding.tosignup.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), SignupActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
             root.getContext().startActivity(intent);
+            finish();
         });
 
         binding.toforget.setOnClickListener($ -> {

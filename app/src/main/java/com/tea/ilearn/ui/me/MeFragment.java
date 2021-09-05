@@ -10,6 +10,8 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -22,9 +24,11 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.google.gson.Gson;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
+import com.tea.ilearn.model.Account;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +43,20 @@ public class MeFragment extends Fragment {
         binding = FragmentMeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == 0) { // success
+                        Intent data = result.getData();
+                        Account account = (new Gson()).fromJson(data.getStringExtra("account"), Account.class);
+                        binding.nameProfile.setText(account.getUsername());
+                    }
+                }
+        );
+
         binding.profile.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), SigninActivity.class);
-            root.getContext().startActivity(intent);
+            activityResultLauncher.launch(intent);
         });
 
         binding.darkModeSwitch.setOnCheckedChangeListener((view, isChecked) -> {
