@@ -2,9 +2,6 @@ package com.tea.ilearn.ui.me;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +10,8 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -25,6 +24,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.google.gson.Gson;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
@@ -51,9 +51,20 @@ public class MeFragment extends Fragment {
         binding = FragmentMeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == 200) { // success
+                        Intent data = result.getData();
+                        Account account = (new Gson()).fromJson(data.getStringExtra("account"), Account.class);
+                        binding.nameProfile.setText(account.getUsername());
+                    }
+                }
+        );
+
         binding.profile.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), SigninActivity.class);
-            root.getContext().startActivity(intent);
+            activityResultLauncher.launch(intent);
         });
 
         binding.darkModeSwitch.setOnCheckedChangeListener((view, isChecked) -> {
@@ -75,8 +86,12 @@ public class MeFragment extends Fragment {
             }
         });
 
-        // =======================================================================
+        initLineChart();
 
+        return root;
+    }
+
+    void initLineChart() {
         LineChart lineChart = binding.lineChart;
         List<String> key = Arrays.asList("周一", "周二", "周三", "周四", "周五", "周六", "周日");
         List<Integer> value = Arrays.asList(120, 200, 150, 80, 10, 110, 130); // TODO colin: true value here
@@ -92,7 +107,7 @@ public class MeFragment extends Fragment {
         dataset.setValueTextSize(10);
         dataset.setValueTextColor(color);
         dataset.setDrawFilled(true);
-        dataset.setFillDrawable(ContextCompat.getDrawable(root.getContext(), R.drawable.gradient_fill));
+        dataset.setFillDrawable(ContextCompat.getDrawable(binding.getRoot().getContext(), R.drawable.gradient_fill));
         lineChart.setClipValuesToContent(false);
         lineChart.getXAxis().setTextColor(color);
         typedValue = new TypedValue();
@@ -116,82 +131,17 @@ public class MeFragment extends Fragment {
         lineChart.getAxisLeft().setDrawGridLines(false);
         lineChart.setData(lineData);
         lineChart.invalidate();
-
-        // TODO: register and login
-        LoginHandler loginHandler = new LoginHandler();
-        RegisterHandler registerHandler = new RegisterHandler();
-//        Backend.getInst().register("coln@lin.sldf", "cnkjllj", "olin", registerHandler);
-//        Backend.getInst().login("cnkjllj", "olin", loginHandler);
-        //Backend.getInst().register("coln@lin.sdf", "dfkkjkghk0j", "olin", registerHandler);
-//        Backend.getInst().login("colin", "colin", loginHandler);
-
-        return root;
-    }
-
-    static protected void initUser() {
-        Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
-        statisticsBox.removeAll();
-        UserStatistics statistics = new UserStatistics()
-                .setFirstDate(LocalDate.now().toString())
-                .setEntitiesViewed(new ArrayList<>(
-                        Collections.nCopies(7, 0)
-                ));
-        statisticsBox.put(statistics);
-        Backend.getInst().uploadUserStatistics(statistics, new InitUserHandler());
-    }
-
-    static class RegisterHandler extends Handler {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Log.i("MeFragment/RegisterHandler", String.valueOf(msg.what));
-            if (msg.what == 0 && msg.obj != null) {
-                Account account = (Account) msg.obj;
-                initUser();
-
-                // TODO
-            }
-            else {  // register failed
-                if (((AtomicReference<String>) msg.obj).toString().contains("duplicated")) {
-                    // TODO
-                }
-            }
-        }
-    }
-
-    static class LoginHandler extends Handler {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Log.i("MeFragment/LoginHandler", String.valueOf(msg.what));
-            if (msg.what == 0 && msg.obj != null) {
-                Account account = (Account) msg.obj;
-                // TODO
-            }
-            else {  // register failed
-                if (((String) msg.obj).contains("login failed")) {
-                    // TODO: incorrect username or password
-                }
-            }
-        }
-    }
-
-    static class InitUserHandler extends Handler {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Log.i("MeFragment/InitUserHandler", String.valueOf(msg.what));
-            if (msg.what == 0 && msg.obj != null) {
-                //Account account = (Account) msg.obj;
-
-                // TODO
-            }
-            else {  // register failed
-                if (((String) msg.obj).contains("duplicated")) {
-                    // TODO
-                }
-            }
-        }
     }
 }
-// TODO edit text color issue in dark mode
+
+//     static protected void initUser() {
+//         Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
+//         statisticsBox.removeAll();
+//         UserStatistics statistics = new UserStatistics()
+//                 .setFirstDate(LocalDate.now().toString())
+//                 .setEntitiesViewed(new ArrayList<>(
+//                         Collections.nCopies(7, 0)
+//                 ));
+//         statisticsBox.put(statistics);
+//         Backend.getInst().uploadUserStatistics(statistics, new InitUserHandler());
+//     }
