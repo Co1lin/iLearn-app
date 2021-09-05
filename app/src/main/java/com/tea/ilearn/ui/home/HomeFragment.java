@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -150,6 +151,11 @@ public class HomeFragment extends Fragment {
                 binding.unused.beginDrag();
                 binding.flowLayout.beginDrag();
             } else {
+                if (binding.flowLayout.getDragItemManager().getItems().size() == 0) {
+                    binding.editMenu.setChecked(true);
+                    Toast.makeText(binding.getRoot().getContext(), "请至少保留一门学科", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 binding.flowLayout.finishDrag();
                 binding.flowLayout.finishDrag();
                 binding.cover.setVisibility(View.INVISIBLE);
