@@ -1,6 +1,7 @@
 package com.tea.ilearn.activity.account;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,16 +10,20 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.florent37.viewtooltip.ViewTooltip;
+import com.google.gson.Gson;
 import com.tea.ilearn.R;
 import com.google.android.material.textfield.TextInputLayout;
 import com.tea.ilearn.databinding.ActivitySignupBinding;
 import com.tea.ilearn.model.Account;
 import com.tea.ilearn.net.backend.Backend;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SignupActivity extends AppCompatActivity {
     private ActivitySignupBinding binding;
@@ -30,24 +35,36 @@ public class SignupActivity extends AppCompatActivity {
         View root = binding.getRoot();
         setContentView(root);
 
-        // TODO validator
         binding.tosignin.setOnClickListener($ -> {
-            finish(); // TODO clear previous signin activity info ?
-            // TODO cannot register if logged in
+            Intent intent = new Intent(this, SigninActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+            startActivity(intent);
+            finish();
         });
+
         binding.signup.setOnClickListener($ -> {
+            if (binding.usernameBox.getError() != null ||
+                    binding.passwordBox.getError() != null ||
+                    binding.emailBox.getError() != null) {
+                Toast.makeText(this, "请检查输入", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (!binding.agree.isChecked()) {
                 ViewTooltip.on(binding.agree)
-                    .autoHide(true, 1000)
-                    .corner(30)
-                    .position(ViewTooltip.Position.TOP)
-                    .text("请先勾选同意")
-                    .show();
+                        .autoHide(true, 1000)
+                        .corner(30)
+                        .position(ViewTooltip.Position.TOP)
+                        .text("请先勾选同意")
+                        .show();
+                return;
             }
-            RegisterHandler handler = new RegisterHandler();
+            binding.progressCircular.setVisibility(View.VISIBLE);
+            SignupHandler handler = new SignupHandler(binding, this);
             Backend.getInst().register(
-                    binding.email.getText().toString(), binding.username.getText().toString(),
-                    binding.password.getText().toString(), handler
+                    binding.email.getText().toString(),
+                    binding.username.getText().toString(),
+                    binding.password.getText().toString(),
+                    handler
             );
         });
 
@@ -55,6 +72,26 @@ public class SignupActivity extends AppCompatActivity {
             if (!hasFocus) {
                 String username = binding.username.getText().toString();
                 Backend.getInst().checkUsername(username, new CheckUsernameHandler(binding.usernameBox));
+            } else {
+                binding.usernameBox.setError(null);
+            }
+        });
+
+        binding.email.setOnFocusChangeListener((view, hasFocus) -> {
+            if (!hasFocus) {
+
+            } else {
+                binding.emailBox.setError(null);
+            }
+        });
+
+        binding.password.setOnFocusChangeListener((view, hasFocus) -> {
+            if (!hasFocus) {
+                if (binding.password.getText().toString().length() < 6) {
+                    binding.passwordBox.setError("密码长度至少为6");
+                }
+            } else {
+                binding.passwordBox.setError(null);
             }
         });
 
@@ -72,19 +109,49 @@ public class SignupActivity extends AppCompatActivity {
         binding.closePolicyDetail.setOnClickListener($->{
             binding.policyDetail.setVisibility(View.GONE);
         });
+
+        binding.progressCircular.setOnTouchListener((view, event) -> {
+            return true;
+        });
     }
 
 
-    static class RegisterHandler extends Handler {
+    static class SignupHandler extends Handler {
+        ActivitySignupBinding binding;
+        AppCompatActivity that;
+
+        SignupHandler(ActivitySignupBinding binding, AppCompatActivity that) {
+            this.binding = binding;
+            this.that = that;
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
+            binding.progressCircular.setVisibility(View.GONE);
             if (msg.what == 1) {
-                // TODO failed, display error message
+                String err = ((AtomicReference<String>)msg.obj).get();
+                if (msg.obj != null) {
+                    if (err.contains("email")) {
+                        binding.emailBox.setError("邮箱不合法");
+                    }
+                    if (err.contains("username")) {
+                        if (err.contains("duplicated")) {
+                        } else {
+                            binding.usernameBox.setError("用户名长度应在3~20个字符之间");
+                        }
+                    }
+                    if (err.contains("resolve")) {
+                        Toast.makeText(binding.getRoot().getContext(), binding.getRoot().getContext().getResources().getString(R.string.network_retry), Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
             else if (msg.obj != null) {
                 Account account = (Account) msg.obj;
-                // TODO: display username
+                Intent intent = new Intent();
+                intent.putExtra("account", (new Gson()).toJson(account));
+                that.setResult(200, intent);
+                that.finish();
             }
         }
     }
@@ -99,8 +166,8 @@ public class SignupActivity extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            if (msg.what == 0 && msg.obj != null) {
-                if (((String) msg.obj).contains("has been occupied")) {
+            if (msg.what == 1 && msg.obj != null) {
+                if (((AtomicReference<String>)(msg.obj)).get().contains("already occupied")) {
                     inputBox.setError("该用户名已被占用");
                 }
             }

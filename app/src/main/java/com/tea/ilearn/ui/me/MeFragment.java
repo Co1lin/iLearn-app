@@ -2,9 +2,6 @@ package com.tea.ilearn.ui.me;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +10,8 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -25,6 +24,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.google.gson.Gson;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
@@ -53,10 +53,21 @@ public class MeFragment extends Fragment {
         root = binding.getRoot();
 
         loadStatistics();
+      
+        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == 200) { // success
+                        Intent data = result.getData();
+                        Account account = (new Gson()).fromJson(data.getStringExtra("account"), Account.class);
+                        binding.nameProfile.setText(account.getUsername());
+                    }
+                }
+        );
 
         binding.profile.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), SigninActivity.class);
-            root.getContext().startActivity(intent);
+            activityResultLauncher.launch(intent);
         });
 
         binding.darkModeSwitch.setOnCheckedChangeListener((view, isChecked) -> {
@@ -244,4 +255,15 @@ public class MeFragment extends Fragment {
         }
     }
 }
-// TODO edit text color issue in dark mode
+
+//     static protected void initUser() {
+//         Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
+//         statisticsBox.removeAll();
+//         UserStatistics statistics = new UserStatistics()
+//                 .setFirstDate(LocalDate.now().toString())
+//                 .setEntitiesViewed(new ArrayList<>(
+//                         Collections.nCopies(7, 0)
+//                 ));
+//         statisticsBox.put(statistics);
+//         Backend.getInst().uploadUserStatistics(statistics, new InitUserHandler());
+//     }
