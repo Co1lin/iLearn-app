@@ -29,6 +29,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.ThemedSpinnerAdapter;
 
+import com.tea.ilearn.model.SearchHistory;
+import com.tea.ilearn.model.SearchHistory_;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +39,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import io.objectbox.Box;
+import io.objectbox.query.Query;
 import per.goweii.actionbarex.common.AutoComplTextView;
 
 public class ACAdapter<T> extends BaseAdapter implements Filterable, ThemedSpinnerAdapter {
@@ -425,13 +430,24 @@ public class ACAdapter<T> extends BaseAdapter implements Filterable, ThemedSpinn
             if (mDelButtonId != 0) {
                 ImageButton delButton = view.findViewById(mDelButtonId);
                 delButton.setOnClickListener(view1 -> {
-                    remove(getItem(position));
+                    T itemToDelete = getItem(position);
+                    new Thread(() -> {  // delete in DB
+                        Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
+                        Query<SearchHistory> query = historyBox.query().equal(SearchHistory_.keyword, (String) itemToDelete).build();
+                        List<SearchHistory> histories = query.find();
+                        query.close();
+                        if (histories != null && histories.size() > 0) {
+                            historyBox.remove(histories.get(0));
+                        }
+                    }).start();
+                    remove(itemToDelete);
                     /**
-                     * Ref <a href="https://stackoverflow.com/a/51808479">Update</a>
+                     * Update the suggestions
+                     * Ref <a href="https://stackoverflow.com/a/51808479">Update</a>T
                      */
-                    Editable mytext = mAcTextView.getText();
-                    mAcTextView.setText(mytext);
-                    mAcTextView.setSelection(mytext.length());
+                    Editable mText = mAcTextView.getText();
+                    mAcTextView.setText(mText);
+                    mAcTextView.setSelection(mText.length());
                 });
             }
         } catch (ClassCastException e) {

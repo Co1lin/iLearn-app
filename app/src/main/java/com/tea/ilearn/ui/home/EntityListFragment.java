@@ -122,7 +122,7 @@ public class EntityListFragment extends Fragment {
                 query = String.valueOf(c);
                 StaticHandler handler = new StaticHandler(
                         binding, mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar,
-                        acTextView, getActivity(), getContext(), false);
+                        acTextView, getActivity(), getContext(), false, false);
                 EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
             }
             binding.emptyHint.setVisibility(View.GONE);
@@ -138,8 +138,8 @@ public class EntityListFragment extends Fragment {
             binding.sortNameDown.setVisibility(View.VISIBLE);
             searchSubjectNum = new CountDownLatch(1);
             StaticHandler handler = new StaticHandler(
-                    binding, mInfoAdapter, subject, query, searchSubjectNum,
-                    binding.loadingBar, acTextView, getActivity(), getContext(), true);
+                    binding, mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar,
+                    acTextView, getActivity(), getContext(), true, true);
             EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
         }
     }
@@ -155,11 +155,12 @@ public class EntityListFragment extends Fragment {
         private Activity activity;
         private Context context;
         private boolean empty_hint;
+        private boolean addToHistory;
 
         StaticHandler(EntityListBinding binding, InfoListAdapter mInfoAdapter,
                       String subject, String keyword, CountDownLatch _latch,
                       View _loadingBar, AutoComplTextView acTextView, Activity activity,
-                      Context context, boolean empty_hint) {
+                      Context context, boolean emptyHint, boolean addToHistory) {
             this.binding = binding;
             this.mInfoAdapter = mInfoAdapter;
             this.subject = subject;
@@ -169,7 +170,8 @@ public class EntityListFragment extends Fragment {
             this.acTextView = acTextView;
             this.activity = activity;
             this.context = context;
-            this.empty_hint = empty_hint;
+            this.empty_hint = emptyHint;
+            this.addToHistory = addToHistory;
         }
 
         @Override
@@ -187,7 +189,7 @@ public class EntityListFragment extends Fragment {
                         .equal(SearchHistory_.keyword, keyword).build();
                 List<SearchHistory> historiesRes = historyQuery.find();
                 historyQuery.close();
-                if (historiesRes == null || historiesRes.size() == 0) {
+                if (addToHistory && (historiesRes == null || historiesRes.size() == 0)) {
                     SearchHistory history = new SearchHistory().setKeyword(keyword);
                     historyBox.put(history);
                     DB_utils.updateACAdapter(activity, context, acTextView);
