@@ -44,11 +44,11 @@ public class EntityListFragment extends Fragment {
     private RecyclerView mInfoRecycler;
     private InfoListAdapter mInfoAdapter;
     private CountDownLatch searchSubjectNum = new CountDownLatch(0);
-    String subject;
+    private String subject;
 
-    public EntityListFragment(String subject) {
-        super();
+    public EntityListFragment setSubject(String subject) {
         this.subject = subject;
+        return this;
     }
 
     @Override
