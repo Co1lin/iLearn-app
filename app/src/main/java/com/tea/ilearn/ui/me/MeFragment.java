@@ -29,10 +29,18 @@ import com.tea.ilearn.R;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 import com.tea.ilearn.model.Account;
+import com.tea.ilearn.model.UserStatistics;
+import com.tea.ilearn.net.backend.Backend;
+import com.tea.ilearn.utils.ObjectBox;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+import io.objectbox.Box;
 
 public class MeFragment extends Fragment {
     private FragmentMeBinding binding;
@@ -125,3 +133,15 @@ public class MeFragment extends Fragment {
         lineChart.invalidate();
     }
 }
+
+//     static protected void initUser() {
+//         Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
+//         statisticsBox.removeAll();
+//         UserStatistics statistics = new UserStatistics()
+//                 .setFirstDate(LocalDate.now().toString())
+//                 .setEntitiesViewed(new ArrayList<>(
+//                         Collections.nCopies(7, 0)
+//                 ));
+//         statisticsBox.put(statistics);
+//         Backend.getInst().uploadUserStatistics(statistics, new InitUserHandler());
+//     }

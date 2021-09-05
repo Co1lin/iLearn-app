@@ -1,5 +1,7 @@
 package com.tea.ilearn.net.edukg;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -41,8 +43,25 @@ public class EduKGEntityDetail {
     public ToMany<Category> categories;
     @Transient
     ArrayList<String> categoriesBuf;
-    boolean stared;
+    boolean starred;
     boolean viewed;
+
+    @Override
+    public int hashCode() {
+        return uri.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null)
+            return false;
+        else if (this == obj)
+            return true;
+        else if (this.getClass() != obj.getClass())
+            return false;
+        else
+            return uri.equals(((EduKGEntityDetail) obj).getUri());
+    }
 
     public static class EduKGRelationsConverter implements PropertyConverter<ArrayList<EduKGRelation>, String> {
 
@@ -106,8 +125,8 @@ public class EduKGEntityDetail {
         return categoriesBuf;
     }
 
-    public boolean isStared() {
-        return stared;
+    public boolean isStarred() {
+        return starred;
     }
 
     public boolean isViewed() {
@@ -130,8 +149,13 @@ public class EduKGEntityDetail {
         return this;
     }
 
-    public EduKGEntityDetail setStared(boolean stared) {
-        this.stared = stared;
+    public EduKGEntityDetail setCategoriesBuf(ArrayList<String> categoriesBuf) {
+        this.categoriesBuf = categoriesBuf;
+        return this;
+    }
+
+    public EduKGEntityDetail setStarred(boolean starred) {
+        this.starred = starred;
         return this;
     }
 
@@ -150,11 +174,13 @@ public class EduKGEntityDetail {
         return this;
     }
 
-    public void setRelations(ArrayList<EduKGRelation> relations) {
+    public EduKGEntityDetail setRelations(ArrayList<EduKGRelation> relations) {
         this.relations = relations;
+        return this;
     }
 
-    public void setProperties(ArrayList<EduKGProperty> properties) {
+    public EduKGEntityDetail setProperties(ArrayList<EduKGProperty> properties) {
         this.properties = properties;
+        return this;
     }
 }
