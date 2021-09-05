@@ -13,13 +13,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.sina.weibo.sdk.api.TextObject;
+import com.sina.weibo.sdk.api.WebpageObject;
 import com.sina.weibo.sdk.api.WeiboMultiMessage;
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.common.UiError;
 import com.sina.weibo.sdk.openapi.IWBAPI;
 import com.sina.weibo.sdk.openapi.WBAPIFactory;
 import com.sina.weibo.sdk.share.WbShareCallback;
+import com.tea.ilearn.activity.JumpActivity;
 import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
 import com.tea.ilearn.model.UserStatistics;
@@ -32,6 +35,7 @@ import com.tea.ilearn.utils.ObjectBox;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import io.objectbox.Box;
 import io.objectbox.query.Query;
@@ -44,6 +48,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
     private ArrayList<String> categories;
     private EduKGEntityDetail detailInDB;
     private Box<EduKGEntityDetail> entityBox;
+    private String shareString;
 
     private void waitUntilDetailGot() {
         // wait until this entity has been stored into DB
@@ -90,6 +95,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             subject = intent.getStringExtra("subject");
             uri = intent.getStringExtra("id");
             categories = intent.getStringArrayListExtra("categories");
+            shareString = (new Gson()).toJson(new JumpActivity.JumpEntity(name, subject, category, uri, categories));
 
             initDB();
 
@@ -235,8 +241,21 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
 
     private void doWeiboShare() {
         WeiboMultiMessage message = new WeiboMultiMessage();
+//        try {
+//            String url = "ilearn://share/entity/" + URLEncoder.encode(shareString, StandardCharsets.UTF_8.name());
+//            text = text + url;
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+        WebpageObject webObject = new WebpageObject();
+        webObject.identify = UUID.randomUUID().toString();
+        webObject.description = "iLearn";
+        webObject.title = binding.entityName.getText().toString();
+        webObject.actionUrl = "http://www.baidu.com";
+        webObject.defaultText = "分享网⻚";
+        message.mediaObject = webObject;
         TextObject textObject = new TextObject();
-        textObject.text = "#iLearn# 我今天在iLearn学习了”"+binding.entityName.getText().toString()+"“这个实体，学到了很多东西，快来加入iLearn与我一起学习！";
+        textObject.text = "#iLearn# 我今天在iLearn学习了”"+binding.entityName.getText().toString()+"“这个实体，学到了很多东西，点此链接与我一起学习";
         message.textObject = textObject;
         mWBAPI.shareMessage(message, true);
     }
