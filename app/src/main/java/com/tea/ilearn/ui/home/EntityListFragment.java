@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tea.ilearn.Constant;
 import com.tea.ilearn.databinding.EntityListBinding;
 import com.tea.ilearn.model.SearchHistory;
 import com.tea.ilearn.model.SearchHistory_;
@@ -27,11 +28,11 @@ import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
 import com.tea.ilearn.net.edukg.Entity;
 import com.tea.ilearn.utils.DB_utils;
 import com.tea.ilearn.utils.ObjectBox;
-import com.tea.ilearn.utils.RandChinese;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 import io.objectbox.Box;
@@ -114,12 +115,13 @@ public class EntityListFragment extends Fragment {
 
     public void search(String query, AutoComplTextView acTextView) {
         if (query.isEmpty()) {
-            int initNum = 5;
+            int initNum = 2;
             binding.loadingBar.setVisibility(View.VISIBLE);
             searchSubjectNum = new CountDownLatch(initNum);
             for (int i = 0; i < initNum; ++i) {
-                char c = RandChinese.gen();
-                query = String.valueOf(c);
+                int j = (new Random()).nextInt(12);
+                int k = Constant.EduKG.SUBJECTS_EN.indexOf(subject);
+                query = Constant.EduKG.INIT_KEYS[k][j];
                 StaticHandler handler = new StaticHandler(
                         binding, mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar,
                         acTextView, getActivity(), getContext(), false, false);
