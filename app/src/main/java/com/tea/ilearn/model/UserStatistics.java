@@ -35,6 +35,11 @@ public class UserStatistics {
         return this;
     }
 
+    public UserStatistics increaseLastNum() {
+        entitiesViewed.set(6, entitiesViewed.get(6) + 1);
+        return this;
+    }
+
     public String getFirstDate() {
         return firstDate;
     }
