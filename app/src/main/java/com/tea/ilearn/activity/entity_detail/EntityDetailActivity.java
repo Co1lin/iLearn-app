@@ -1,16 +1,23 @@
 package com.tea.ilearn.activity.entity_detail;
 
 import android.content.Intent;
+import android.graphics.CornerPathEffect;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +28,7 @@ import com.sina.weibo.sdk.common.UiError;
 import com.sina.weibo.sdk.openapi.IWBAPI;
 import com.sina.weibo.sdk.openapi.WBAPIFactory;
 import com.sina.weibo.sdk.share.WbShareCallback;
+import com.tea.ilearn.R;
 import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
 import com.tea.ilearn.model.UserStatistics;
@@ -34,6 +42,12 @@ import com.tea.ilearn.utils.ObjectBox;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.bandb.graphview.AbstractGraphAdapter;
+import dev.bandb.graphview.graph.Graph;
+import dev.bandb.graphview.graph.Node;
+import dev.bandb.graphview.layouts.layered.SugiyamaArrowEdgeDecoration;
+import dev.bandb.graphview.layouts.layered.SugiyamaConfiguration;
+import dev.bandb.graphview.layouts.layered.SugiyamaLayoutManager;
 import io.objectbox.Box;
 import io.objectbox.query.Query;
 
@@ -45,6 +59,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
     private ArrayList<String> categories;
     private EduKGEntityDetail detailInDB;
     private Box<EduKGEntityDetail> entityBox;
+    private AbstractGraphAdapter graphAdapter;
 
     private void waitUntilDetailGot() {
         // wait until this entity has been stored into DB
@@ -131,6 +146,76 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                 // TODO load from database (star, properties, relations)
             }
         }
+
+        initGraph();
+    }
+
+    void initGraph() {
+        SugiyamaConfiguration configuration = new SugiyamaConfiguration.Builder()
+                .setNodeSeparation(100)
+                .setLevelSeparation(100)
+                .build();
+        binding.graphView.setLayoutManager(new SugiyamaLayoutManager(binding.getRoot().getContext(), configuration));
+        binding.graphView.addItemDecoration(new SugiyamaArrowEdgeDecoration());
+        Paint edgeStyle = new Paint(Paint.ANTI_ALIAS_FLAG);
+        TypedValue typedValue = new TypedValue();
+        binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.colorSecondary, typedValue, true);
+        int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
+        edgeStyle.setColor(color);
+        edgeStyle.setStrokeWidth(5f);
+        edgeStyle.setStyle(Paint.Style.STROKE);
+        edgeStyle.setStrokeJoin(Paint.Join.ROUND);
+        edgeStyle.setPathEffect(new CornerPathEffect(10f));
+        binding.graphView.addItemDecoration(new SugiyamaArrowEdgeDecoration(edgeStyle));
+
+        graphAdapter = new AbstractGraphAdapter<NodeHolder>() {
+            @Override
+            public NodeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
+                return new NodeHolder(view);
+            }
+
+            @Override
+            public void onBindViewHolder(NodeHolder holder, int position) {
+                holder.mText.setText(getNodeData(position).toString());
+            }
+        };
+        binding.graphView.setAdapter(graphAdapter);
+
+        Graph graph = new Graph();
+        Node node1 = new Node("key");
+        Node node2 = new Node("Child 1");
+        Node node3 = new Node("Child 2");
+        Node node4 = new Node("Father");
+        Node node5 = new Node("Mother");
+        Node node6 = new Node("GrandPa");
+        Node node7 = new Node("GrandMa");
+
+        graph.addEdge(node1, node2);
+        graph.addEdge(node1, node3);
+        graph.addEdge(node4, node1);
+        graph.addEdge(node5, node1);
+        graph.addEdge(node6, node1);
+        graph.addEdge(node7, node1);
+        graphAdapter.submitGraph(graph);
+    }
+
+    private class NodeHolder extends RecyclerView.ViewHolder {
+        TextView mText;
+
+        NodeHolder(View itemView) {
+            super(itemView);
+
+            mText = itemView.findViewById(R.id.text);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int pos = getBindingAdapterPosition();
+                    Log.v("MYDEBUG", "Clicked on " + graphAdapter.getNodeData(pos).toString());
+                    // TODO new intent here, nodes[pos] is clicked
+                }
+            });
+        }
     }
 
     class StaticHandler extends Handler {
@@ -179,6 +264,10 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             else { // msg.what = 1
                 // TODO load from database and display offline loading hint
             }
+
+            // finish loading entity's relations
+            // begin to show relation graph
+
         }
     }
 
