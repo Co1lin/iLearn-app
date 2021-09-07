@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -16,9 +17,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.florent37.viewtooltip.ViewTooltip;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.tea.ilearn.R;
-import com.google.android.material.textfield.TextInputLayout;
 import com.tea.ilearn.databinding.ActivitySignupBinding;
 import com.tea.ilearn.model.Account;
 import com.tea.ilearn.net.backend.Backend;
@@ -128,6 +129,7 @@ public class SignupActivity extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
+            Log.i("SignupActivity/SignupHandler", msg.what + " " + msg.obj);
             binding.progressCircular.setVisibility(View.GONE);
             if (msg.what == 1) {
                 String err = ((AtomicReference<String>)msg.obj).get();

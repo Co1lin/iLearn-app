@@ -5,13 +5,11 @@ import androidx.annotation.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
-import com.tea.ilearn.model.Category;
 import com.tea.ilearn.model.SearchHistory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-import io.objectbox.annotation.Backlink;
 import io.objectbox.annotation.Convert;
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
@@ -39,10 +37,8 @@ public class EduKGEntityDetail {
     String label;
     String subject;
     String category;
-    @Backlink(to = "entities")
-    public ToMany<Category> categories;
     @Transient
-    ArrayList<String> categoriesBuf;
+    ArrayList<String> categories;
     boolean starred;
     boolean viewed;
 
@@ -105,6 +101,10 @@ public class EduKGEntityDetail {
         return category;
     }
 
+    public ArrayList<String> getCategories() {
+        return categories;
+    }
+
     public String getUri() {
         return uri;
     }
@@ -119,10 +119,6 @@ public class EduKGEntityDetail {
 
     public ArrayList<EduKGRelation> getRelations() {
         return relations;
-    }
-
-    public ArrayList<String> getCategoriesBuf() {
-        return categoriesBuf;
     }
 
     public boolean isStarred() {
@@ -145,12 +141,12 @@ public class EduKGEntityDetail {
 
     public EduKGEntityDetail setCategory(ArrayList<String> categories) {
         this.category = String.join(" ", categories);
-        this.categoriesBuf = categories;
+        this.categories = categories;
         return this;
     }
 
-    public EduKGEntityDetail setCategoriesBuf(ArrayList<String> categoriesBuf) {
-        this.categoriesBuf = categoriesBuf;
+    public EduKGEntityDetail setCategories(ArrayList<String> categories) {
+        setCategory(categories);
         return this;
     }
 
