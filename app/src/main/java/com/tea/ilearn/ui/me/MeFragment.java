@@ -1,5 +1,6 @@
 package com.tea.ilearn.ui.me;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -56,7 +57,7 @@ public class MeFragment extends Fragment {
         binding = FragmentMeBinding.inflate(inflater, container, false);
         root = binding.getRoot();
 
-        loadStatistics();
+        loadStatistics(getActivity(), binding, root);
       
         ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -93,13 +94,8 @@ public class MeFragment extends Fragment {
             }
         });
 
-        // TODO: register and login
-        LoginHandler loginHandler = new LoginHandler();
-        RegisterHandler registerHandler = new RegisterHandler();
-//        Backend.getInst().register("coln@lin.sldf", "cnkjllj", "olin", registerHandler);
-//        Backend.getInst().login("cnkjllj", "olin", loginHandler);
-        //Backend.getInst().register("coln@lin.sdf", "dfkkjkghk0j", "olin", registerHandler);
-//        Backend.getInst().login("colin", "colin", loginHandler);
+        // try to login
+       Backend.getInst().login(new LoginHandler(getActivity(), binding, root));
 
         return root;
     }
@@ -107,10 +103,10 @@ public class MeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadStatistics();
+        loadStatistics(getActivity(), binding, root);
     }
 
-    public void loadStatistics() {
+    static public void loadStatistics(Activity activity, FragmentMeBinding binding, View root) {
         new Thread(() -> {
             // DB
             LocalDate today = LocalDate.now();
@@ -155,7 +151,7 @@ public class MeFragment extends Fragment {
                 for (int i = 0; i < key.size(); ++i)
                     add(new Entry(i, value.get(i)));
             }};
-            getActivity().runOnUiThread(() -> {
+            activity.runOnUiThread(() -> {
                 LineDataSet dataset = new LineDataSet(entries, "近一周浏览量"); // add entries to dataset
                 TypedValue typedValue = new TypedValue();
                 root.getContext().getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
@@ -231,19 +227,48 @@ public class MeFragment extends Fragment {
     }
 
     static class LoginHandler extends Handler {
+        private Activity activity;
+        private FragmentMeBinding binding;
+        private View root;
+
+        public LoginHandler(Activity activity, FragmentMeBinding binding, View root) {
+            this.activity = activity;
+            this.binding = binding;
+            this.root = root;
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             Log.i("MeFragment/LoginHandler", String.valueOf(msg.what));
-            if (msg.what == 0 && msg.obj != null) {
+            if (msg.what == 0 && msg.obj instanceof Account) {
                 Account account = (Account) msg.obj;
-                // TODO
+                binding.nameProfile.setText(account.getUsername());
+                Backend.getInst().getUserStatistics(new GetStatisticsHandler(activity, binding, root));
             }
             else {  // register failed
                 if (((String) msg.obj).contains("login failed")) {
                     // TODO: incorrect username or password
                 }
             }
+        }
+    }
+
+    static class GetStatisticsHandler extends Handler {
+        private Activity activity;
+        private FragmentMeBinding binding;
+        private View root;
+
+        public GetStatisticsHandler(Activity activity, FragmentMeBinding binding, View root) {
+            this.activity = activity;
+            this.binding = binding;
+            this.root = root;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            loadStatistics(activity, binding, root);
         }
     }
 

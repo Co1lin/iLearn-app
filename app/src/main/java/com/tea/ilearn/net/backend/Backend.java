@@ -112,6 +112,13 @@ public class Backend extends APIRequest {
         asyncRefresh(new LogInCallbackHandler(handler, username, password));
     }
 
+    public void login(Handler handler) {
+        asyncRefresh(new LogInCallbackHandler(handler,
+                (String) loginParams.get("username"),
+                (String) loginParams.get("password"))
+        );
+    }
+
     public void register(String email, String username,
                             String password, Handler handler) {
         POSTJson("/register",

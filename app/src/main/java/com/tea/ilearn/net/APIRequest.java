@@ -114,38 +114,35 @@ public abstract class APIRequest {
 
     protected abstract void onRefreshSuccess(Object response);
 
-    public boolean syncRefresh(Handler handler) {
-        synchronized(lastRefreshSuccess) {
-            if (System.currentTimeMillis() - lastRefreshSuccess < minRefreshIntervalMillis)
-                return true;
-            Log.i("APIRequest.refresh", "refreshing");
-            AtomicBoolean success = new AtomicBoolean(false);
-            RxHttp p = getSyncRxHttp(loginMethod);
-            paramAddAll(p, loginParams);
-            loginRequestDefiner.define(p)
-            .timeout(3, TimeUnit.SECONDS)
-            .subscribe(response -> {
-                onRefreshSuccess(response);
-                success.set(true);
-                lastRefreshSuccess = System.currentTimeMillis();
-                if (handler != null)
-                    Message.obtain(handler, 0, response).sendToTarget();
-                Log.i("APIRequest.refresh", ": onRefreshSuccess completed");
-            }, throwable -> {
-                if (handler != null)
-                    Message.obtain(handler, 1, throwable.getMessage()).sendToTarget();
-                Log.e("APIRequest.refresh", "login error: " + throwable.getMessage());
-            });
-            return success.get();
-        }
+    public synchronized boolean syncRefresh(Handler handler) {
+        if (System.currentTimeMillis() - lastRefreshSuccess < minRefreshIntervalMillis)
+            return true;
+        Log.i("APIRequest.refresh", "refreshing");
+        AtomicBoolean success = new AtomicBoolean(false);
+        RxHttp p = getSyncRxHttp(loginMethod);
+        paramAddAll(p, loginParams);
+        loginRequestDefiner.define(p)
+        .timeout(3, TimeUnit.SECONDS)
+        .subscribe(response -> {
+            onRefreshSuccess(response);
+            success.set(true);
+            lastRefreshSuccess = System.currentTimeMillis();
+            if (handler != null)
+                Message.obtain(handler, 0, response).sendToTarget();
+            Log.i("APIRequest.refresh", ": onRefreshSuccess completed");
+        }, throwable -> {
+            if (handler != null)
+                Message.obtain(handler, 1, throwable.getMessage()).sendToTarget();
+            lastRefreshSuccess = 0L;
+            Log.e("APIRequest.refresh", "login error: " + throwable.getMessage());
+        });
+        return success.get();
     }
 
-    public void asyncRefresh(Handler handler) {
-        synchronized(lastRefreshSuccess) {
-            new Thread(() -> {
-                syncRefresh(handler);
-            }).start();
-        }
+    public synchronized void asyncRefresh(Handler handler) {
+        new Thread(() -> {
+            syncRefresh(handler);
+        }).start();
     }
 
     /**
