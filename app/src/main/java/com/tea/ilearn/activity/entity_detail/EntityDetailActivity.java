@@ -31,6 +31,7 @@ import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
 import com.tea.ilearn.databinding.NodeBinding;
 import com.tea.ilearn.model.UserStatistics;
+import com.tea.ilearn.net.backend.Backend;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
@@ -71,7 +72,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
     private Box<EduKGEntityDetail> entityBox;
     private AbstractGraphAdapter graphAdapter;
 
-    private void waitUntilDetailGot() {
+    private synchronized void waitUntilDetailGot() {
         // wait until this entity has been stored into DB
         while (detailInDB == null) {
             Query<EduKGEntityDetail> query = entityBox.query()
@@ -131,6 +132,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     waitUntilDetailGot();
                     detailInDB.setStarred(binding.star.isChecked());
                     entityBox.put(detailInDB);
+                    uploadEntity();
                 }).start();
             });
 
@@ -241,7 +243,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
 
                     ArrayList<EduKGRelation> finalRelations = relations;
                     ArrayList<EduKGProperty> finalProperties = properties;
-                    new Thread(() -> {
+                    new Thread(() -> {  // update relations and properties
                         waitUntilDetailGot();
                         detailInDB.setRelations(finalRelations)
                                 .setProperties(finalProperties);
@@ -303,7 +305,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             } else { // new viewed entity, store to DB
                 detailInDB = new EduKGEntityDetail()
                         .setCategory(category)
-                        .setCategoriesBuf(categories)
+                        .setCategory(categories)
                         .setSubject(subject)
                         .setLabel(name)
                         .setUri(uri)
@@ -314,9 +316,17 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
         new Thread(() -> {  // update statistics
             Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
             List<UserStatistics> statisticsRes = statisticsBox.getAll();
+            UserStatistics statistics = statisticsRes.get(0).increaseLastNum();
             if (statisticsRes != null && statisticsRes.size() > 0)
-                statisticsBox.put(statisticsRes.get(0).increaseLastNum());
+                statisticsBox.put(statistics);
+            Backend.getInst().uploadUserStatistics(statistics, null);
         }).start();
+        new Thread(() -> uploadEntity()).start();
+    }
+
+    private void uploadEntity() {
+        waitUntilDetailGot();
+        Backend.getInst().uploadEntity(detailInDB, null);
     }
 
     // ==========================================================================

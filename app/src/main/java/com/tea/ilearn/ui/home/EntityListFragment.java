@@ -22,6 +22,7 @@ import com.tea.ilearn.Constant;
 import com.tea.ilearn.databinding.EntityListBinding;
 import com.tea.ilearn.model.SearchHistory;
 import com.tea.ilearn.model.SearchHistory_;
+import com.tea.ilearn.net.backend.Backend;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail_;
@@ -195,6 +196,7 @@ public class EntityListFragment extends Fragment {
                     SearchHistory history = new SearchHistory().setKeyword(keyword);
                     historyBox.put(history);
                     DB_utils.updateACAdapter(activity, context, acTextView);
+                    Backend.getInst().uploadSearchHistory(history, null);
                 }
             }).start();
 
@@ -206,7 +208,7 @@ public class EntityListFragment extends Fragment {
                         HashMap<Entity, ArrayList<String>> uriToCategories = new HashMap<>();
                         for (Entity e : entities) {
                             ArrayList<String> categories = uriToCategories.getOrDefault(
-                                    e.getUri(), new ArrayList<>()
+                                    e, new ArrayList<>()
                             );
                             categories.add(e.getCategory());
                             uriToCategories.put(e, categories);

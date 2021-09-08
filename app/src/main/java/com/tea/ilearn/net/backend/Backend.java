@@ -7,7 +7,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.tea.ilearn.model.Account;
-import com.tea.ilearn.model.Category;
 import com.tea.ilearn.model.SearchHistory;
 import com.tea.ilearn.model.UserStatistics;
 import com.tea.ilearn.net.APIRequest;
@@ -113,6 +112,13 @@ public class Backend extends APIRequest {
         asyncRefresh(new LogInCallbackHandler(handler, username, password));
     }
 
+    public void login(Handler handler) {
+        asyncRefresh(new LogInCallbackHandler(handler,
+                (String) loginParams.get("username"),
+                (String) loginParams.get("password"))
+        );
+    }
+
     public void register(String email, String username,
                             String password, Handler handler) {
         POSTJson("/register",
@@ -165,7 +171,7 @@ public class Backend extends APIRequest {
         getUserStatistics(callbackHandler);
         getSearchHistories(callbackHandler);
         getEntities(callbackHandler);
-        getCategories(callbackHandler);
+        // getCategories(callbackHandler);
     }
 
     static class GetPersonalDataCallback extends Handler {
@@ -236,7 +242,7 @@ public class Backend extends APIRequest {
     }
 
     // search histories
-    public void uploadSearchHistories(SearchHistory history, Handler handler) {
+    public void uploadSearchHistory(SearchHistory history, Handler handler) {
         PUTJson("/history/put",
                 new HashMap<String, Object>() {{
                     put("description", history.getKeyword());
@@ -278,7 +284,7 @@ public class Backend extends APIRequest {
     }
 
     // "viewed" entities
-    public void uploadEntities(EduKGEntityDetail entityDetail, Handler handler) {
+    public void uploadEntity(EduKGEntityDetail entityDetail, Handler handler) {
         POSTJson("/entity",
                 new HashMap<String, Object>(){{
                     put("uri", entityDetail.getUri());
@@ -286,6 +292,7 @@ public class Backend extends APIRequest {
                     put("subject", entityDetail.getSubject());
                     put("starred", entityDetail.isStarred());
                     put("viewed", entityDetail.isViewed());
+                    put("categories", entityDetail.getCategories());
                 }},
                 p -> p.asResponse(String.class),
                 handler);
@@ -325,6 +332,7 @@ public class Backend extends APIRequest {
     }
 
     // categories
+    /*
     public void uploadCategories(Category category, Handler handler) {
         POSTJson("category",
                 new HashMap<String, Object>(){{
@@ -366,4 +374,5 @@ public class Backend extends APIRequest {
             }
         }
     }
+    */
 }
