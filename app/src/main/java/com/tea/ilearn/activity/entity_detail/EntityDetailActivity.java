@@ -6,12 +6,10 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,6 +29,7 @@ import com.sina.weibo.sdk.share.WbShareCallback;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.exercise_list.ExerciseListActivity;
 import com.tea.ilearn.databinding.ActivityEntityDetailBinding;
+import com.tea.ilearn.databinding.NodeBinding;
 import com.tea.ilearn.model.UserStatistics;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.EduKGEntityDetail;
@@ -43,9 +42,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.bandb.graphview.AbstractGraphAdapter;
+import dev.bandb.graphview.decoration.edge.ArrowEdgeDecoration;
 import dev.bandb.graphview.graph.Graph;
 import dev.bandb.graphview.graph.Node;
-import dev.bandb.graphview.layouts.layered.SugiyamaArrowEdgeDecoration;
 import dev.bandb.graphview.layouts.layered.SugiyamaConfiguration;
 import dev.bandb.graphview.layouts.layered.SugiyamaLayoutManager;
 import io.objectbox.Box;
@@ -99,6 +98,8 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
 
         entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
 
+        initGraph();
+
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             name = intent.getStringExtra("name");
@@ -138,7 +139,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             binding.progressCircular.setVisibility(View.VISIBLE);
             boolean loaded = false; // TODO get info from database (base on id?)
             if (!loaded) {
-                StaticHandler handler = new StaticHandler(binding.entityDescription, binding.progressCircular);
+                StaticHandler handler = new StaticHandler(name, binding, graphAdapter);
                 EduKG.getInst().getEntityDetails(subject, name, handler);
                 // TODO save to database (including the loaded status)
             }
@@ -146,8 +147,6 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                 // TODO load from database (star, properties, relations)
             }
         }
-
-        initGraph();
     }
 
     void initGraph() {
@@ -156,7 +155,6 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                 .setLevelSeparation(100)
                 .build();
         binding.graphView.setLayoutManager(new SugiyamaLayoutManager(binding.getRoot().getContext(), configuration));
-        binding.graphView.addItemDecoration(new SugiyamaArrowEdgeDecoration());
         Paint edgeStyle = new Paint(Paint.ANTI_ALIAS_FLAG);
         TypedValue typedValue = new TypedValue();
         binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.colorSecondary, typedValue, true);
@@ -166,108 +164,112 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
         edgeStyle.setStyle(Paint.Style.STROKE);
         edgeStyle.setStrokeJoin(Paint.Join.ROUND);
         edgeStyle.setPathEffect(new CornerPathEffect(10f));
-        binding.graphView.addItemDecoration(new SugiyamaArrowEdgeDecoration(edgeStyle));
+        binding.graphView.addItemDecoration(new ArrowEdgeDecoration(edgeStyle));
+        binding.zoomLayout.setOnTouchListener((view, event) -> {
+            return true;
+        });
 
         graphAdapter = new AbstractGraphAdapter<NodeHolder>() {
             @Override
             public NodeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
-                return new NodeHolder(view);
+                NodeBinding binding = NodeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                return new NodeHolder(binding);
             }
 
             @Override
             public void onBindViewHolder(NodeHolder holder, int position) {
-                holder.mText.setText(getNodeData(position).toString());
+                holder.binding.text.setText(getNodeData(position).toString());
             }
         };
         binding.graphView.setAdapter(graphAdapter);
-
-        Graph graph = new Graph();
-        Node node1 = new Node("key");
-        Node node2 = new Node("Child 1");
-        Node node3 = new Node("Child 2");
-        Node node4 = new Node("Father");
-        Node node5 = new Node("Mother");
-        Node node6 = new Node("GrandPa");
-        Node node7 = new Node("GrandMa");
-
-        graph.addEdge(node1, node2);
-        graph.addEdge(node1, node3);
-        graph.addEdge(node4, node1);
-        graph.addEdge(node5, node1);
-        graph.addEdge(node6, node1);
-        graph.addEdge(node7, node1);
-        graphAdapter.submitGraph(graph);
     }
 
     private class NodeHolder extends RecyclerView.ViewHolder {
-        TextView mText;
+        NodeBinding binding;
 
-        NodeHolder(View itemView) {
-            super(itemView);
+        NodeHolder(NodeBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
 
-            mText = itemView.findViewById(R.id.text);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int pos = getBindingAdapterPosition();
-                    Log.v("MYDEBUG", "Clicked on " + graphAdapter.getNodeData(pos).toString());
-                    // TODO new intent here, nodes[pos] is clicked
-                }
+            binding.text.setOnClickListener($ -> {
+                int pos = getBindingAdapterPosition();
+                String name = graphAdapter.getNodeData(pos).toString();
+                Toast.makeText(binding.getRoot().getContext(), name, Toast.LENGTH_SHORT).show();
             });
         }
     }
 
     class StaticHandler extends Handler {
-        private TextView entityDescription;
-        private View progress;
+        private String entityName;
+        private ActivityEntityDetailBinding binding;
+        private AbstractGraphAdapter graphAdapter;
 
-        StaticHandler(TextView entityDescription, View progress) {
-            this.entityDescription = entityDescription;
-            this.progress = progress;
+        StaticHandler(String entityName, ActivityEntityDetailBinding binding, AbstractGraphAdapter graphAdapter) {
+            this.entityName = entityName;
+            this.binding = binding;
+            this.graphAdapter = graphAdapter;
         }
 
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            entityDescription.setText("实体描述仍在标注中...");
-            progress.setVisibility(View.GONE);
+            binding.entityDescription.setText("实体描述仍在标注中...");
+            binding.progressCircular.setVisibility(View.GONE);
+            ArrayList<EduKGRelation> relations = null;
+            ArrayList<EduKGProperty> properties = null;
             if (msg.what == 0) {
                 EduKGEntityDetail detailFromNet = (EduKGEntityDetail) msg.obj;
                 if (detailFromNet != null) {
-                    if (detailFromNet.getRelations() != null) {
-                        for (EduKGRelation r : detailFromNet.getRelations())
-                            mRelationAdapter.add(new Relation(
-                                    r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(),
-                                    subject, category, categories, r.getObject()));
-                    }
-                    if (detailFromNet.getProperties() != null) {
-                        for (EduKGProperty p : detailFromNet.getProperties()) {
-                            if (p.getPredicateLabel().equals("描述"))
-                                entityDescription.setText("实体描述: " + p.getObject());
-                            else
-                                mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
-                        }
-                    }
+                    relations = detailFromNet.getRelations();
+                    properties = detailFromNet.getProperties();
 
+                    ArrayList<EduKGRelation> finalRelations = relations;
+                    ArrayList<EduKGProperty> finalProperties = properties;
                     new Thread(() -> {
                         waitUntilDetailGot();
-                        detailInDB.setRelations(detailFromNet.getRelations())
-                                .setProperties(detailFromNet.getProperties());
+                        detailInDB.setRelations(finalRelations)
+                                .setProperties(finalProperties);
                         entityBox.put(detailInDB);
                     }).start();
                 }
-                else {
-                    // successful API request, but got no entity detail; display hint
+            } else { // msg.what = 1
+                // TODO load from database and display offline loading hint
+                // TODO and set to local variable relations and properties (mentioned above) (use below)
+            }
+
+            // ==== fill in ui ====
+
+            if (relations != null) {
+                Graph graph = new Graph();
+                Node center = new Node(entityName);
+                int num_in = 0, num_out = 0;
+                for (EduKGRelation r : relations) {
+                    Node other = new Node(r.getObjectLabel());
+                    if (!r.getObjectLabel().equals(entityName)) {
+                        if (r.getDirection() == 1 && num_out < 5) {
+                            num_out += 1;
+                            graph.addEdge(center, other);
+                        }
+                        else if (r.getDirection() == 0 && num_in < 5) {
+                            num_in += 1;
+                            graph.addEdge(other, center);
+                        }
+                    }
+                    mRelationAdapter.add(new Relation(
+                            r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(),
+                            subject, category, categories, r.getObject()));
+                }
+                graphAdapter.submitGraph(graph);
+                graphAdapter.notifyDataSetChanged();
+                if (properties != null) {
+                    for (EduKGProperty p : properties) {
+                        if (p.getPredicateLabel().equals("描述"))
+                            binding.entityDescription.setText("实体描述: " + p.getObject());
+                        else
+                            mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
+                    }
                 }
             }
-            else { // msg.what = 1
-                // TODO load from database and display offline loading hint
-            }
-
-            // finish loading entity's relations
-            // begin to show relation graph
-
         }
     }
 
@@ -282,8 +284,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                 // already exists (also already viewed), update status of starred
                 detailInDB = entitiesRes.get(0);
                 runOnUiThread(() -> binding.star.setChecked(detailInDB.isStarred()));
-            }
-            else { // new viewed entity, store to DB
+            } else { // new viewed entity, store to DB
                 detailInDB = new EduKGEntityDetail()
                         .setCategory(category)
                         .setCategoriesBuf(categories)
