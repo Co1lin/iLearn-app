@@ -51,6 +51,17 @@ import io.objectbox.Box;
 import io.objectbox.query.Query;
 
 public class EntityDetailActivity extends AppCompatActivity implements WbShareCallback {
+    static private class EntityInfo {
+        public String name, category, subject, uri;
+
+        public EntityInfo(String name, String category, String subject, String uri) {
+            this.name = name;
+            this.category = category;
+            this.subject = subject;
+            this.uri = uri;
+        }
+    };
+
     private ActivityEntityDetailBinding binding;
     private RecyclerView mRelationRecycler, mPropertyRecycler;
     private RelationListAdapter mRelationAdapter, mPropertyAdapter;
@@ -139,7 +150,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             binding.progressCircular.setVisibility(View.VISIBLE);
             boolean loaded = false; // TODO get info from database (base on id?)
             if (!loaded) {
-                StaticHandler handler = new StaticHandler(name, binding, graphAdapter);
+                StaticHandler handler = new StaticHandler(binding, graphAdapter);
                 EduKG.getInst().getEntityDetails(subject, name, handler);
                 // TODO save to database (including the loaded status)
             }
@@ -165,9 +176,6 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
         edgeStyle.setStrokeJoin(Paint.Join.ROUND);
         edgeStyle.setPathEffect(new CornerPathEffect(10f));
         binding.graphView.addItemDecoration(new ArrowEdgeDecoration(edgeStyle));
-        binding.zoomLayout.setOnTouchListener((view, event) -> {
-            return true;
-        });
 
         graphAdapter = new AbstractGraphAdapter<NodeHolder>() {
             @Override
@@ -178,7 +186,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
 
             @Override
             public void onBindViewHolder(NodeHolder holder, int position) {
-                holder.binding.text.setText(getNodeData(position).toString());
+                holder.set((EntityInfo) getNodeData(position));
             }
         };
         binding.graphView.setAdapter(graphAdapter);
@@ -186,26 +194,34 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
 
     private class NodeHolder extends RecyclerView.ViewHolder {
         NodeBinding binding;
+        EntityInfo info;
 
         NodeHolder(NodeBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
 
             binding.text.setOnClickListener($ -> {
-                int pos = getBindingAdapterPosition();
-                String name = graphAdapter.getNodeData(pos).toString();
-                Toast.makeText(binding.getRoot().getContext(), name, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent (binding.getRoot().getContext(), EntityDetailActivity.class);
+                intent.setAction(Intent.ACTION_SEARCH);
+                intent.putExtra("name", info.name);
+                intent.putExtra("subject", info.subject);
+                intent.putExtra("category", info.category);
+                intent.putExtra("id", info.uri);
+                binding.getRoot().getContext().startActivity(intent);
             });
+        }
+
+        public void set(EntityInfo info) {
+            this.info = info;
+            binding.text.setText(info.name);
         }
     }
 
     class StaticHandler extends Handler {
-        private String entityName;
         private ActivityEntityDetailBinding binding;
         private AbstractGraphAdapter graphAdapter;
 
-        StaticHandler(String entityName, ActivityEntityDetailBinding binding, AbstractGraphAdapter graphAdapter) {
-            this.entityName = entityName;
+        StaticHandler(ActivityEntityDetailBinding binding, AbstractGraphAdapter graphAdapter) {
             this.binding = binding;
             this.graphAdapter = graphAdapter;
         }
@@ -241,11 +257,11 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
 
             if (relations != null) {
                 Graph graph = new Graph();
-                Node center = new Node(entityName);
+                Node center = new Node(new EntityInfo(name, category, subject, uri));
                 int num_in = 0, num_out = 0;
                 for (EduKGRelation r : relations) {
-                    Node other = new Node(r.getObjectLabel());
-                    if (!r.getObjectLabel().equals(entityName)) {
+                    Node other = new Node(new EntityInfo(r.getObjectLabel(), category, subject, r.getObject()));
+                    if (!r.getObjectLabel().equals(name)) {
                         if (r.getDirection() == 1 && num_out < 5) {
                             num_out += 1;
                             graph.addEdge(center, other);
