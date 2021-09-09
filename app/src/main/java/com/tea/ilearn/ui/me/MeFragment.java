@@ -18,7 +18,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -76,14 +75,6 @@ public class MeFragment extends Fragment {
         binding.profile.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), SigninActivity.class);
             activityResultLauncher.launch(intent);
-        });
-
-        binding.darkModeSwitch.setOnCheckedChangeListener((view, isChecked) -> {
-            if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            }
         });
 
         binding.appVersion.setOnClickListener($ -> {
