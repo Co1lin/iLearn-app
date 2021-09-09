@@ -10,8 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.viewpager.widget.ViewPager;
 
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.common.UiError;
@@ -27,6 +25,7 @@ import java.util.List;
 
 public class ExerciseListActivity extends AppCompatActivity implements WbShareCallback {
     private ActivityExerciseListBinding binding;
+    private ExerciseListAdapter mExerciseListAdapter;
 
     private IWBAPI mWBAPI;
 
@@ -43,31 +42,46 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
             finish();
         });
 
+        binding.submitBtn.setOnClickListener($ -> {
+            int sum = 0, total = 0;
+            for (int i = 0; i < mExerciseListAdapter.getCount(); ++i) {
+                sum += ((ExerciseFragment)(mExerciseListAdapter.getItem(i))).getScore();
+                total += 1;
+            }
+            binding.score.setText((int)((double)sum/(double)total*100)+"分");
+            binding.submitBtn.setVisibility(View.INVISIBLE);
+            binding.score.setVisibility(View.VISIBLE);
+        });
+
+        mExerciseListAdapter = new ExerciseListAdapter(getSupportFragmentManager());
+
         binding.progressCircular.setVisibility(View.VISIBLE);
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String name = intent.getStringExtra("name");
             String subject = intent.getStringExtra("subject");
             binding.name.setText(name + "相关习题");
-            StaticHandler handler = new StaticHandler(getSupportFragmentManager(), binding.exerciseList, subject, binding.progressCircular, binding.notFound, mWBAPI);
+            StaticHandler handler = new StaticHandler(mExerciseListAdapter, subject, binding, mWBAPI, false);
             EduKG.getInst().getProblems(name, handler);
+            binding.submitBtn.setVisibility(View.INVISIBLE);
+        } else {
+            // TODO do exam
         }
     }
 
     static class StaticHandler extends Handler {
-        private FragmentManager fm;
-        private ViewPager vp;
+        private ExerciseListAdapter mExerciseAdapter;
         private String subject;
-        private View progress, notfound;
+        private ActivityExerciseListBinding binding;
         private IWBAPI mWPAPI;
+        private boolean examMode;
 
-        StaticHandler(FragmentManager fm, ViewPager vp, String subject, View progress, View notfound, IWBAPI WBAPI) {
-            this.fm = fm;
-            this.vp = vp;
+        StaticHandler(ExerciseListAdapter mExerciseListAdapter, String subject, ActivityExerciseListBinding binding, IWBAPI WBAPI, boolean examMode) {
+            this.mExerciseAdapter = mExerciseListAdapter;
             this.subject = subject;
-            this.progress = progress;
-            this.notfound = notfound;
+            this.binding = binding;
             this.mWPAPI = WBAPI;
+            this.examMode = examMode;
         }
 
         @Override
@@ -89,21 +103,25 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                                 p.getDescription(),
                                 p.getChoices(),
                                 p.getAnswer(),
-                                mWPAPI
+                                mWPAPI,
+                                examMode
                         );
                         fragments.add(fragment);
                     }
-                    ExerciseListAdapter mExerciseAdapter = new ExerciseListAdapter(fm, fragments);
-                    vp.setOffscreenPageLimit(fragments.size());
-                    vp.setPageMargin(10);
-                    vp.setAdapter(mExerciseAdapter);
+                    mExerciseAdapter.setList(fragments);
+                    mExerciseAdapter.notifyDataSetChanged();
+                    binding.exerciseList.setOffscreenPageLimit(fragments.size());
+                    binding.exerciseList.setPageMargin(10);
+                    binding.exerciseList.setAdapter(mExerciseAdapter);
                 } else {
-                    notfound.setVisibility(View.VISIBLE);
+                    binding.notFound.setVisibility(View.VISIBLE);
                 }
+                if (examMode)
+                    binding.submitBtn.setVisibility(View.VISIBLE);
             } else { // msg.what = 1
                 // TODO load from database
             }
-            progress.setVisibility(View.GONE);
+            binding.progressCircular.setVisibility(View.GONE);
         }
     }
 
