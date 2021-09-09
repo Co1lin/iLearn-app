@@ -39,7 +39,7 @@ public class Backend extends APIRequest {
                 "Authorization",
                 RxHttp.postJson("https://api.ilearn.enjoycolin.top/login"),
                 true,
-                "login failed, password incorrect",
+                "runtime exception",
                 p -> p.asResponse(TokenResponse.class)
         );
         accountBox = ObjectBox.get().boxFor(Account.class);
@@ -171,8 +171,8 @@ public class Backend extends APIRequest {
     public void getPersonalData(Handler handler) {
         Handler callbackHandler = new GetPersonalDataCallback(handler);
         // getUserStatistics(callbackHandler);
-        getSearchHistories(callbackHandler);
-        //getEntities(callbackHandler);
+        getSearchHistories(null);
+        getEntities(null);
         // getCategories(callbackHandler);
     }
 
@@ -274,15 +274,15 @@ public class Backend extends APIRequest {
             super.handleMessage(msg);
             if (msg.what == 1 || msg.obj == null) {
                 Log.e("Backend/GetSearchHistoriesCallback", msg.what + " " + msg.obj);
-                Message.obtain(originalHandler, 1, null).sendToTarget();
             }
             else {
                 ArrayList<SearchHistory> histories = (ArrayList<SearchHistory>) msg.obj;
                 Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
                 historyBox.removeAll();
                 historyBox.put(histories);
-                Message.obtain(originalHandler, 0, msg.obj).sendToTarget();
             }
+            if (originalHandler != null)
+                Message.obtain(originalHandler, msg.what, msg.obj).sendToTarget();
         }
     }
 
@@ -321,17 +321,30 @@ public class Backend extends APIRequest {
             super.handleMessage(msg);
             if (msg.what == 1 || msg.obj == null) {
                 Log.e("Backend/GetEntitiesCallback", msg.what + " " + msg.obj);
-                Message.obtain(originalHandler, 1, null).sendToTarget();
             }
             else {
                 ArrayList<EduKGEntityDetail> entityDetails = (ArrayList<EduKGEntityDetail>) msg.obj;
                 Box<EduKGEntityDetail> detailsBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
                 detailsBox.removeAll();
                 detailsBox.put(entityDetails);
-                Message.obtain(originalHandler, 0, msg.obj).sendToTarget();
             }
-
+            if (originalHandler != null)
+                Message.obtain(originalHandler, msg.what, msg.obj).sendToTarget();
         }
+    }
+
+    public void logout() {
+        new Thread(() -> {
+            loginParams = new HashMap<String, Object>(){{
+                put("username", "");
+                put("password", "");
+            }};
+            tokenValue = "";
+            accountBox.removeAll();
+            ObjectBox.get().boxFor(SearchHistory.class).removeAll();
+            ObjectBox.get().boxFor(UserStatistics.class).removeAll();
+            ObjectBox.get().boxFor(EduKGEntityDetail.class).removeAll();
+        }).start();
     }
 
     // categories

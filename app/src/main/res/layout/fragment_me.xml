@@ -331,6 +331,17 @@
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/logout_button"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:backgroundTint="?colorSurface"
+                android:textColor="@color/md_red_700"
+                android:text="登出"
+                android:layout_marginTop="8dp"
+                />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="48dp" />

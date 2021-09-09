@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -88,8 +89,29 @@ public class MeFragment extends Fragment {
             }
         });
 
+        binding.logoutButton.setOnClickListener(view -> {
+            new Thread(() -> {
+                Box<Account> accountBox = ObjectBox.get().boxFor(Account.class);
+                List<Account> accounts = accountBox.getAll();
+                if (accounts != null && accounts.size() > 0
+                        && !accounts.get(0).getUsername().trim().isEmpty()) {
+                    Backend.getInst().logout();
+                    getActivity().runOnUiThread(() -> {
+                        binding.nameProfile.setText("登录账号");
+                        loadStatistics(getActivity(), binding, root);
+                        Toast.makeText(root.getContext(), "已登出！", Toast.LENGTH_SHORT).show();
+                    });
+                }
+                else {
+                    getActivity().runOnUiThread(() ->
+                            Toast.makeText(root.getContext(), "当前未登录！", Toast.LENGTH_SHORT).show()
+                    );
+                }
+            }).start();
+        });
+
         // try to login
-       Backend.getInst().login(new LoginHandler(getActivity(), binding, root));
+        Backend.getInst().login(new LoginHandler(getActivity(), binding, root));
 
         return root;
     }

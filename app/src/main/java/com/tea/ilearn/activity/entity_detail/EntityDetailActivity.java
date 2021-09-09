@@ -39,6 +39,7 @@ import com.tea.ilearn.net.edukg.EduKGProperty;
 import com.tea.ilearn.net.edukg.EduKGRelation;
 import com.tea.ilearn.utils.ObjectBox;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -317,10 +318,14 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
         new Thread(() -> {  // update statistics
             Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
             List<UserStatistics> statisticsRes = statisticsBox.getAll();
-            UserStatistics statistics = statisticsRes.get(0).increaseLastNum();
+            UserStatistics statistics;
             if (statisticsRes != null && statisticsRes.size() > 0)
-                statisticsBox.put(statistics);
+                statistics = statisticsRes.get(0).increaseLastNum();
+            else
+                statistics = new UserStatistics().setFirstDate(LocalDate.now().minusDays(6).toString());
+            statisticsBox.put(statistics);
             Backend.getInst().uploadUserStatistics(statistics, null);
+
         }).start();
         new Thread(() -> uploadEntity()).start();
     }

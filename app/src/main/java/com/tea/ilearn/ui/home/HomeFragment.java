@@ -125,6 +125,12 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        DB_utils.updateACAdapter(getActivity(), getContext(), acTextView);
+    }
+
     private void initTabs() {
         List<String> subjects = Arrays.asList("biology", "chemistry"); // TODO colin: database ralated (no thread)
 
