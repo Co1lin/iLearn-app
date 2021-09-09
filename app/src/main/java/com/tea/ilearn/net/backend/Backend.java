@@ -102,6 +102,7 @@ public class Backend extends APIRequest {
             }
             if (originalHandler != null)
                 Message.obtain(originalHandler, msg.what, msg.obj).sendToTarget();
+            getPersonalData(null);
         }
     }
 
@@ -169,8 +170,8 @@ public class Backend extends APIRequest {
     // personal data
     public void getPersonalData(Handler handler) {
         Handler callbackHandler = new GetPersonalDataCallback(handler);
-        getUserStatistics(callbackHandler);
-        //getSearchHistories(callbackHandler);
+        // getUserStatistics(callbackHandler);
+        getSearchHistories(callbackHandler);
         //getEntities(callbackHandler);
         // getCategories(callbackHandler);
     }
@@ -247,6 +248,7 @@ public class Backend extends APIRequest {
         PUTJson("/history/put",
                 new HashMap<String, Object>() {{
                     put("description", history.getKeyword());
+                    put("timestamp", history.getTimestamp());
                 }},
                 p -> p.asResponse(String.class),
                 handler);

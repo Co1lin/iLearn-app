@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.tea.ilearn.R;
 import com.tea.ilearn.model.SearchHistory;
+import com.tea.ilearn.model.SearchHistory_;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,8 @@ public class DB_utils {
     static public void updateACAdapter(Activity activity, Context context, AutoComplTextView acTextView) {
         new Thread(() -> {
             Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
-            List<SearchHistory> searchHistories = historyBox.getAll();
+            List<SearchHistory> searchHistories = historyBox.query()
+                    .orderDesc(SearchHistory_.timestamp).build().find();
             ArrayList<String> histories = new ArrayList<String>(){{
                 for (SearchHistory history : searchHistories)
                     add(history.getKeyword());
