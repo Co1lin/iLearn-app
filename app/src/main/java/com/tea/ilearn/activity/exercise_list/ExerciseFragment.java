@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import com.sina.weibo.sdk.api.TextObject;
 import com.sina.weibo.sdk.api.WeiboMultiMessage;
 import com.sina.weibo.sdk.openapi.IWBAPI;
+import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.ExerciseCardBinding;
 
 public class ExerciseFragment extends Fragment {
@@ -69,9 +70,24 @@ public class ExerciseFragment extends Fragment {
     public int getScore() {
         binding.answer.setVisibility(View.VISIBLE);
         binding.radioGroup.setClickable(false);
+        binding.radioA.setClickable(false);
+        binding.radioB.setClickable(false);
+        binding.radioC.setClickable(false);
+        binding.radioD.setClickable(false);
+        if (answer.equals("A")) binding.radioA.setTextColor(getResources().getColor(R.color.md_green_500));
+        if (answer.equals("B")) binding.radioB.setTextColor(getResources().getColor(R.color.md_green_500));
+        if (answer.equals("C")) binding.radioC.setTextColor(getResources().getColor(R.color.md_green_500));
+        if (answer.equals("D")) binding.radioD.setTextColor(getResources().getColor(R.color.md_green_500));
+        if (!answer.equals("A") && binding.radioA.isChecked()) binding.radioA.setTextColor(getResources().getColor(R.color.md_red_500));
+        if (!answer.equals("B") && binding.radioB.isChecked()) binding.radioB.setTextColor(getResources().getColor(R.color.md_red_500));
+        if (!answer.equals("C") && binding.radioC.isChecked()) binding.radioC.setTextColor(getResources().getColor(R.color.md_red_500));
+        if (!answer.equals("D") && binding.radioD.isChecked()) binding.radioD.setTextColor(getResources().getColor(R.color.md_red_500));
+        if (answer.equals("A") && binding.radioA.isChecked()) return 1;
+        if (answer.equals("B") && binding.radioB.isChecked()) return 1;
+        if (answer.equals("C") && binding.radioC.isChecked()) return 1;
+        if (answer.equals("D") && binding.radioD.isChecked()) return 1;
         return 0;
     }
-
 
     private void doWeiboShare() {
         WeiboMultiMessage message = new WeiboMultiMessage();

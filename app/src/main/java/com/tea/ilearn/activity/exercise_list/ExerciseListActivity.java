@@ -10,7 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager.widget.ViewPager;
 
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.common.UiError;
@@ -46,9 +45,12 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
         binding.submitBtn.setOnClickListener($ -> {
             int sum = 0, total = 0;
             for (int i = 0; i < mExerciseListAdapter.getCount(); ++i) {
-                sum += (ExerciseFragment)(mExerciseListAdapter.getItem(i)).getScore();
+                sum += ((ExerciseFragment)(mExerciseListAdapter.getItem(i))).getScore();
                 total += 1;
             }
+            binding.score.setText((int)((double)sum/(double)total*100)+"分");
+            binding.submitBtn.setVisibility(View.INVISIBLE);
+            binding.score.setVisibility(View.VISIBLE);
         });
 
         mExerciseListAdapter = new ExerciseListAdapter(getSupportFragmentManager());
@@ -61,7 +63,7 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
             binding.name.setText(name + "相关习题");
             StaticHandler handler = new StaticHandler(mExerciseListAdapter, subject, binding, mWBAPI);
             EduKG.getInst().getProblems(name, handler);
-            binding.submitBtn.setVisibility(View.GONE);
+            binding.submitBtn.setVisibility(View.INVISIBLE);
         } else {
             // TODO do exam
         }
