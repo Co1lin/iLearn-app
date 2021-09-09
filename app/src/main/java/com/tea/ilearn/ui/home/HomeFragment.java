@@ -133,9 +133,7 @@ public class HomeFragment extends Fragment {
         binding.viewPager.setAdapter(pagerAdapter);
         binding.subjectTabs.setupWithViewPager(binding.viewPager);
 
-        binding.editPanel.setOnTouchListener((view, event) -> {
-            return true;
-        });
+        binding.editPanel.setOnTouchListener((view, event) -> true);
 
         binding.editMenu.setOnCheckedChangeListener((btn, checked) -> {
             if (checked) {

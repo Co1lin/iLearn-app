@@ -35,9 +35,9 @@ public class EduKGEntityDetail {
     ArrayList<EduKGProperty> properties;
     String label;
     String subject;
-    String category;
+    String category = "";
     @Convert(converter = StringArrayConverter.class, dbType = String.class)
-    ArrayList<String> categories;
+    ArrayList<String> categories = new ArrayList<>();
     boolean starred;
     boolean viewed;
 
@@ -156,6 +156,8 @@ public class EduKGEntityDetail {
     }
 
     public EduKGEntityDetail setCategory(ArrayList<String> categories) {
+        if (categories == null)
+            categories = new ArrayList<>();
         this.category = String.join(" ", categories);
         this.categories = categories;
         return this;

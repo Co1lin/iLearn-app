@@ -128,7 +128,7 @@ public class EntityListFragment extends Fragment {
                         acTextView, getActivity(), getContext(), false, false);
                 EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
             }
-            binding.emptyHint.setVisibility(View.GONE);
+            binding.emptyHint.setText("暂无条目推荐");
             return;
         }
         if (searchSubjectNum.getCount() == 0) {
@@ -144,6 +144,21 @@ public class EntityListFragment extends Fragment {
                     binding, mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar,
                     acTextView, getActivity(), getContext(), true, true);
             EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
+            // add history
+            String finalQuery = query;
+            new Thread(() -> {
+                Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
+                Query<SearchHistory> historyQuery = historyBox.query()
+                        .equal(SearchHistory_.keyword, finalQuery).build();
+                List<SearchHistory> historiesRes = historyQuery.find();
+                historyQuery.close();
+                if (historiesRes == null || historiesRes.size() == 0) {
+                    SearchHistory history = new SearchHistory().setKeyword(finalQuery);
+                    historyBox.put(history);
+                    DB_utils.updateACAdapter(getActivity(), getContext(), acTextView);
+                    Backend.getInst().uploadSearchHistory(history, null);
+                }
+            }).start();
         }
     }
 
@@ -184,21 +199,6 @@ public class EntityListFragment extends Fragment {
             this.expectedNum.countDown();
             if (this.expectedNum.getCount() == 0)
                 loadingBar.setVisibility(View.INVISIBLE);
-
-            // add history
-            new Thread(() -> {
-                Box<SearchHistory> historyBox = ObjectBox.get().boxFor(SearchHistory.class);
-                Query<SearchHistory> historyQuery = historyBox.query()
-                        .equal(SearchHistory_.keyword, keyword).build();
-                List<SearchHistory> historiesRes = historyQuery.find();
-                historyQuery.close();
-                if (addToHistory && (historiesRes == null || historiesRes.size() == 0)) {
-                    SearchHistory history = new SearchHistory().setKeyword(keyword);
-                    historyBox.put(history);
-                    DB_utils.updateACAdapter(activity, context, acTextView);
-                    Backend.getInst().uploadSearchHistory(history, null);
-                }
-            }).start();
 
             if (msg.what == 0) {
                 List<Entity> entities = (List<Entity>) msg.obj;
