@@ -205,17 +205,19 @@ public class EntityListFragment extends Fragment {
                 if (entities != null && entities.size() != 0) {
                     new Thread(() -> {
                         // remove duplicate entities with different categories
-                        HashMap<Entity, ArrayList<String>> uriToCategories = new HashMap<>();
+                        HashMap<Entity, ArrayList<String>> entityToCategories = new HashMap<>();
                         for (Entity e : entities) {
-                            ArrayList<String> categories = uriToCategories.getOrDefault(
+                            ArrayList<String> categories = entityToCategories.getOrDefault(
                                     e, new ArrayList<>()
                             );
-                            categories.add(e.getCategory());
-                            uriToCategories.put(e, categories);
+                            if (e.getCategory().trim().length() > 0) {
+                                categories.add(e.getCategory());
+                                entityToCategories.put(e, categories);
+                            }
                         }
                         // iterate processed entities and its URIs
                         Box<EduKGEntityDetail> entityBox = ObjectBox.get().boxFor(EduKGEntityDetail.class);
-                        uriToCategories.forEach((entity, uri) -> {
+                        entityToCategories.forEach((entity, uri) -> {
                             // query the entity from DB
                             Query<EduKGEntityDetail> query = entityBox.query()
                                     .equal(EduKGEntityDetail_.uri, entity.getUri()).build();
@@ -226,7 +228,7 @@ public class EntityListFragment extends Fragment {
                                     .setId(entity.getUri())
                                     .setSubject(subject)
                                     .setName(entity.getLabel())
-                                    .setCategories(uriToCategories.get(entity));
+                                    .setCategories(entityToCategories.get(entity));
                             if (entitiesRes != null && entitiesRes.size() > 0) {
                                 detail = entitiesRes.get(0);
                                 // already exists in DB, update UI

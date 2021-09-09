@@ -60,6 +60,7 @@ public class UserStatistics {
 
         @Override
         public String convertToDatabaseValue(ArrayList<Integer> originalObj) {
+            originalObj = new ArrayList<>(originalObj);
             Gson gson = new Gson();
             return gson.toJson(originalObj);
         }

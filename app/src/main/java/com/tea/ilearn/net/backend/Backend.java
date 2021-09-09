@@ -100,7 +100,8 @@ public class Backend extends APIRequest {
                 accountBox.put(account);
                 msg.obj = account;  // send account to frontend
             }
-            Message.obtain(originalHandler, msg.what, msg.obj).sendToTarget();
+            if (originalHandler != null)
+                Message.obtain(originalHandler, msg.what, msg.obj).sendToTarget();
         }
     }
 
@@ -169,8 +170,8 @@ public class Backend extends APIRequest {
     public void getPersonalData(Handler handler) {
         Handler callbackHandler = new GetPersonalDataCallback(handler);
         getUserStatistics(callbackHandler);
-        getSearchHistories(callbackHandler);
-        getEntities(callbackHandler);
+        //getSearchHistories(callbackHandler);
+        //getEntities(callbackHandler);
         // getCategories(callbackHandler);
     }
 
@@ -292,7 +293,7 @@ public class Backend extends APIRequest {
                     put("subject", entityDetail.getSubject());
                     put("starred", entityDetail.isStarred());
                     put("viewed", entityDetail.isViewed());
-                    put("categories", entityDetail.getCategories());
+                    put("category_list", entityDetail.getCategories());
                 }},
                 p -> p.asResponse(String.class),
                 handler);

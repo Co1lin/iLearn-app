@@ -62,10 +62,13 @@ public class MeFragment extends Fragment {
         ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == 200) { // success
+                    if (result.getResultCode() == 200) { // login success
+                        // update account info
                         Intent data = result.getData();
                         Account account = (new Gson()).fromJson(data.getStringExtra("account"), Account.class);
                         binding.nameProfile.setText(account.getUsername());
+                        // update statistics
+                        Backend.getInst().getUserStatistics(new GetStatisticsHandler(getActivity(), binding, root));
                     }
                 }
         );
@@ -133,16 +136,15 @@ public class MeFragment extends Fragment {
                                 // add (7 - deltaDays) items
                                 for (int oldIndex = deltaDays; oldIndex < 7; oldIndex++)
                                     add(oldStatistics.get(oldIndex));
-                                for (int i = deltaDays; i < 7; i++)
+                                for (int i = deltaDays; i > 0; i--)
                                     add(0);
-                            }}
-                    );
+                            }});
                     statisticsBox.put(statistics);
                 }
             }
             List<Integer> value = statistics.getEntitiesViewed();
             List<String> key = new ArrayList<String>(){{
-                for (int i = 7; i > 0; i--) {
+                for (int i = 6; i >= 0; i--) {
                     LocalDate thisDay = today.minusDays(i);
                     add(thisDay.getMonthValue() + "/" + thisDay.getDayOfMonth());
                 }

@@ -14,7 +14,6 @@ import io.objectbox.annotation.Convert;
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
 import io.objectbox.annotation.Index;
-import io.objectbox.annotation.Transient;
 import io.objectbox.annotation.Unique;
 import io.objectbox.converter.PropertyConverter;
 import io.objectbox.relation.ToMany;
@@ -37,7 +36,7 @@ public class EduKGEntityDetail {
     String label;
     String subject;
     String category;
-    @Transient
+    @Convert(converter = StringArrayConverter.class, dbType = String.class)
     ArrayList<String> categories;
     boolean starred;
     boolean viewed;
@@ -88,6 +87,23 @@ public class EduKGEntityDetail {
 
         @Override
         public String convertToDatabaseValue(ArrayList<EduKGProperty> originalObj) {
+            Gson gson = new Gson();
+            return gson.toJson(originalObj);
+        }
+    }
+
+    public static class StringArrayConverter implements PropertyConverter<ArrayList<String>, String> {
+
+        @Override
+        public ArrayList<String> convertToEntityProperty(String databaseValue) {
+            Gson gson = new Gson();
+            Type type = new TypeToken<ArrayList<String>>(){}.getType();
+            ArrayList<String> relations = gson.fromJson(databaseValue, type);
+            return relations;
+        }
+
+        @Override
+        public String convertToDatabaseValue(ArrayList<String> originalObj) {
             Gson gson = new Gson();
             return gson.toJson(originalObj);
         }

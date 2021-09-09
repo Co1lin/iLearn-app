@@ -191,21 +191,21 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     .equal(EduKGEntityDetail_.uri, uri).build();
             List<EduKGEntityDetail> entitiesRes = query.find();
             query.close();
+            EduKGEntityDetail detailTemp;
             if (entitiesRes != null && entitiesRes.size() > 0) {
                 // already exists (also already viewed), update status of starred
-                detailInDB = entitiesRes.get(0);
-                runOnUiThread(() -> binding.star.setChecked(detailInDB.isStarred()));
+                detailTemp = entitiesRes.get(0);
+                runOnUiThread(() -> binding.star.setChecked(detailTemp.isStarred()));
             }
-            else { // new viewed entity, store to DB
-                detailInDB = new EduKGEntityDetail()
-                        .setCategory(category)
-                        .setCategory(categories)
-                        .setSubject(subject)
-                        .setLabel(name)
-                        .setUri(uri)
-                        .setViewed(true);
-                entityBox.put(detailInDB);
-            }
+            else // new viewed entity, store to DB
+                detailTemp = new EduKGEntityDetail().setViewed(true);
+            detailTemp.setCategory(category)
+                    .setCategory(categories)
+                    .setSubject(subject)
+                    .setLabel(name)
+                    .setUri(uri);
+            detailInDB = detailTemp;
+            entityBox.put(detailInDB);
         }).start();
         new Thread(() -> {  // update statistics
             Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
