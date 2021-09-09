@@ -61,7 +61,7 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
             String name = intent.getStringExtra("name");
             String subject = intent.getStringExtra("subject");
             binding.name.setText(name + "相关习题");
-            StaticHandler handler = new StaticHandler(mExerciseListAdapter, subject, binding, mWBAPI);
+            StaticHandler handler = new StaticHandler(mExerciseListAdapter, subject, binding, mWBAPI, false);
             EduKG.getInst().getProblems(name, handler);
             binding.submitBtn.setVisibility(View.INVISIBLE);
         } else {
@@ -74,12 +74,14 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
         private String subject;
         private ActivityExerciseListBinding binding;
         private IWBAPI mWPAPI;
+        private boolean examMode;
 
-        StaticHandler(ExerciseListAdapter mExerciseListAdapter, String subject, ActivityExerciseListBinding binding, IWBAPI WBAPI) {
+        StaticHandler(ExerciseListAdapter mExerciseListAdapter, String subject, ActivityExerciseListBinding binding, IWBAPI WBAPI, boolean examMode) {
             this.mExerciseAdapter = mExerciseListAdapter;
             this.subject = subject;
             this.binding = binding;
             this.mWPAPI = WBAPI;
+            this.examMode = examMode;
         }
 
         @Override
@@ -101,7 +103,8 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                                 p.getDescription(),
                                 p.getChoices(),
                                 p.getAnswer(),
-                                mWPAPI
+                                mWPAPI,
+                                examMode
                         );
                         fragments.add(fragment);
                     }
@@ -113,7 +116,8 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                 } else {
                     binding.notFound.setVisibility(View.VISIBLE);
                 }
-                binding.submitBtn.setVisibility(View.VISIBLE);
+                if (examMode)
+                    binding.submitBtn.setVisibility(View.VISIBLE);
             } else { // msg.what = 1
                 // TODO load from database
             }

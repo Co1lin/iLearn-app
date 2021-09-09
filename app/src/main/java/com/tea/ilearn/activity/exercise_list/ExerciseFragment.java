@@ -22,6 +22,7 @@ public class ExerciseFragment extends Fragment {
     private String[] choices;
     private String answer;
     private IWBAPI mWBAPI;
+    private boolean examMode;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -51,20 +52,21 @@ public class ExerciseFragment extends Fragment {
             doWeiboShare();
         });
         binding.radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            binding.answer.setVisibility(View.VISIBLE);
+            if (!examMode) getScore();
         });
         // TODO acha: differ normal exercise and examination
 
         return root;
     }
 
-    public ExerciseFragment(String pageNumber, String description, String[] choices, String answer, IWBAPI WBAPI) {
+    public ExerciseFragment(String pageNumber, String description, String[] choices, String answer, IWBAPI WBAPI, boolean examMode) {
         super();
         this.pageNumber = pageNumber;
         this.description = description;
         this.choices = choices;
         this.answer = answer;
         this.mWBAPI = WBAPI;
+        this.examMode = examMode;
     }
 
     public int getScore() {
