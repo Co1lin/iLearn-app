@@ -30,6 +30,8 @@ import com.tea.ilearn.net.edukg.Entity;
 import com.tea.ilearn.utils.DB_utils;
 import com.tea.ilearn.utils.ObjectBox;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -152,12 +154,16 @@ public class EntityListFragment extends Fragment {
                         .equal(SearchHistory_.keyword, finalQuery).build();
                 List<SearchHistory> historiesRes = historyQuery.find();
                 historyQuery.close();
-                if (historiesRes == null || historiesRes.size() == 0) {
-                    SearchHistory history = new SearchHistory().setKeyword(finalQuery);
-                    historyBox.put(history);
-                    DB_utils.updateACAdapter(getActivity(), getContext(), acTextView);
-                    Backend.getInst().uploadSearchHistory(history, null);
-                }
+                SearchHistory history;
+                if (historiesRes == null || historiesRes.size() == 0)
+                    history = new SearchHistory();
+                else
+                    history = historiesRes.get(0);
+                history.setKeyword(finalQuery)
+                        .setTimestamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+                historyBox.put(history);
+                DB_utils.updateACAdapter(getActivity(), getContext(), acTextView);
+                Backend.getInst().uploadSearchHistory(history, null);
             }).start();
         }
     }
