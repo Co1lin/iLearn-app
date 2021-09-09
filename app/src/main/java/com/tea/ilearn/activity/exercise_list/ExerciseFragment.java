@@ -66,6 +66,12 @@ public class ExerciseFragment extends Fragment {
         this.mWBAPI = WBAPI;
     }
 
+    public int getScore() {
+        binding.answer.setVisibility(View.VISIBLE);
+        binding.radioGroup.setClickable(false);
+        return 0;
+    }
+
 
     private void doWeiboShare() {
         WeiboMultiMessage message = new WeiboMultiMessage();

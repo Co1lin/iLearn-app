@@ -9,10 +9,14 @@ import java.util.List;
 public class ExerciseListAdapter extends FragmentPagerAdapter {
     private List<ExerciseFragment> mFragmentList;
 
-    public ExerciseListAdapter(FragmentManager fm, List<ExerciseFragment> fragmentList) {
+    public ExerciseListAdapter(FragmentManager fm) {
         super(fm);
+    }
+
+    public void setList(List<ExerciseFragment> fragmentList) {
         mFragmentList = fragmentList;
     }
+
 
     @Override
     public Fragment getItem(int position) {
