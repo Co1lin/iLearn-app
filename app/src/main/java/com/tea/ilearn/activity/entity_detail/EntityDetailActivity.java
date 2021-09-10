@@ -254,11 +254,16 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             } else { // msg.what = 1
                 // TODO load from database and display offline loading hint
                 // TODO and set to local variable relations and properties (mentioned above) (use below)
+                List<EduKGEntityDetail> entitiesRes =
+                        entityBox.query().equal(EduKGEntityDetail_.uri, uri).build().find();
+                if (entitiesRes != null && entitiesRes.size() > 0) {
+                    EduKGEntityDetail detail = entitiesRes.get(0);
+                    relations = detail.getRelations();
+                    properties = detail.getProperties();
+                }
             }
-
             // ==== fill in ui ====
-
-            if (relations != null) {
+            if (relations != null && relations.size() > 0) {
                 Graph graph = new Graph();
                 Node center = new Node(new EntityInfo(name, category, subject, uri));
                 int num_in = 0, num_out = 0;
@@ -280,13 +285,13 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                 }
                 graphAdapter.submitGraph(graph);
                 graphAdapter.notifyDataSetChanged();
-                if (properties != null) {
-                    for (EduKGProperty p : properties) {
-                        if (p.getPredicateLabel().equals("描述"))
-                            binding.entityDescription.setText("实体描述: " + p.getObject());
-                        else
-                            mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
-                    }
+            }
+            if (properties != null && properties.size() > 0) {
+                for (EduKGProperty p : properties) {
+                    if (p.getPredicateLabel().equals("描述"))
+                        binding.entityDescription.setText("实体描述: " + p.getObject());
+                    else
+                        mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
                 }
             }
         }
