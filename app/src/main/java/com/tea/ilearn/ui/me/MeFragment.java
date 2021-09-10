@@ -31,6 +31,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.gson.Gson;
 import com.tea.ilearn.R;
+import com.tea.ilearn.activity.HistoryActivity;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 import com.tea.ilearn.model.Account;
@@ -110,6 +111,11 @@ public class MeFragment extends Fragment {
                     );
                 }
             }).start();
+        });
+
+        binding.history.setOnClickListener($ -> {
+            Intent intent = new Intent(root.getContext(), HistoryActivity.class);
+            startActivity(intent);
         });
 
         // try to login

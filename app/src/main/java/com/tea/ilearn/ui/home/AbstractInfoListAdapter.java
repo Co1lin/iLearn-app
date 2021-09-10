@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.entity_detail.EntityDetailActivity;
 import com.tea.ilearn.databinding.AbstractCardBinding;
@@ -32,7 +33,7 @@ public class AbstractInfoListAdapter extends RecyclerView.Adapter {
         void bind(AbstractInfo abstractInfo) {
             binding.entityName.setText(abstractInfo.name);
             binding.entityCategory.setText(abstractInfo.getCategory());
-            binding.entitySubject.setText(abstractInfo.subject);
+            binding.entitySubject.setText(Constant.EduKG.EN_ZH.get(abstractInfo.subject));
 
             if (abstractInfo.loaded) {
                 TypedValue typedValue = new TypedValue();

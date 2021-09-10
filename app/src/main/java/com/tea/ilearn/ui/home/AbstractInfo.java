@@ -2,7 +2,7 @@ package com.tea.ilearn.ui.home;
 
 import java.util.ArrayList;
 
-class AbstractInfo {
+public class AbstractInfo {
     int kd; // 0 for entity
     String name, subject, id;
     boolean star, loaded;

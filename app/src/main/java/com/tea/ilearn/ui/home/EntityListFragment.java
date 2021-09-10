@@ -45,8 +45,8 @@ import per.goweii.actionbarex.common.AutoComplTextView;
 public class EntityListFragment extends Fragment {
     private EntityListBinding binding;
 
-    private RecyclerView mInfoRecycler;
-    private AbstractInfoListAdapter mInfoAdapter;
+    private RecyclerView mAbstractInfoRecycler;
+    private AbstractInfoListAdapter mAbstractInfoAdapter;
     private CountDownLatch searchSubjectNum = new CountDownLatch(0);
     private String subject;
 
@@ -66,14 +66,14 @@ public class EntityListFragment extends Fragment {
             if (binding.sortNameUp.getVisibility() == View.VISIBLE && binding.sortNameDown.getVisibility() == View.INVISIBLE) {
                 binding.sortNameUp.setVisibility(View.INVISIBLE);
                 binding.sortNameDown.setVisibility(View.VISIBLE);
-                mInfoAdapter.applySortAndFilter(AbstractInfo::getName, true);
+                mAbstractInfoAdapter.applySortAndFilter(AbstractInfo::getName, true);
             }
             else {
                 binding.sortNameUp.setVisibility(View.VISIBLE);
                 binding.sortNameDown.setVisibility(View.INVISIBLE);
-                mInfoAdapter.applySortAndFilter(AbstractInfo::getName, false);
+                mAbstractInfoAdapter.applySortAndFilter(AbstractInfo::getName, false);
             }
-            mInfoRecycler.scrollToPosition(0);
+            mAbstractInfoRecycler.scrollToPosition(0);
         });
 
         binding.sortCategory.setOnClickListener(view -> {
@@ -83,20 +83,20 @@ public class EntityListFragment extends Fragment {
                     && binding.sortCategoryDown.getVisibility() == View.INVISIBLE) {
                 binding.sortCategoryUp.setVisibility(View.INVISIBLE);
                 binding.sortCategoryDown.setVisibility(View.VISIBLE);
-                mInfoAdapter.applySortAndFilter(AbstractInfo::getCategory, true);
+                mAbstractInfoAdapter.applySortAndFilter(AbstractInfo::getCategory, true);
             }
             else {
                 binding.sortCategoryUp.setVisibility(View.VISIBLE);
                 binding.sortCategoryDown.setVisibility(View.INVISIBLE);
-                mInfoAdapter.applySortAndFilter(AbstractInfo::getCategory, false);
+                mAbstractInfoAdapter.applySortAndFilter(AbstractInfo::getCategory, false);
             }
-            mInfoRecycler.scrollToPosition(0);
+            mAbstractInfoRecycler.scrollToPosition(0);
         });
 
-        mInfoRecycler = binding.infoRecycler;
-        mInfoAdapter = new AbstractInfoListAdapter(root.getContext(), new ArrayList<AbstractInfo>());
-        mInfoRecycler.setLayoutManager(new LinearLayoutManager(root.getContext()));
-        mInfoRecycler.setAdapter(mInfoAdapter);
+        mAbstractInfoRecycler = binding.entityRecycler;
+        mAbstractInfoAdapter = new AbstractInfoListAdapter(root.getContext(), new ArrayList<AbstractInfo>());
+        mAbstractInfoRecycler.setLayoutManager(new LinearLayoutManager(root.getContext()));
+        mAbstractInfoRecycler.setAdapter(mAbstractInfoAdapter);
 
         return root;
     }
@@ -126,7 +126,7 @@ public class EntityListFragment extends Fragment {
                 int k = Constant.EduKG.SUBJECTS_EN.indexOf(subject);
                 query = Constant.EduKG.INIT_KEYS[k][j];
                 StaticHandler handler = new StaticHandler(
-                        binding, mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar,
+                        binding, mAbstractInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar,
                         acTextView, getActivity(), getContext(), false, false);
                 EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
             }
@@ -135,7 +135,7 @@ public class EntityListFragment extends Fragment {
         }
         if (searchSubjectNum.getCount() == 0) {
             binding.loadingBar.setVisibility(View.VISIBLE);
-            mInfoAdapter.clear();
+            mAbstractInfoAdapter.clear();
             binding.emptyHint.setVisibility(View.GONE);
             binding.sortCategoryUp.setVisibility(View.VISIBLE);
             binding.sortCategoryDown.setVisibility(View.VISIBLE);
@@ -143,7 +143,7 @@ public class EntityListFragment extends Fragment {
             binding.sortNameDown.setVisibility(View.VISIBLE);
             searchSubjectNum = new CountDownLatch(1);
             StaticHandler handler = new StaticHandler(
-                    binding, mInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar,
+                    binding, mAbstractInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar,
                     acTextView, getActivity(), getContext(), true, true);
             EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
             // add history
@@ -170,7 +170,7 @@ public class EntityListFragment extends Fragment {
 
     static class StaticHandler extends Handler {
         private EntityListBinding binding;
-        private AbstractInfoListAdapter mInfoAdapter;
+        private AbstractInfoListAdapter mAbstractInfoAdapter;
         private View loadingBar;
         private String subject;
         private CountDownLatch expectedNum;
@@ -181,12 +181,12 @@ public class EntityListFragment extends Fragment {
         private boolean empty_hint;
         private boolean addToHistory;
 
-        StaticHandler(EntityListBinding binding, AbstractInfoListAdapter mInfoAdapter,
+        StaticHandler(EntityListBinding binding, AbstractInfoListAdapter mAbstractInfoAdapter,
                       String subject, String keyword, CountDownLatch _latch,
                       View _loadingBar, AutoComplTextView acTextView, Activity activity,
                       Context context, boolean emptyHint, boolean addToHistory) {
             this.binding = binding;
-            this.mInfoAdapter = mInfoAdapter;
+            this.mAbstractInfoAdapter = mAbstractInfoAdapter;
             this.subject = subject;
             this.expectedNum = _latch;
             this.loadingBar = _loadingBar;
@@ -241,7 +241,7 @@ public class EntityListFragment extends Fragment {
                                 abstractInfo.setStar(detail.isStarred()).setLoaded(detail.isViewed());
                             }
                             // add to adapter to update UI
-                            activity.runOnUiThread(() -> mInfoAdapter.add(abstractInfo));
+                            activity.runOnUiThread(() -> mAbstractInfoAdapter.add(abstractInfo));
                         }); // end foreach
                     }).start();
                 }
