@@ -101,26 +101,26 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
 
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_weight="1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <ImageButton
-                            android:padding="4dp"
-                            android:layout_gravity="center_horizontal"
-                            android:src="@drawable/ic_cache_24"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            app:tint="@color/md_teal_600"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                        <TextView
-                            android:layout_gravity="center_horizontal"
-                            android:text="离线缓存"
-                            android:textAppearance="?attr/textAppearanceBody2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
+<!--                    <LinearLayout-->
+<!--                        android:orientation="vertical"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content">-->
+<!--                        <ImageButton-->
+<!--                            android:padding="4dp"-->
+<!--                            android:layout_gravity="center_horizontal"-->
+<!--                            android:src="@drawable/ic_cache_24"-->
+<!--                            android:background="?attr/selectableItemBackgroundBorderless"-->
+<!--                            app:tint="@color/md_teal_600"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content" />-->
+<!--                        <TextView-->
+<!--                            android:layout_gravity="center_horizontal"-->
+<!--                            android:text="离线缓存"-->
+<!--                            android:textAppearance="?attr/textAppearanceBody2"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content" />-->
+<!--                    </LinearLayout>-->
 
                     <LinearLayout
                         android:orientation="vertical"
@@ -338,6 +338,7 @@
                 android:layout_height="48dp"
                 app:backgroundTint="?colorSurface"
                 android:textColor="@color/md_red_700"
+                android:visibility="gone"
                 android:text="登出"
                 android:layout_marginTop="8dp"
                 />

@@ -46,7 +46,7 @@ public class EntityListFragment extends Fragment {
     private EntityListBinding binding;
 
     private RecyclerView mInfoRecycler;
-    private InfoListAdapter mInfoAdapter;
+    private AbstractInfoListAdapter mInfoAdapter;
     private CountDownLatch searchSubjectNum = new CountDownLatch(0);
     private String subject;
 
@@ -66,12 +66,12 @@ public class EntityListFragment extends Fragment {
             if (binding.sortNameUp.getVisibility() == View.VISIBLE && binding.sortNameDown.getVisibility() == View.INVISIBLE) {
                 binding.sortNameUp.setVisibility(View.INVISIBLE);
                 binding.sortNameDown.setVisibility(View.VISIBLE);
-                mInfoAdapter.applySortAndFilter(Info::getName, true);
+                mInfoAdapter.applySortAndFilter(AbstractInfo::getName, true);
             }
             else {
                 binding.sortNameUp.setVisibility(View.VISIBLE);
                 binding.sortNameDown.setVisibility(View.INVISIBLE);
-                mInfoAdapter.applySortAndFilter(Info::getName, false);
+                mInfoAdapter.applySortAndFilter(AbstractInfo::getName, false);
             }
             mInfoRecycler.scrollToPosition(0);
         });
@@ -83,18 +83,18 @@ public class EntityListFragment extends Fragment {
                     && binding.sortCategoryDown.getVisibility() == View.INVISIBLE) {
                 binding.sortCategoryUp.setVisibility(View.INVISIBLE);
                 binding.sortCategoryDown.setVisibility(View.VISIBLE);
-                mInfoAdapter.applySortAndFilter(Info::getCategory, true);
+                mInfoAdapter.applySortAndFilter(AbstractInfo::getCategory, true);
             }
             else {
                 binding.sortCategoryUp.setVisibility(View.VISIBLE);
                 binding.sortCategoryDown.setVisibility(View.INVISIBLE);
-                mInfoAdapter.applySortAndFilter(Info::getCategory, false);
+                mInfoAdapter.applySortAndFilter(AbstractInfo::getCategory, false);
             }
             mInfoRecycler.scrollToPosition(0);
         });
 
         mInfoRecycler = binding.infoRecycler;
-        mInfoAdapter = new InfoListAdapter(root.getContext(), new ArrayList<Info>());
+        mInfoAdapter = new AbstractInfoListAdapter(root.getContext(), new ArrayList<AbstractInfo>());
         mInfoRecycler.setLayoutManager(new LinearLayoutManager(root.getContext()));
         mInfoRecycler.setAdapter(mInfoAdapter);
 
@@ -170,7 +170,7 @@ public class EntityListFragment extends Fragment {
 
     static class StaticHandler extends Handler {
         private EntityListBinding binding;
-        private InfoListAdapter mInfoAdapter;
+        private AbstractInfoListAdapter mInfoAdapter;
         private View loadingBar;
         private String subject;
         private CountDownLatch expectedNum;
@@ -181,7 +181,7 @@ public class EntityListFragment extends Fragment {
         private boolean empty_hint;
         private boolean addToHistory;
 
-        StaticHandler(EntityListBinding binding, InfoListAdapter mInfoAdapter,
+        StaticHandler(EntityListBinding binding, AbstractInfoListAdapter mInfoAdapter,
                       String subject, String keyword, CountDownLatch _latch,
                       View _loadingBar, AutoComplTextView acTextView, Activity activity,
                       Context context, boolean emptyHint, boolean addToHistory) {
@@ -230,7 +230,7 @@ public class EntityListFragment extends Fragment {
                             List<EduKGEntityDetail> entitiesRes = query.find();
                             query.close();
                             EduKGEntityDetail detail;
-                            Info info = new Info().setKd(0)
+                            AbstractInfo abstractInfo = new AbstractInfo().setKd(0)
                                     .setId(entity.getUri())
                                     .setSubject(subject)
                                     .setName(entity.getLabel())
@@ -238,10 +238,10 @@ public class EntityListFragment extends Fragment {
                             if (entitiesRes != null && entitiesRes.size() > 0) {
                                 detail = entitiesRes.get(0);
                                 // already exists in DB, update UI
-                                info.setStar(detail.isStarred()).setLoaded(detail.isViewed());
+                                abstractInfo.setStar(detail.isStarred()).setLoaded(detail.isViewed());
                             }
                             // add to adapter to update UI
-                            activity.runOnUiThread(() -> mInfoAdapter.add(info));
+                            activity.runOnUiThread(() -> mInfoAdapter.add(abstractInfo));
                         }); // end foreach
                     }).start();
                 }

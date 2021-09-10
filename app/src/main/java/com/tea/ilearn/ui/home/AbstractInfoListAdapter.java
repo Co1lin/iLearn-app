@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class InfoListAdapter extends RecyclerView.Adapter {
+public class AbstractInfoListAdapter extends RecyclerView.Adapter {
 
     private class AbstractHolder extends RecyclerView.ViewHolder {
         private AbstractCardBinding binding;
@@ -29,12 +29,12 @@ public class InfoListAdapter extends RecyclerView.Adapter {
             this.binding = binding;
         }
 
-        void bind(Info info) {
-            binding.entityName.setText(info.name);
-            binding.entityCategory.setText(info.getCategory());
-            binding.entitySubject.setText(info.subject);
+        void bind(AbstractInfo abstractInfo) {
+            binding.entityName.setText(abstractInfo.name);
+            binding.entityCategory.setText(abstractInfo.getCategory());
+            binding.entitySubject.setText(abstractInfo.subject);
 
-            if (info.loaded) {
+            if (abstractInfo.loaded) {
                 TypedValue typedValue = new TypedValue();
                 binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.customColorValue, typedValue, true);
                 int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
@@ -47,7 +47,7 @@ public class InfoListAdapter extends RecyclerView.Adapter {
                 binding.getRoot().setCardBackgroundColor(color);
             }
             binding.getRoot().setOnClickListener(view -> {
-                info.loaded = true;
+                abstractInfo.loaded = true;
                 TypedValue typedValue = new TypedValue();
                 binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.customColorValue, typedValue, true);
                 int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
@@ -55,11 +55,11 @@ public class InfoListAdapter extends RecyclerView.Adapter {
 
                 Intent intent = new Intent (binding.getRoot().getContext(), EntityDetailActivity.class);
                 intent.setAction(Intent.ACTION_SEARCH);
-                intent.putExtra("name", info.name);
-                intent.putExtra("id", info.id);
-                intent.putExtra("category", info.getCategory());
-                intent.putStringArrayListExtra("categories", info.categories);
-                intent.putExtra("subject", info.subject);
+                intent.putExtra("name", abstractInfo.name);
+                intent.putExtra("id", abstractInfo.id);
+                intent.putExtra("category", abstractInfo.getCategory());
+                intent.putStringArrayListExtra("categories", abstractInfo.categories);
+                intent.putExtra("subject", abstractInfo.subject);
                 binding.getRoot().getContext().startActivity(intent);
 
                 // loaded state already changed when step into entity detail page
@@ -67,47 +67,47 @@ public class InfoListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private List<Info> mInfoList;
+    private List<AbstractInfo> mAbstractInfoList;
 
-    public InfoListAdapter(Context context, List<Info> infoList) {
-        mInfoList = infoList;
+    public AbstractInfoListAdapter(Context context, List<AbstractInfo> abstractInfoList) {
+        mAbstractInfoList = abstractInfoList;
     }
 
-    public void add(Info info) {
-        mInfoList.add(info);
-        notifyItemInserted(mInfoList.size() - 1);
+    public void add(AbstractInfo abstractInfo) {
+        mAbstractInfoList.add(abstractInfo);
+        notifyItemInserted(mAbstractInfoList.size() - 1);
     }
 
     public void clear() {
-        mInfoList.clear();
+        mAbstractInfoList.clear();
         notifyDataSetChanged();
     }
 
     public void modify(int position, boolean star, boolean loaded) {
-        Info info = mInfoList.get(position);
-        info.star = star;
-        info.loaded = loaded;
-        mInfoList.set(position, info);
+        AbstractInfo abstractInfo = mAbstractInfoList.get(position);
+        abstractInfo.star = star;
+        abstractInfo.loaded = loaded;
+        mAbstractInfoList.set(position, abstractInfo);
         notifyItemChanged(position);
     }
 
-    public <U extends Comparable<? super U>> void applySortAndFilter(Function<? super Info, ? extends U> f, boolean reverse) {
-        Stream s = mInfoList.stream();
+    public <U extends Comparable<? super U>> void applySortAndFilter(Function<? super AbstractInfo, ? extends U> f, boolean reverse) {
+        Stream s = mAbstractInfoList.stream();
         if (reverse) s = s.sorted(Comparator.comparing(f).reversed());
         else s = s.sorted(Comparator.comparing(f));
-        mInfoList = (List<Info>) s.collect(Collectors.toList());
+        mAbstractInfoList = (List<AbstractInfo>) s.collect(Collectors.toList());
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return mInfoList.size();
+        return mAbstractInfoList.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        Info info = mInfoList.get(position);
-        return info.kd;
+        AbstractInfo abstractInfo = mAbstractInfoList.get(position);
+        return abstractInfo.kd;
     }
 
     @Override
@@ -120,10 +120,10 @@ public class InfoListAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Info info = mInfoList.get(position);
+        AbstractInfo abstractInfo = mAbstractInfoList.get(position);
         switch (holder.getItemViewType()) {
             case 0:
-                ((AbstractHolder) holder).bind(info);
+                ((AbstractHolder) holder).bind(abstractInfo);
                 break;
         }
     }
