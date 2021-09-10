@@ -31,6 +31,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.gson.Gson;
 import com.tea.ilearn.R;
+import com.tea.ilearn.activity.HistoryActivity;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 import com.tea.ilearn.model.Account;
@@ -69,6 +70,7 @@ public class MeFragment extends Fragment {
                         binding.nameProfile.setText(account.getUsername());
                         // update statistics
                         Backend.getInst().getUserStatistics(new GetStatisticsHandler(getActivity(), binding, root));
+                        binding.logoutButton.setVisibility(View.VISIBLE);
                     }
                 }
         );
@@ -100,6 +102,7 @@ public class MeFragment extends Fragment {
                         binding.nameProfile.setText("登录账号");
                         loadStatistics(getActivity(), binding, root);
                         Toast.makeText(root.getContext(), "已登出！", Toast.LENGTH_SHORT).show();
+                        binding.logoutButton.setVisibility(View.GONE);
                     });
                 }
                 else {
@@ -108,6 +111,11 @@ public class MeFragment extends Fragment {
                     );
                 }
             }).start();
+        });
+
+        binding.history.setOnClickListener($ -> {
+            Intent intent = new Intent(root.getContext(), HistoryActivity.class);
+            startActivity(intent);
         });
 
         // try to login
@@ -260,6 +268,7 @@ public class MeFragment extends Fragment {
                 Account account = (Account) msg.obj;
                 binding.nameProfile.setText(account.getUsername());
                 Backend.getInst().getUserStatistics(new GetStatisticsHandler(activity, binding, root));
+                binding.logoutButton.setVisibility(View.VISIBLE);
             }
             else {  // register failed
                 if (((String) msg.obj).contains("login failed")) {
