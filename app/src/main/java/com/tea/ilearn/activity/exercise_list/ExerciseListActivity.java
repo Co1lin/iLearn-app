@@ -1,10 +1,10 @@
 package com.tea.ilearn.activity.exercise_list;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -73,7 +73,7 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                 String name = intent.getStringExtra("name");
                 binding.name.setText(name + "相关习题");
                 loadLatch = new CountDownLatch(1);
-                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch, fragments, false, this);
+                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch, fragments, false, lock);
                 EduKG.getInst().getProblems(name, handler);
                 binding.submitBtn.setVisibility(View.INVISIBLE);
             } else {
@@ -90,8 +90,8 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                             int r = Math.min((i+1) * 5, names.size());
                             loadLatch = new CountDownLatch(r-l);
                             for (int j = l; j < r; ++j) {
-                                retry = r!=names.size();
-                                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, examMode, loadLatch, fragments, retry, this);
+                                retry = (r!=names.size());
+                                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, examMode, loadLatch, fragments, retry, lock);
                                 EduKG.getInst().getProblems(names.get(i), handler);
                             }
                             try {
@@ -101,6 +101,7 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                             }
                         }
                     }
+                    Log.d("MYDEBUG", "here");
                 }).start();
             }
         }
@@ -112,11 +113,11 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
         private IWBAPI mWPAPI;
         private boolean examMode;
         private Boolean retry;
-        private Activity that;
+        private Object lock;
         private CountDownLatch loadLatch;
         private List<ExerciseFragment> fragments;
 
-        StaticHandler(ExerciseListAdapter mExerciseListAdapter, ActivityExerciseListBinding binding, IWBAPI WBAPI, boolean examMode, CountDownLatch loadLatch, List<ExerciseFragment> fragments, boolean retry, Activity that) {
+        StaticHandler(ExerciseListAdapter mExerciseListAdapter, ActivityExerciseListBinding binding, IWBAPI WBAPI, boolean examMode, CountDownLatch loadLatch, List<ExerciseFragment> fragments, boolean retry, Object lock) {
             this.mExerciseListAdapter = mExerciseListAdapter;
             this.binding = binding;
             this.mWPAPI = WBAPI;
@@ -124,7 +125,7 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
             this.loadLatch = loadLatch;
             this.fragments = fragments;
             this.retry = retry;
-            this.that = that;
+            this.lock = lock;
         }
 
         @Override
@@ -158,14 +159,14 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                 if (fragments.size() == 0) {
                     binding.notFound.setVisibility(View.VISIBLE);
                     if (retry) {
-                        that.notify();
+                        lock.notify();
                         return;
                     }
                 }
                 else {
                     if (retry) {
                         retry = false;
-                        that.notify();
+                        lock.notify();
                     }
                     Collections.shuffle(fragments, new Random(System.nanoTime()));
                     if (fragments.size() > 10) {
