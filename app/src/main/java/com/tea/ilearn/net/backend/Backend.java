@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.tea.ilearn.model.Account;
+import com.tea.ilearn.model.Preference;
 import com.tea.ilearn.model.SearchHistory;
 import com.tea.ilearn.model.UserStatistics;
 import com.tea.ilearn.net.APIRequest;
@@ -169,11 +170,11 @@ public class Backend extends APIRequest {
 
     // personal data
     public void getPersonalData(Handler handler) {
-        Handler callbackHandler = new GetPersonalDataCallback(handler);
+        // Handler callbackHandler = new GetPersonalDataCallback(handler);
         // getUserStatistics(callbackHandler);
         getSearchHistories(null);
         getEntities(null);
-        // getCategories(callbackHandler);
+        getPreferences(null);
     }
 
     static class GetPersonalDataCallback extends Handler {
@@ -231,14 +232,70 @@ public class Backend extends APIRequest {
             super.handleMessage(msg);
             if (msg.what == 1 || msg.obj == null) {
                 Log.e("Backend/GetUserStatisticsCallback", msg.what + " " + msg.obj);
-                Message.obtain(originalHandler, 1, null).sendToTarget();
+                if (originalHandler != null)
+                    Message.obtain(originalHandler, 1, null).sendToTarget();
             }
             else {  // store to DB and send to frontend
                 UserStatistics statistics = (UserStatistics) msg.obj;
                 Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
                 statisticsBox.removeAll();
                 statisticsBox.put(statistics);
-                Message.obtain(originalHandler,0, statistics).sendToTarget();
+                if (originalHandler != null)
+                    Message.obtain(originalHandler,0, statistics).sendToTarget();
+            }
+        }
+    }
+
+    // preferences
+    public void uploadPreferences(Handler handler) {
+        new Thread(() -> {
+            Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
+            List<Preference> res = preferenceBox.getAll();
+            if (res != null && res.size() > 0) {
+                uploadPreferences(res.get(0), handler);
+            }
+        }).start();
+    }
+
+    public void uploadPreferences(Preference preference, Handler handler) {
+        POSTJson("/preference",
+                new HashMap<String, Object>(){{
+                    put("subjects", preference.getSubjects());
+                }},
+                p -> p.asResponse(String.class),
+                handler);
+    }
+
+    public void getPreferences(Handler handler) {
+        Handler callbackHandler = new GetPreferencesCallback(handler);
+        GET("/preference",
+                new HashMap<>(),
+                p -> p.asResponse(Preference.class),
+                callbackHandler);
+    }
+
+    static class GetPreferencesCallback extends Handler {
+        Handler originalHandler;
+
+        public GetPreferencesCallback(Handler originalHandler) {
+            this.originalHandler = originalHandler;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1 || msg.obj == null) {
+                Log.e("Backend/GetPreferencesCallback", msg.what + " " + msg.obj);
+                if (originalHandler != null)
+                    Message.obtain(originalHandler, 1, null).sendToTarget();
+            }
+            else {  // store to DB and send to frontend
+                Preference preference = (Preference) msg.obj;
+                Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
+                preferenceBox.removeAll();
+                preferenceBox.put(preference);
+                if (originalHandler != null)
+                    Message.obtain(originalHandler,0, preference).sendToTarget();
             }
         }
     }

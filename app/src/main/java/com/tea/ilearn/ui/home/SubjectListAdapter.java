@@ -33,6 +33,10 @@ public class SubjectListAdapter extends FragmentStatePagerAdapter {
         notifyDataSetChanged();
     }
 
+    public List<String> getSubjects() {
+        return subjects;
+    }
+
     @Override
     public Fragment getItem(int position) {
         return fragmentList.get(position);
