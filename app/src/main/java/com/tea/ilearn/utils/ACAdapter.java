@@ -31,6 +31,7 @@ import androidx.appcompat.widget.ThemedSpinnerAdapter;
 
 import com.tea.ilearn.model.SearchHistory;
 import com.tea.ilearn.model.SearchHistory_;
+import com.tea.ilearn.net.backend.Backend;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -438,12 +439,13 @@ public class ACAdapter<T> extends BaseAdapter implements Filterable, ThemedSpinn
                         query.close();
                         if (histories != null && histories.size() > 0) {
                             historyBox.remove(histories.get(0));
+                            Backend.getInst().deleteSearchHistory(histories.get(0), null);
                         }
                     }).start();
                     remove(itemToDelete);
                     /**
                      * Update the suggestions
-                     * Ref <a href="https://stackoverflow.com/a/51808479">Update</a>T
+                     * Ref <a href="https://stackoverflow.com/a/51808479">Update</a>
                      */
                     Editable mText = mAcTextView.getText();
                     mAcTextView.setText(mText);

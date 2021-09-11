@@ -15,6 +15,7 @@ import com.tea.ilearn.net.edukg.EduKGEntityDetail;
 import com.tea.ilearn.utils.ObjectBox;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -396,6 +397,15 @@ public class Backend extends APIRequest {
         }
     }
 
+    public void deleteSearchHistory(SearchHistory history, Handler handler) {
+        PUTJson("/history/delete",
+                new HashMap<String, Object>() {{
+                    put("histories", Arrays.asList(history.getKeyword()));
+                }},
+                p -> p.asResponse(String.class),
+                handler);
+    }
+
     // "viewed" entities
     public void uploadEntity(EduKGEntityDetail entityDetail, Handler handler) {
         POSTJson("/entity",
@@ -441,6 +451,13 @@ public class Backend extends APIRequest {
             if (originalHandler != null)
                 Message.obtain(originalHandler, msg.what, msg.obj).sendToTarget();
         }
+    }
+
+    public void getRecommendedEntities(Handler handler) {
+        GET("/question",
+                new HashMap<>(),
+                p -> p.asResponseList(String.class),
+                handler);
     }
 
     public void logout() {
