@@ -169,41 +169,26 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-<!--            <com.google.android.material.card.MaterialCardView-->
-<!--                app:cardElevation="0dp"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="16dp">-->
+            <com.google.android.material.card.MaterialCardView
+                app:cardElevation="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
 
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:orientation="vertical">-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-<!--                    <com.google.android.material.switchmaterial.SwitchMaterial-->
-<!--                        android:id="@+id/dark_mode_switch"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:checked="false"-->
-<!--                        android:paddingStart="8dp"-->
-<!--                        android:text="@string/dark_mode" />-->
-
-<!--                    <View-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="1dp"-->
-<!--                        android:layout_marginStart="8dp"-->
-<!--                        android:layout_marginEnd="8dp"-->
-<!--                        android:background="?android:colorBackground" />-->
-
-<!--                    <com.google.android.material.switchmaterial.SwitchMaterial-->
-<!--                        android:id="@+id/cache_switch"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:checked="false"-->
-<!--                        android:paddingStart="8dp"-->
-<!--                        android:text="应用缓存" />-->
-<!--                </LinearLayout>-->
-<!--            </com.google.android.material.card.MaterialCardView>-->
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/dark_mode_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:checked="false"
+                        android:paddingStart="8dp"
+                        android:text="@string/dark_mode" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 app:cardElevation="0dp"
