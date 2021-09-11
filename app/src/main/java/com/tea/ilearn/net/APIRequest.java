@@ -144,7 +144,7 @@ public abstract class APIRequest {
         RxHttp p = getSyncRxHttp(loginMethod);
         paramAddAll(p, loginParams);
         loginRequestDefiner.define(p)
-        .timeout(3, TimeUnit.SECONDS)
+        .timeout(5, TimeUnit.SECONDS)
         .subscribe(response -> {
             onRefreshSuccess(response);
             success.set(true);

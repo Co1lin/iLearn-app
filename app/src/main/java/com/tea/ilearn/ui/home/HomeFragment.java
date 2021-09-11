@@ -20,6 +20,7 @@ import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
 import com.tea.ilearn.model.Preference;
+import com.tea.ilearn.net.backend.Backend;
 import com.tea.ilearn.utils.DB_utils;
 import com.tea.ilearn.utils.ObjectBox;
 
@@ -128,18 +129,39 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        reloadTabs();
         DB_utils.updateACAdapter(getActivity(), getContext(), acTextView);
     }
 
-    private void initTabs() {
-        Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
-
-        new Thread(() -> {
+    private void reloadTabs() {
+        if (pagerAdapter != null) { new Thread(() -> {
+            Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
             // load subject preference from DB
             List<String> subjects;
             List<Preference> res = preferenceBox.getAll();
             if (res != null && res.size() > 0 &&
-                res.get(0).getSubjects() != null && res.get(0).getSubjects().size() > 0) {
+                    res.get(0).getSubjects() != null && res.get(0).getSubjects().size() > 0) {
+                subjects = res.get(0).getSubjects();
+            } else {
+                preferenceBox.removeAll();
+                Preference preference = new Preference();
+                subjects = preference.getSubjects();
+                preferenceBox.put(preference);
+            }
+            // set to UI
+            if (!subjects.equals(pagerAdapter.getSubjects()))
+                getActivity().runOnUiThread(() -> pagerAdapter.change(subjects));
+        }).start();}
+    }
+
+    private void initTabs() {
+        new Thread(() -> {
+            Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
+            // load subject preference from DB
+            List<String> subjects;
+            List<Preference> res = preferenceBox.getAll();
+            if (res != null && res.size() > 0 &&
+                    res.get(0).getSubjects() != null && res.get(0).getSubjects().size() > 0) {
                 subjects = res.get(0).getSubjects();
             }
             else {
@@ -157,6 +179,8 @@ public class HomeFragment extends Fragment {
                 ((EntityListFragment) pagerAdapter.getItem(0)).waitForBinding("", acTextView);
             });
         }).start();
+
+        Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
 
         binding.editPanel.setOnTouchListener((view, event) -> true);
 
@@ -196,8 +220,8 @@ public class HomeFragment extends Fragment {
 
                 search();
 
-                // store the preference into DB
                 new Thread(() -> {
+                    // store the preference into DB
                     Preference preference;
                     List<Preference> res = preferenceBox.getAll();
                     if (res != null && res.size() > 0)
@@ -206,6 +230,8 @@ public class HomeFragment extends Fragment {
                         preference = new Preference();
                     preference.setSubjects(new ArrayList<>(newSubjects));
                     preferenceBox.put(preference);
+                    // upload
+                    Backend.getInst().uploadPreferences(preference, null);
                 }).start();
             }
         });
