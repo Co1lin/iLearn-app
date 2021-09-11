@@ -36,6 +36,7 @@ import com.tea.ilearn.activity.account.ChangePasswordActivity;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 import com.tea.ilearn.model.Account;
+import com.tea.ilearn.model.Preference;
 import com.tea.ilearn.model.UserStatistics;
 import com.tea.ilearn.net.backend.Backend;
 import com.tea.ilearn.utils.ObjectBox;
@@ -138,11 +139,30 @@ public class MeFragment extends Fragment {
 
         binding.darkModeSwitch.setOnClickListener($ -> {
             Toast.makeText(root.getContext(), "主题色的修改将在应用下次启动时生效", Toast.LENGTH_SHORT).show();
-            // TODO save to database
+            // store to DB
+            new Thread(() -> {
+                boolean isDark = binding.darkModeSwitch.isChecked();
+                Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
+                List<Preference> preferences = preferenceBox.getAll();
+                if (preferences != null && preferences.size() > 0) {
+                    Preference preference = preferences.get(0);
+                    preference.setDark(isDark);
+                    preferenceBox.put(preference);
+                }
+            }).start();
         });
 
         // try to login
         fakeLogin();
+
+        new Thread(() -> {
+            Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
+            List<Preference> preferences = preferenceBox.getAll();
+            if (preferences != null && preferences.size() > 0) {
+                Preference preference = preferences.get(0);
+                getActivity().runOnUiThread(() -> binding.darkModeSwitch.setChecked(preference.isDark()));
+            }
+        }).start();
 
         return root;
     }
