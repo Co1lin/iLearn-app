@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExerciseListAdapter extends FragmentPagerAdapter {
@@ -11,12 +12,13 @@ public class ExerciseListAdapter extends FragmentPagerAdapter {
 
     public ExerciseListAdapter(FragmentManager fm) {
         super(fm);
+        mFragmentList = new ArrayList<>();
     }
 
-    public void setList(List<ExerciseFragment> fragmentList) {
-        mFragmentList = fragmentList;
+    public void add(ExerciseFragment frag) {
+        mFragmentList.add(frag);
+        notifyDataSetChanged();
     }
-
 
     @Override
     public Fragment getItem(int position) {

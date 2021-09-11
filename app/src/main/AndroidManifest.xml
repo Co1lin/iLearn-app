@@ -19,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.iLearn">
         <activity
+            android:name=".activity.SearchExamActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.account.ChangePasswordActivity"
             android:exported="true" />
         <activity

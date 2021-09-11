@@ -30,17 +30,17 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
 
-            <CheckBox
-                android:id="@+id/star"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:buttonTint="@color/md_pink_200"
-                android:button="@drawable/ic_favorite_24"
-                android:translationX="22dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/share"
-                app:layout_constraintTop_toTopOf="parent" />
+<!--            <CheckBox-->
+<!--                android:id="@+id/star"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:buttonTint="@color/md_pink_200"-->
+<!--                android:button="@drawable/ic_favorite_24"-->
+<!--                android:translationX="22dp"-->
+<!--                android:layout_marginEnd="16dp"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintEnd_toStartOf="@id/share"-->
+<!--                app:layout_constraintTop_toTopOf="parent" />-->
 
             <ImageButton
                 android:id="@+id/share"
