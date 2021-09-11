@@ -241,7 +241,6 @@ public class Backend extends APIRequest {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-
         }
     }
 
