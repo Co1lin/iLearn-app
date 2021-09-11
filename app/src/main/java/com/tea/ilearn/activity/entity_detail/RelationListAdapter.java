@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
 import com.tea.ilearn.R;
+import com.tea.ilearn.databinding.ImageCardBinding;
 import com.tea.ilearn.databinding.PropertyCardBinding;
 import com.tea.ilearn.databinding.RelationCardBinding;
 
@@ -59,6 +61,18 @@ public class RelationListAdapter extends RecyclerView.Adapter {
         }
     }
 
+    private class ImageHolder extends RecyclerView.ViewHolder {
+        ImageCardBinding binding;
+        ImageHolder(ImageCardBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        void bind(Relation relation) {
+            Picasso.get().load(relation.name).into(binding.image);
+        }
+    }
+
     private Context mContext;
     private List<Relation> mRelationList;
 
@@ -86,8 +100,8 @@ public class RelationListAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         Relation relation = mRelationList.get(position);
-        if (relation.dir != 2) return 0;
-        return 1;
+        if (relation.dir < 2) return 0;
+        return relation.dir - 1;
     }
 
     // Inflates the appropriate layout according to the ViewType.
@@ -100,6 +114,10 @@ public class RelationListAdapter extends RecyclerView.Adapter {
         else if (viewType == 1) {
             PropertyCardBinding binding = PropertyCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new PropertyHolder(binding);
+        }
+        else if (viewType == 2) {
+            ImageCardBinding binding = ImageCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new ImageHolder(binding);
         }
         return null;
     }
@@ -115,6 +133,8 @@ public class RelationListAdapter extends RecyclerView.Adapter {
             case 1:
                 ((PropertyHolder) holder).bind(relation);
                 break;
+            case 2:
+                ((ImageHolder) holder).bind(relation);
         }
     }
 }

@@ -39,6 +39,8 @@ public class PropertyListFragment extends Fragment {
         for (EduKGProperty p : properties) {
             if (p.getPredicateLabel().equals("描述"))
                 binding.entityDescription.setText("实体描述: " + p.getObject());
+            else if (p.getPredicateLabel().equals("图片"))
+                mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 3));
             else
                 mPropertyAdapter.add(new Relation(p.getPredicateLabel(), p.getObject(), 2));
         }
