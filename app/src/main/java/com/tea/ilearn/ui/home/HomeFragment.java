@@ -122,8 +122,6 @@ public class HomeFragment extends Fragment {
 
         initTabs();
 
-        ((EntityListFragment)pagerAdapter.getItem(0)).waitForBinding("", acTextView);
-
         return root;
     }
 
@@ -156,6 +154,7 @@ public class HomeFragment extends Fragment {
                 binding.viewPager.setOffscreenPageLimit(Constant.EduKG.SUBJECTS_EN.size());
                 binding.viewPager.setAdapter(pagerAdapter);
                 binding.subjectTabs.setupWithViewPager(binding.viewPager);
+                ((EntityListFragment) pagerAdapter.getItem(0)).waitForBinding("", acTextView);
             });
         }).start();
 
