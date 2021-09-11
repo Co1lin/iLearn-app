@@ -32,6 +32,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.gson.Gson;
 import com.tea.ilearn.R;
 import com.tea.ilearn.activity.HistoryActivity;
+import com.tea.ilearn.activity.account.ChangePasswordActivity;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 import com.tea.ilearn.model.Account;
@@ -71,6 +72,7 @@ public class MeFragment extends Fragment {
                         // update statistics
                         Backend.getInst().getUserStatistics(new GetStatisticsHandler(getActivity(), binding, root));
                         binding.logoutButton.setVisibility(View.VISIBLE);
+                        binding.changePasswordBox.setVisibility(View.VISIBLE);
                     }
                 }
         );
@@ -103,6 +105,7 @@ public class MeFragment extends Fragment {
                         loadStatistics(getActivity(), binding, root);
                         Toast.makeText(root.getContext(), "已登出！", Toast.LENGTH_SHORT).show();
                         binding.logoutButton.setVisibility(View.GONE);
+                        binding.changePasswordBox.setVisibility(View.GONE);
                     });
                 }
                 else {
@@ -121,6 +124,15 @@ public class MeFragment extends Fragment {
         binding.star.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), HistoryActivity.class);
             intent.putExtra("star", true);
+            startActivity(intent);
+        });
+
+        binding.selfSync.setOnClickListener($ -> {
+            // TODO colin
+        });
+
+        binding.changePassword.setOnClickListener($ -> {
+            Intent intent = new Intent(root.getContext(), ChangePasswordActivity.class);
             startActivity(intent);
         });
 
@@ -147,6 +159,7 @@ public class MeFragment extends Fragment {
                     getActivity().runOnUiThread(() -> {
                         binding.nameProfile.setText(account.getUsername());
                         binding.logoutButton.setVisibility(View.VISIBLE);
+                        binding.changePasswordBox.setVisibility(View.VISIBLE);
                     });
                 }
             }
@@ -292,6 +305,7 @@ public class MeFragment extends Fragment {
                 binding.nameProfile.setText(account.getUsername());
                 Backend.getInst().getUserStatistics(new GetStatisticsHandler(activity, binding, root));
                 binding.logoutButton.setVisibility(View.VISIBLE);
+                binding.changePasswordBox.setVisibility(View.VISIBLE);
             }
             else {  // register failed
                 if (((String) msg.obj).contains("login failed")) {

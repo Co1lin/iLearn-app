@@ -76,7 +76,9 @@ public class SigninActivity extends AppCompatActivity {
 
         binding.toforget.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), ForgetPasswordActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
             root.getContext().startActivity(intent);
+            finish();
         });
     }
 

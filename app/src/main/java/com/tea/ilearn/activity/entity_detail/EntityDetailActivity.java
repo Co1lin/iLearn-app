@@ -152,8 +152,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     }).start();
                 }
             } else { // msg.what = 1
-                // TODO load from database and display offline loading hint
-                // TODO and set to local variable relations and properties (mentioned above) (use below)
+                Toast.makeText(binding.getRoot().getContext(), "网络异常，显示离线缓存中...", Toast.LENGTH_SHORT).show();
                 List<EduKGEntityDetail> entitiesRes =
                         entityBox.query().equal(EduKGEntityDetail_.uri, uri).build().find();
                 if (entitiesRes != null && entitiesRes.size() > 0) {
