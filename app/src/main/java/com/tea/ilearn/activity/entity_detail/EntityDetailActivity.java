@@ -31,6 +31,8 @@ import com.tea.ilearn.net.edukg.EduKGRelation;
 import com.tea.ilearn.utils.ObjectBox;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -151,21 +153,28 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     new Thread(() -> {  // update relations and properties
                         waitUntilDetailGot();
                         detailInDB.setRelations(finalRelations)
-                                .setProperties(finalProperties);
+                                .setProperties(finalProperties)
+                                .setTimestamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
                         entityBox.put(detailInDB);
                     }).start();
                 }
             } else { // msg.what = 1
                 // TODO load from database and display offline loading hint
                 // TODO and set to local variable relations and properties (mentioned above) (use below)
+                List<EduKGEntityDetail> entitiesRes =
+                        entityBox.query().equal(EduKGEntityDetail_.uri, uri).build().find();
+                if (entitiesRes != null && entitiesRes.size() > 0) {
+                    EduKGEntityDetail detail = entitiesRes.get(0);
+                    relations = detail.getRelations();
+                    properties = detail.getProperties();
+                }
             }
-
             // ==== fill in ui ====
 
-            if (properties != null) {
+            if (properties != null && properties.size() > 0) {
                 ((PropertyListFragment)pagerAdapter.getItem(0)).set(properties);
             }
-            if (relations != null) {
+            if (relations != null && relations.size() > 0) {
                 ((RelationListFragment)pagerAdapter.getItem(1)).set(relations);
             }
         }
@@ -190,7 +199,8 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     .setCategory(categories)
                     .setSubject(subject)
                     .setLabel(name)
-                    .setUri(uri);
+                    .setUri(uri)
+                    .setTimestamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
             detailInDB = detailTemp;
             entityBox.put(detailInDB);
         }).start();

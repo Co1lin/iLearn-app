@@ -2,6 +2,9 @@ package com.tea.ilearn.net;
 
 import static java.lang.Thread.sleep;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -23,6 +26,7 @@ import rxhttp.wrapper.param.RxHttpNoBodyParam;
  * to request to a specific API
  */
 public abstract class APIRequest {
+    protected static Context context;
     // variables need to be override
     protected String baseUrl;
     protected String refreshPath;
@@ -58,6 +62,19 @@ public abstract class APIRequest {
         loginFailedMessage = _loginFailedMessage;
         loginRequestDefiner = _loginRequestDefiner;
         listen();
+    }
+
+    public static void setContext(Context _context) {
+        context = _context;
+    }
+
+    public static boolean hasNetworkConnection() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        boolean res = networkInfo != null && networkInfo.isConnected();
+        Log.i("APIRequest/hasNetworkConnection", String.valueOf(res));
+        return res;
     }
 
     /**
@@ -115,6 +132,11 @@ public abstract class APIRequest {
     protected abstract void onRefreshSuccess(Object response);
 
     public synchronized boolean syncRefresh(Handler handler) {
+        if (!hasNetworkConnection()) {
+            if (handler != null)
+                Message.obtain(handler, 1, "no network connection").sendToTarget();
+            return false;
+        }
         if (System.currentTimeMillis() - lastRefreshSuccess < minRefreshIntervalMillis)
             return true;
         Log.i("APIRequest.refresh", "refreshing");
@@ -140,9 +162,7 @@ public abstract class APIRequest {
     }
 
     public synchronized void asyncRefresh(Handler handler) {
-        new Thread(() -> {
-            syncRefresh(handler);
-        }).start();
+        new Thread(() -> syncRefresh(handler)).start();
     }
 
     /**
@@ -159,6 +179,11 @@ public abstract class APIRequest {
             ResponseDefiner responseDefiner,
             Handler handler
     ) {
+        if (!hasNetworkConnection()) {
+            if (handler != null)
+                Message.obtain(handler, 1, "no network connection").sendToTarget();
+            return;
+        }
         new Thread(() -> {
             AtomicBoolean loginFailed = new AtomicBoolean(false);
             AtomicBoolean messageSent = new AtomicBoolean(false);

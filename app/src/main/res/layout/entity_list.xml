@@ -80,7 +80,7 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/info_recycler"
+        android:id="@+id/entity_recycler"
         app:layout_constraintTop_toBottomOf="@id/sort_filter"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -96,10 +96,10 @@
         android:textAppearance="?attr/textAppearanceBody2"
         android:gravity="center"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@id/info_recycler"
-        app:layout_constraintBottom_toBottomOf="@id/info_recycler"
-        app:layout_constraintStart_toStartOf="@id/info_recycler"
-        app:layout_constraintEnd_toEndOf="@id/info_recycler"
+        app:layout_constraintTop_toTopOf="@id/entity_recycler"
+        app:layout_constraintBottom_toBottomOf="@id/entity_recycler"
+        app:layout_constraintStart_toStartOf="@id/entity_recycler"
+        app:layout_constraintEnd_toEndOf="@id/entity_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp" >
     </TextView>

@@ -2,14 +2,14 @@ package com.tea.ilearn.ui.home;
 
 import java.util.ArrayList;
 
-class Info {
+public class AbstractInfo {
     int kd; // 0 for entity
     String name, subject, id;
     boolean star, loaded;
     ArrayList<String> categories;
 
-    public Info(int kd, String name, String subject, boolean star,
-                boolean loaded, String id, ArrayList<String> categories) {
+    public AbstractInfo(int kd, String name, String subject, boolean star,
+                        boolean loaded, String id, ArrayList<String> categories) {
         this.kd = kd;
         this.name = name;
         this.subject = subject;
@@ -19,7 +19,7 @@ class Info {
         this.id = id;
     }
 
-    public Info() {}
+    public AbstractInfo() {}
 
     public ArrayList<String> getCategories() {
         return categories;
@@ -53,37 +53,37 @@ class Info {
         return loaded;
     }
 
-    public Info setKd(int kd) {
+    public AbstractInfo setKd(int kd) {
         this.kd = kd;
         return this;
     }
 
-    public Info setName(String name) {
+    public AbstractInfo setName(String name) {
         this.name = name;
         return this;
     }
 
-    public Info setSubject(String subject) {
+    public AbstractInfo setSubject(String subject) {
         this.subject = subject;
         return this;
     }
 
-    public Info setId(String id) {
+    public AbstractInfo setId(String id) {
         this.id = id;
         return this;
     }
 
-    public Info setStar(boolean star) {
+    public AbstractInfo setStar(boolean star) {
         this.star = star;
         return this;
     }
 
-    public Info setLoaded(boolean loaded) {
+    public AbstractInfo setLoaded(boolean loaded) {
         this.loaded = loaded;
         return this;
     }
 
-    public Info setCategories(ArrayList<String> categories) {
+    public AbstractInfo setCategories(ArrayList<String> categories) {
         this.categories = categories;
         return this;
     }
