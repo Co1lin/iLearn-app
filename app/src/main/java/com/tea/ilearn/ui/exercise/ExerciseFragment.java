@@ -37,12 +37,17 @@ public class ExerciseFragment extends Fragment {
         binding = FragmentExerciseBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        binding.progressCircular.setOnTouchListener((view, event) -> {
+            return true;
+        });
+
         binding.searchExam.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), SearchExamActivity.class);
             startActivity(intent);
         });
 
         binding.suggestExam.setOnClickListener($ -> {
+            binding.progressCircular.setVisibility(View.VISIBLE);
             Backend.getInst().getRecommendedEntities(new SuggestionHandler(binding, this));
         });
 
@@ -61,6 +66,7 @@ public class ExerciseFragment extends Fragment {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
+            binding.progressCircular.setVisibility(View.GONE);
             if (msg.what == 0 && msg.obj != null) {
                 List<String> entities = (List<String>)(msg.obj);
                 if (entities.size() == 0) {
@@ -80,8 +86,12 @@ public class ExerciseFragment extends Fragment {
                 intent.putStringArrayListExtra("entities", new ArrayList<String>(entities));
                 intent.putExtra("exam", false);
                 that.startActivity(intent);
-            } else {
+            }
+            else if (msg.obj.toString().equals("no network connection")) {
                 Toast.makeText(binding.getRoot().getContext(), "网络服务不可用", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(binding.getRoot().getContext(), "获取推荐试题失败，请检查登录状态", Toast.LENGTH_SHORT).show();
             }
         }
     }

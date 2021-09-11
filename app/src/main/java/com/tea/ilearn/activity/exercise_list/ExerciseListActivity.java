@@ -85,18 +85,22 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                 }
                 new Thread(() -> {
                     synchronized (lock) {
+                        StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, examMode, loadLatch, fragments, retry, lock);
                         for (int i = 0; i < names.size(); i += 5) {
                             int l = i * 5;
                             int r = Math.min((i+1) * 5, names.size());
                             loadLatch = new CountDownLatch(r-l);
                             for (int j = l; j < r; ++j) {
                                 retry = (r!=names.size());
-                                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, examMode, loadLatch, fragments, retry, lock);
-                                EduKG.getInst().getProblems(names.get(i), handler);
+                                int finalJ = j;
+                                runOnUiThread(() -> EduKG.getInst().getProblems(names.get(finalJ), handler));
                             }
+                            Log.e("handleMessage", "before wait");
                             try {
                                 lock.wait();
+                                Log.e("handleMessage", "after wait");
                             } catch (InterruptedException e) {
+                                Log.e("handleMessage", "not wait: " + e.toString());
                                 if (!retry) return;
                             }
                         }
@@ -132,6 +136,9 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             loadLatch.countDown();
+            Log.e("handleMessage", "before");
+            synchronized(lock) {}
+            Log.e("handleMessage", "after");
             if (msg.what == 0 && msg.obj != null) {
                 List<Problem> problems = (List<Problem>) msg.obj;
                 if (problems != null && problems.size() != 0) {
@@ -159,14 +166,14 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                 if (fragments.size() == 0) {
                     binding.notFound.setVisibility(View.VISIBLE);
                     if (retry) {
-                        lock.notify();
+                        synchronized (lock) { lock.notify(); }
                         return;
                     }
                 }
                 else {
                     if (retry) {
                         retry = false;
-                        lock.notify();
+                        synchronized (lock) { lock.notify(); }
                     }
                     Collections.shuffle(fragments, new Random(System.nanoTime()));
                     if (fragments.size() > 10) {
@@ -178,10 +185,10 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                         fragments.get(i).setPageNumber((i+1)+"/"+fragments.size());
                     }
                     mExerciseListAdapter.set(fragments);
+                    if (examMode)
+                        binding.submitBtn.setVisibility(View.VISIBLE);
                 }
                 binding.progressCircular.setVisibility(View.GONE);
-                if (examMode)
-                    binding.submitBtn.setVisibility(View.VISIBLE);
             }
         }
     }
