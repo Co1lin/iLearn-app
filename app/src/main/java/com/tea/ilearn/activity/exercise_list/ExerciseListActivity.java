@@ -26,12 +26,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ExerciseListActivity extends AppCompatActivity implements WbShareCallback {
     private ActivityExerciseListBinding binding;
     private ExerciseListAdapter mExerciseListAdapter;
     private CountDownLatch loadLatch = new CountDownLatch(0);
-    private Boolean retry;
+    private AtomicBoolean retry = new AtomicBoolean(false);
     private Object lock = new Object();
 
     private IWBAPI mWBAPI;
@@ -73,7 +75,7 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                 String name = intent.getStringExtra("name");
                 binding.name.setText(name + "相关习题");
                 loadLatch = new CountDownLatch(1);
-                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch, fragments, false, lock);
+                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch, fragments, retry, lock);
                 EduKG.getInst().getProblems(name, handler);
                 binding.submitBtn.setVisibility(View.INVISIBLE);
             } else {
@@ -85,27 +87,27 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                 }
                 new Thread(() -> {
                     synchronized (lock) {
-                        StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, examMode, loadLatch, fragments, retry, lock);
+                        AtomicReference<StaticHandler> handler = new AtomicReference<>();
+                        runOnUiThread(() -> {
+                            handler.set(new StaticHandler(mExerciseListAdapter, binding, mWBAPI, examMode, loadLatch, fragments, retry, lock));
+                        });
                         for (int i = 0; i < names.size(); i += 5) {
-                            int l = i * 5;
-                            int r = Math.min((i+1) * 5, names.size());
+                            int l = i;
+                            int r = Math.min(i+5, names.size());
                             loadLatch = new CountDownLatch(r-l);
+                            retry.set(r != names.size());
                             for (int j = l; j < r; ++j) {
-                                retry = (r!=names.size());
                                 int finalJ = j;
-                                runOnUiThread(() -> EduKG.getInst().getProblems(names.get(finalJ), handler));
+                                runOnUiThread(() -> EduKG.getInst().getProblems(names.get(finalJ), handler.get()));
                             }
-                            Log.e("handleMessage", "before wait");
                             try {
                                 lock.wait();
-                                Log.e("handleMessage", "after wait");
-                            } catch (InterruptedException e) {
-                                Log.e("handleMessage", "not wait: " + e.toString());
-                                if (!retry) return;
+                                if (!retry.get()) return;
+                            } catch (Exception e) {
+                                Log.e("ExerciseListActivity", "not wait: " + e.toString());
                             }
                         }
                     }
-                    Log.d("MYDEBUG", "here");
                 }).start();
             }
         }
@@ -116,12 +118,12 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
         private ActivityExerciseListBinding binding;
         private IWBAPI mWPAPI;
         private boolean examMode;
-        private Boolean retry;
+        private AtomicBoolean retry;
         private Object lock;
         private CountDownLatch loadLatch;
         private List<ExerciseFragment> fragments;
 
-        StaticHandler(ExerciseListAdapter mExerciseListAdapter, ActivityExerciseListBinding binding, IWBAPI WBAPI, boolean examMode, CountDownLatch loadLatch, List<ExerciseFragment> fragments, boolean retry, Object lock) {
+        StaticHandler(ExerciseListAdapter mExerciseListAdapter, ActivityExerciseListBinding binding, IWBAPI WBAPI, boolean examMode, CountDownLatch loadLatch, List<ExerciseFragment> fragments, AtomicBoolean retry, Object lock) {
             this.mExerciseListAdapter = mExerciseListAdapter;
             this.binding = binding;
             this.mWPAPI = WBAPI;
@@ -136,9 +138,7 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             loadLatch.countDown();
-            Log.e("handleMessage", "before");
             synchronized(lock) {}
-            Log.e("handleMessage", "after");
             if (msg.what == 0 && msg.obj != null) {
                 List<Problem> problems = (List<Problem>) msg.obj;
                 if (problems != null && problems.size() != 0) {
@@ -165,21 +165,24 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
             if (loadLatch.getCount() == 0) {
                 if (fragments.size() == 0) {
                     binding.notFound.setVisibility(View.VISIBLE);
-                    if (retry) {
+                    if (retry.get()) {
                         synchronized (lock) { lock.notify(); }
                         return;
                     }
                 }
                 else {
-                    if (retry) {
-                        retry = false;
+                    if (retry.get()) {
+                        retry.set(false);
                         synchronized (lock) { lock.notify(); }
                     }
                     Collections.shuffle(fragments, new Random(System.nanoTime()));
-                    if (fragments.size() > 10) {
-                        for (int i = fragments.size() - 1; i >= 10; --i) {
+                    if (fragments.size() > 20) {
+                        for (int i = fragments.size() - 1; i >= 20; --i)
                             fragments.remove(i);
-                        }
+                    }
+                    else if (fragments.size() > 10) {
+                        for (int i = fragments.size() - 1; i >= 10; --i)
+                            fragments.remove(i);
                     }
                     for (int i = 0; i < fragments.size(); ++i) {
                         fragments.get(i).setPageNumber((i+1)+"/"+fragments.size());

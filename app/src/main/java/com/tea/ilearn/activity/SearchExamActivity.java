@@ -37,6 +37,8 @@ public class SearchExamActivity extends AppCompatActivity {
         binding.entityName.setOnKeyListener((view, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
                 addEntity();
+                binding.entityName.setText(binding.entityName.getText().toString().trim());
+                binding.entityName.setSelection(binding.entityName.getText().length());
                 return true;
             }
             return false;
