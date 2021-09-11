@@ -456,49 +456,4 @@ public class Backend extends APIRequest {
             ObjectBox.get().boxFor(EduKGEntityDetail.class).removeAll();
         }).start();
     }
-
-    // categories
-    /*
-    public void uploadCategories(Category category, Handler handler) {
-        POSTJson("category",
-                new HashMap<String, Object>(){{
-                    put("name", category.getName());
-                    put("num", category.getNum());
-                }},
-                p -> p.asResponse(String.class),
-                handler);
-    }
-
-    public void getCategories(Handler handler) {
-        Handler callbackHandler = new GetEntitiesCallback(handler);
-        GET("category",
-                new HashMap<String, Object>(),
-                p -> p.asResponseList(Category.class),
-                handler);
-    }
-
-    static class GetCategoriesCallback extends Handler {
-        Handler originalHandler;
-
-        public GetCategoriesCallback(Handler originalHandler) {
-            this.originalHandler = originalHandler;
-        }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            if (msg.what == 1 || msg.obj == null) {
-                Log.e("Backend/GetCategoriesCallback", msg.what + " " + msg.obj);
-                Message.obtain(originalHandler, 1, null).sendToTarget();
-            }
-            else {
-                ArrayList<Category> categories = (ArrayList<Category>) msg.obj;
-                Box<Category> categoryBox = ObjectBox.get().boxFor(Category.class);
-                categoryBox.removeAll();
-                categoryBox.put(categories);
-                Message.obtain(originalHandler, 0, msg.obj).sendToTarget();
-            }
-        }
-    }
-    */
 }

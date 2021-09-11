@@ -94,7 +94,8 @@ public class ExerciseFragment extends Fragment {
     private void doWeiboShare() {
         WeiboMultiMessage message = new WeiboMultiMessage();
         TextObject textObject = new TextObject();
-        textObject.text = "#iLearn# 这题出的真好！快来看看你会做吗？"+description+" A."+choices[0]+" B."+choices[1]+" C."+choices[2]+" D."+choices[3];
+        textObject.text = "#iLearn# 这题出的真好！快来看看你会做吗？\n\n" + description + "\nA." + choices[0] +
+                "\nB." + choices[1] + "\nC." + choices[2] + "\nD." + choices[3] + "\n";
         message.textObject = textObject;
         mWBAPI.shareMessage(message, true);
     }
