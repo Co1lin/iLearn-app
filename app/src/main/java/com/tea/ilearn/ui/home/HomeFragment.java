@@ -19,12 +19,14 @@ import com.heaven7.android.dragflowlayout.DragFlowLayout;
 import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
+import com.tea.ilearn.model.Preference;
 import com.tea.ilearn.utils.DB_utils;
+import com.tea.ilearn.utils.ObjectBox;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import io.objectbox.Box;
 import per.goweii.actionbarex.common.ActionBarSearch;
 import per.goweii.actionbarex.common.AutoComplTextView;
 
@@ -132,12 +134,30 @@ public class HomeFragment extends Fragment {
     }
 
     private void initTabs() {
-        List<String> subjects = Arrays.asList("biology", "chemistry"); // TODO colin: database ralated (no thread)
+        Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
 
-        pagerAdapter = new SubjectListAdapter(getChildFragmentManager(), subjects);
-        binding.viewPager.setOffscreenPageLimit(Constant.EduKG.SUBJECTS_EN.size());
-        binding.viewPager.setAdapter(pagerAdapter);
-        binding.subjectTabs.setupWithViewPager(binding.viewPager);
+        new Thread(() -> {
+            // load subject preference from DB
+            List<String> subjects;
+            List<Preference> res = preferenceBox.getAll();
+            if (res != null && res.size() > 0 &&
+                res.get(0).getSubjects() != null && res.get(0).getSubjects().size() > 0) {
+                subjects = res.get(0).getSubjects();
+            }
+            else {
+                preferenceBox.removeAll();
+                Preference preference = new Preference();
+                subjects = preference.getSubjects();
+                preferenceBox.put(preference);
+            }
+            // set to UI
+            getActivity().runOnUiThread(() -> {
+                pagerAdapter = new SubjectListAdapter(getChildFragmentManager(), subjects);
+                binding.viewPager.setOffscreenPageLimit(Constant.EduKG.SUBJECTS_EN.size());
+                binding.viewPager.setAdapter(pagerAdapter);
+                binding.subjectTabs.setupWithViewPager(binding.viewPager);
+            });
+        }).start();
 
         binding.editPanel.setOnTouchListener((view, event) -> true);
 
@@ -169,12 +189,25 @@ public class HomeFragment extends Fragment {
                 binding.cover.setVisibility(View.INVISIBLE);
                 binding.editPanel.setVisibility(View.INVISIBLE);
 
-                pagerAdapter.change(binding.flowLayout.getDragItemManager().getItems());
+                List<String> newSubjects = binding.flowLayout.getDragItemManager().getItems();
+                pagerAdapter.change(newSubjects);
 
                 binding.flowLayout.getDragItemManager().clearItems();
                 binding.unused.getDragItemManager().clearItems();
 
                 search();
+
+                // store the preference into DB
+                new Thread(() -> {
+                    Preference preference;
+                    List<Preference> res = preferenceBox.getAll();
+                    if (res != null && res.size() > 0)
+                        preference = res.get(0);
+                    else
+                        preference = new Preference();
+                    preference.setSubjects(new ArrayList<>(newSubjects));
+                    preferenceBox.put(preference);
+                }).start();
             }
         });
 
