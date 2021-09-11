@@ -176,11 +176,11 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                         synchronized (lock) { lock.notify(); }
                     }
                     Collections.shuffle(fragments, new Random(System.nanoTime()));
-                    if (fragments.size() > 20) {
+                    if (fragments.size() >= 20) {
                         for (int i = fragments.size() - 1; i >= 20; --i)
                             fragments.remove(i);
                     }
-                    else if (fragments.size() > 10) {
+                    else if (fragments.size() >= 10) {
                         for (int i = fragments.size() - 1; i >= 10; --i)
                             fragments.remove(i);
                     }
@@ -188,6 +188,7 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                         fragments.get(i).setPageNumber((i+1)+"/"+fragments.size());
                     }
                     mExerciseListAdapter.set(fragments);
+                    binding.exerciseList.setOffscreenPageLimit(fragments.size());
                     if (examMode)
                         binding.submitBtn.setVisibility(View.VISIBLE);
                 }
