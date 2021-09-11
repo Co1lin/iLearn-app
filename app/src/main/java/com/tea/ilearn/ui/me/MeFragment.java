@@ -119,7 +119,7 @@ public class MeFragment extends Fragment {
         });
 
         // try to login
-        Backend.getInst().login(new LoginHandler(getActivity(), binding, root));
+        fakeLogin();
 
         return root;
     }
@@ -128,6 +128,23 @@ public class MeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         loadStatistics(getActivity(), binding, root);
+    }
+
+    void fakeLogin() {
+        new Thread(() -> {
+            Box<Account> accountBox = ObjectBox.get().boxFor(Account.class);
+            List<Account> accountRes = accountBox.getAll();
+            if (accountRes != null && accountRes.size() > 0) {
+                Account account = accountRes.get(0);
+                if (account.getUsername().trim().length() > 0 &&
+                    account.getPassword().trim().length() > 0) {
+                    getActivity().runOnUiThread(() -> {
+                        binding.nameProfile.setText(account.getUsername());
+                        binding.logoutButton.setVisibility(View.VISIBLE);
+                    });
+                }
+            }
+        }).start();
     }
 
     static public void loadStatistics(Activity activity, FragmentMeBinding binding, View root) {

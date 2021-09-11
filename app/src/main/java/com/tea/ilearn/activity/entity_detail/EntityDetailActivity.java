@@ -40,6 +40,8 @@ import com.tea.ilearn.net.edukg.EduKGRelation;
 import com.tea.ilearn.utils.ObjectBox;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -247,7 +249,8 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     new Thread(() -> {  // update relations and properties
                         waitUntilDetailGot();
                         detailInDB.setRelations(finalRelations)
-                                .setProperties(finalProperties);
+                                .setProperties(finalProperties)
+                                .setTimestamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
                         entityBox.put(detailInDB);
                     }).start();
                 }
@@ -316,7 +319,8 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     .setCategory(categories)
                     .setSubject(subject)
                     .setLabel(name)
-                    .setUri(uri);
+                    .setUri(uri)
+                    .setTimestamp(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
             detailInDB = detailTemp;
             entityBox.put(detailInDB);
         }).start();
