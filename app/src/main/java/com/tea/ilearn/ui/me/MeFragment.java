@@ -118,6 +118,12 @@ public class MeFragment extends Fragment {
             startActivity(intent);
         });
 
+        binding.star.setOnClickListener($ -> {
+            Intent intent = new Intent(root.getContext(), HistoryActivity.class);
+            intent.putExtra("star", true);
+            startActivity(intent);
+        });
+
         // try to login
         fakeLogin();
 

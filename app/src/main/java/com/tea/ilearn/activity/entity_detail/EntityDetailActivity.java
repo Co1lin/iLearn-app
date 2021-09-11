@@ -115,15 +115,8 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             });
 
             binding.progressCircular.setVisibility(View.VISIBLE);
-            boolean loaded = false; // TODO get info from database (base on id?)
-            if (!loaded) {
-                StaticHandler handler = new StaticHandler(binding, pagerAdapter);
-                EduKG.getInst().getEntityDetails(subject, name, handler);
-                // TODO save to database (including the loaded status)
-            }
-            else {
-                // TODO load from database (star, properties, relations)
-            }
+            StaticHandler handler = new StaticHandler(binding, pagerAdapter);
+            EduKG.getInst().getEntityDetails(subject, name, handler);
         }
     }
 
