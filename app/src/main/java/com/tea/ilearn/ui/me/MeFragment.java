@@ -136,6 +136,11 @@ public class MeFragment extends Fragment {
             startActivity(intent);
         });
 
+        binding.darkModeSwitch.setOnClickListener($ -> {
+            Toast.makeText(root.getContext(), "主题色的修改将在应用下次启动时生效", Toast.LENGTH_SHORT).show();
+            // TODO save to database
+        });
+
         // try to login
         fakeLogin();
 

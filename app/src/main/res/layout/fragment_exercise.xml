@@ -7,60 +7,92 @@
     android:layout_height="match_parent"
     tools:context=".ui.exercise.ExerciseFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/top_bar"
+    <com.google.android.material.card.MaterialCardView
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="48dp"
+        android:id="@+id/search_exam"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_gravity="center"
-        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/suggest_exam"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-        <TextView
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:gravity="center"
-            android:layout_marginStart="16dp"
-            android:text="为您推荐套题"
-            android:textAppearance="?attr/textAppearanceBody1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <Button
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
-            android:id="@+id/changeBatch"
-            android:text="换一批"
-            android:layout_marginEnd="16dp"
-            app:icon="@drawable/ic_refresh_24"
-            app:iconGravity="end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+            <ImageView
+                android:id="@+id/exam_image"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:src="@drawable/ic_exam"
+                android:layout_width="128dp"
+                android:layout_height="128dp" />
+            <TextView
+                android:text="专项测试"
+                android:gravity="center"
+                android:textAppearance="?attr/textAppearanceHeadline4"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/exam_image"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-    <View
-        android:id="@+id/separate_bar"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintTop_toBottomOf="@id/top_bar"
-        android:background="?colorSurface" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/exercise_recycler"
-        app:layout_constraintTop_toBottomOf="@id/separate_bar"
+    <com.google.android.material.card.MaterialCardView
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="48dp"
+        android:id="@+id/suggest_exam"
+        app:layout_constraintTop_toBottomOf="@id/search_exam"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
-        android:layout_height="0dp" />
+        android:layout_height="wrap_content" >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+            <ImageView
+                android:id="@+id/suggest_image"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:src="@drawable/ic_suggestion"
+                android:layout_width="128dp"
+                android:layout_height="128dp" />
+            <TextView
+                android:text="试题推荐"
+                android:gravity="center"
+                android:textAppearance="?attr/textAppearanceHeadline4"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/suggest_image"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        app:layout_constraintTop_toTopOf="@id/exercise_recycler"
-        app:layout_constraintBottom_toBottomOf="@id/exercise_recycler"
-        app:layout_constraintStart_toStartOf="@id/exercise_recycler"
-        app:layout_constraintEnd_toEndOf="@id/exercise_recycler"
-        android:indeterminate="true"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/progress_circular"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:background="?colorSurface"
+        android:visibility="gone"
+        android:translationZ="100dp"
+        android:alpha="0.7"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

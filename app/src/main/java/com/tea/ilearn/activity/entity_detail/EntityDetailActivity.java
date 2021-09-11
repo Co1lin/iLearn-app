@@ -135,7 +135,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             binding.progressCircular.setVisibility(View.GONE);
             ArrayList<EduKGRelation> relations = null;
             ArrayList<EduKGProperty> properties = null;
-            if (msg.what == 0) {
+            if (msg.what == 0 && msg.obj != null) {
                 EduKGEntityDetail detailFromNet = (EduKGEntityDetail) msg.obj;
                 if (detailFromNet != null) {
                     relations = detailFromNet.getRelations();
