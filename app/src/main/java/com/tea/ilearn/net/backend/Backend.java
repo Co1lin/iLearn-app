@@ -135,12 +135,10 @@ public class Backend extends APIRequest {
         );
     }
 
-    public void changePassword(String oldPassword, String newPassword,
-                                  String username, Handler handler) {
+    public void changePassword(String oldPassword, String newPassword, Handler handler) {
         Handler callbackHandler = new ChangePasswordCallback(handler).setPassword(newPassword);
         POSTJson("/users/changepassword",
                 new HashMap<String, Object>(){{
-                    put("username", username);
                     put("new_password", newPassword);
                     put("old_password", oldPassword);
                 }},
@@ -168,7 +166,7 @@ public class Backend extends APIRequest {
             if (msg.what == 1 || msg.obj == null) {
                 Log.e("Backend/ChangePasswordCallback", msg.what + " " + msg.obj);
                 if (originalHandler != null)
-                    Message.obtain(originalHandler, 1, null).sendToTarget();
+                    Message.obtain(originalHandler, 1, msg.obj).sendToTarget();
             }
             else {  // store to DB and send to frontend
                 Box<Account> accountBox = ObjectBox.get().boxFor(Account.class);
@@ -288,7 +286,7 @@ public class Backend extends APIRequest {
             if (msg.what == 1 || msg.obj == null) {
                 Log.e("Backend/GetUserStatisticsCallback", msg.what + " " + msg.obj);
                 if (originalHandler != null)
-                    Message.obtain(originalHandler, 1, null).sendToTarget();
+                    Message.obtain(originalHandler, 1, msg.obj).sendToTarget();
             }
             else {  // store to DB and send to frontend
                 UserStatistics statistics = (UserStatistics) msg.obj;
@@ -342,7 +340,7 @@ public class Backend extends APIRequest {
             if (msg.what == 1 || msg.obj == null) {
                 Log.e("Backend/GetPreferencesCallback", msg.what + " " + msg.obj);
                 if (originalHandler != null)
-                    Message.obtain(originalHandler, 1, null).sendToTarget();
+                    Message.obtain(originalHandler, 1, msg.obj).sendToTarget();
             }
             else {  // store to DB and send to frontend
                 Preference preference = (Preference) msg.obj;
