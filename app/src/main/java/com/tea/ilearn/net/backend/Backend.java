@@ -136,6 +136,7 @@ public class Backend extends APIRequest {
 
     public void changePassword(String oldPassword, String newPassword,
                                   String username, Handler handler) {
+        Handler callbackHandler = new ChangePasswordCallback(handler).setPassword(newPassword);
         POSTJson("/users/changepassword",
                 new HashMap<String, Object>(){{
                     put("username", username);
@@ -143,9 +144,43 @@ public class Backend extends APIRequest {
                     put("old_password", oldPassword);
                 }},
                 p -> p.asResponse(ChangePasswdResponse.class),
-                handler
+                callbackHandler
         );
-        // TODO callback?
+    }
+
+    static class ChangePasswordCallback extends Handler {
+        Handler originalHandler;
+        String password;
+
+        public ChangePasswordCallback setPassword(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public ChangePasswordCallback(Handler originalHandler) {
+            this.originalHandler = originalHandler;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1 || msg.obj == null) {
+                Log.e("Backend/ChangePasswordCallback", msg.what + " " + msg.obj);
+                if (originalHandler != null)
+                    Message.obtain(originalHandler, 1, null).sendToTarget();
+            }
+            else {  // store to DB and send to frontend
+                Box<Account> accountBox = ObjectBox.get().boxFor(Account.class);
+                List<Account> res = accountBox.getAll();
+                if (res != null && res.size() > 0) {
+                    Account account = res.get(0);
+                    account.setPassword(password);
+                    accountBox.put(account);
+                    if (originalHandler != null)
+                        Message.obtain(originalHandler,0, account).sendToTarget();
+                }
+            }
+        }
     }
 
     public void checkUsername(String username, Handler handler) {
@@ -231,14 +266,16 @@ public class Backend extends APIRequest {
             super.handleMessage(msg);
             if (msg.what == 1 || msg.obj == null) {
                 Log.e("Backend/GetUserStatisticsCallback", msg.what + " " + msg.obj);
-                Message.obtain(originalHandler, 1, null).sendToTarget();
+                if (originalHandler != null)
+                    Message.obtain(originalHandler, 1, null).sendToTarget();
             }
             else {  // store to DB and send to frontend
                 UserStatistics statistics = (UserStatistics) msg.obj;
                 Box<UserStatistics> statisticsBox = ObjectBox.get().boxFor(UserStatistics.class);
                 statisticsBox.removeAll();
                 statisticsBox.put(statistics);
-                Message.obtain(originalHandler,0, statistics).sendToTarget();
+                if (originalHandler != null)
+                    Message.obtain(originalHandler,0, statistics).sendToTarget();
             }
         }
     }
