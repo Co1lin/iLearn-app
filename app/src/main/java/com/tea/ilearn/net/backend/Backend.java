@@ -184,6 +184,26 @@ public class Backend extends APIRequest {
         }
     }
 
+    public void resetPassword(String username, String code, String newPassword, Handler handler) {
+        POSTJson("/users/reset",
+                new HashMap<String, Object>(){{
+                    put("username", username);
+                    put("code", code);
+                    put("new_password", newPassword);
+                }},
+                p -> p.asResponse(String.class),
+                handler);
+    }
+
+    public void forgetPassword(String username, Handler handler) {
+        POSTJson("/users/forget",
+                new HashMap<String, Object>(){{
+                    put("username", username);
+                }},
+                p -> p.asResponse(String.class),
+                handler);
+    }
+
     public void checkUsername(String username, Handler handler) {
         POSTJson("/users/checkbyname",
                 new HashMap<String, Object>(){{

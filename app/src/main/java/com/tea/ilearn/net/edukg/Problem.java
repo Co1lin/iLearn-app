@@ -14,7 +14,15 @@ public class Problem {
     String[] choices;
 
     public String getAnswer() {
-        return answer;
+        if (answer.contains("A"))
+            return "A";
+        else if (answer.contains("B"))
+            return "B";
+        else if (answer.contains("C"))
+            return "C";
+        else if (answer.contains("D"))
+            return "D";
+        return "";
     }
 
     public int getId() {
