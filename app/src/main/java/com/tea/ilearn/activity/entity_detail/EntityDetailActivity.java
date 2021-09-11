@@ -115,15 +115,8 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             });
 
             binding.progressCircular.setVisibility(View.VISIBLE);
-            boolean loaded = false; // TODO get info from database (base on id?)
-            if (!loaded) {
-                StaticHandler handler = new StaticHandler(binding, pagerAdapter);
-                EduKG.getInst().getEntityDetails(subject, name, handler);
-                // TODO save to database (including the loaded status)
-            }
-            else {
-                // TODO load from database (star, properties, relations)
-            }
+            StaticHandler handler = new StaticHandler(binding, pagerAdapter);
+            EduKG.getInst().getEntityDetails(subject, name, handler);
         }
     }
 
@@ -159,8 +152,7 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
                     }).start();
                 }
             } else { // msg.what = 1
-                // TODO load from database and display offline loading hint
-                // TODO and set to local variable relations and properties (mentioned above) (use below)
+                Toast.makeText(binding.getRoot().getContext(), "网络异常，显示离线缓存中...", Toast.LENGTH_SHORT).show();
                 List<EduKGEntityDetail> entitiesRes =
                         entityBox.query().equal(EduKGEntityDetail_.uri, uri).build().find();
                 if (entitiesRes != null && entitiesRes.size() > 0) {
