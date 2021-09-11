@@ -23,6 +23,8 @@ public class Preference {
             Constant.EduKG.CHINESE, Constant.EduKG.MATH
     ));
 
+    boolean dark = true;
+
     public static class StringListConverter implements PropertyConverter<ArrayList<String>, String> {
 
         @Override
@@ -45,8 +47,17 @@ public class Preference {
         return subjects;
     }
 
+    public boolean isDark() {
+        return dark;
+    }
+
     public Preference setSubjects(ArrayList<String> subjects) {
         this.subjects = subjects;
+        return this;
+    }
+
+    public Preference setDark(boolean dark) {
+        this.dark = dark;
         return this;
     }
 }
