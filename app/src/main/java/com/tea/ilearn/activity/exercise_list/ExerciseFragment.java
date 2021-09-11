@@ -17,11 +17,16 @@ import com.tea.ilearn.databinding.ExerciseCardBinding;
 
 public class ExerciseFragment extends Fragment {
     private ExerciseCardBinding binding;
-    private String description, pageNumber;
+    private String description;
+    private String pageNumber;
     private String[] choices;
     private String answer;
     private IWBAPI mWBAPI;
     private boolean examMode;
+
+    public void setPageNumber(String pageNumber) {
+        this.pageNumber = pageNumber;
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -45,7 +50,7 @@ public class ExerciseFragment extends Fragment {
 //            else {
 //                Toast.makeText(root.getContext(), "已取消收藏", Toast.LENGTH_SHORT).show();
 //            }
-//            // TODO save to dababase
+//            // save to dababase
 //        });
         binding.share.setOnClickListener($ -> {
             doWeiboShare();

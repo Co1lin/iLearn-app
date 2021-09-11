@@ -15,8 +15,8 @@ public class ExerciseListAdapter extends FragmentPagerAdapter {
         mFragmentList = new ArrayList<>();
     }
 
-    public void add(ExerciseFragment frag) {
-        mFragmentList.add(frag);
+    public void set(List<ExerciseFragment> fragments) {
+        mFragmentList = fragments;
         notifyDataSetChanged();
     }
 

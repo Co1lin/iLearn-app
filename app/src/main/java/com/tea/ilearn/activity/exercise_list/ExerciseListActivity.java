@@ -20,7 +20,10 @@ import com.tea.ilearn.databinding.ActivityExerciseListBinding;
 import com.tea.ilearn.net.edukg.EduKG;
 import com.tea.ilearn.net.edukg.Problem;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 public class ExerciseListActivity extends AppCompatActivity implements WbShareCallback {
@@ -55,16 +58,19 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
         });
 
         mExerciseListAdapter = new ExerciseListAdapter(getSupportFragmentManager());
+        binding.exerciseList.setAdapter(mExerciseListAdapter);
+        binding.exerciseList.setPageMargin(10);
 
         binding.progressCircular.setVisibility(View.VISIBLE);
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             List<String> names = intent.getStringArrayListExtra("entities");
+            List<ExerciseFragment> fragments = new ArrayList<>();
             if (names == null) {
                 String name = intent.getStringExtra("name");
                 binding.name.setText(name + "相关习题");
                 loadLatch = new CountDownLatch(1);
-                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch);
+                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch, fragments);
                 EduKG.getInst().getProblems(name, handler);
                 binding.submitBtn.setVisibility(View.INVISIBLE);
             } else {
@@ -72,7 +78,7 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                 binding.name.setText("专项测试");
                 loadLatch = new CountDownLatch(names.size());
                 for (String name : names) {
-                    StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch);
+                    StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch, fragments);
                     EduKG.getInst().getProblems(name, handler);
                 }
                 binding.submitBtn.setVisibility(View.VISIBLE);
@@ -81,18 +87,20 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
     }
 
     static class StaticHandler extends Handler {
-        private ExerciseListAdapter mExerciseAdapter;
+        private ExerciseListAdapter mExerciseListAdapter;
         private ActivityExerciseListBinding binding;
         private IWBAPI mWPAPI;
         private boolean examMode;
         private CountDownLatch loadLatch;
+        private List<ExerciseFragment> fragments;
 
-        StaticHandler(ExerciseListAdapter mExerciseListAdapter, ActivityExerciseListBinding binding, IWBAPI WBAPI, boolean examMode, CountDownLatch loadLatch) {
-            this.mExerciseAdapter = mExerciseListAdapter;
+        StaticHandler(ExerciseListAdapter mExerciseListAdapter, ActivityExerciseListBinding binding, IWBAPI WBAPI, boolean examMode, CountDownLatch loadLatch, List<ExerciseFragment> fragments) {
+            this.mExerciseListAdapter = mExerciseListAdapter;
             this.binding = binding;
             this.mWPAPI = WBAPI;
             this.examMode = examMode;
             this.loadLatch = loadLatch;
+            this.fragments = fragments;
         }
 
         @Override
@@ -117,17 +125,26 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                                 mWPAPI,
                                 examMode
                         );
-                        mExerciseAdapter.add(fragment);
+                        fragments.add(fragment);
                     }
-                    binding.exerciseList.setOffscreenPageLimit(mExerciseAdapter.getCount());
-                    binding.exerciseList.setPageMargin(10);
-                    binding.exerciseList.setAdapter(mExerciseAdapter);
                     binding.notFound.setVisibility(View.GONE);
                 }
             }
             if (loadLatch.getCount() == 0) {
-                if (mExerciseAdapter.getCount() == 0)
+                if (fragments.size() == 0)
                     binding.notFound.setVisibility(View.VISIBLE);
+                else {
+                    Collections.shuffle(fragments, new Random(System.nanoTime()));
+                    if (fragments.size() > 10) {
+                        for (int i = fragments.size() - 1; i >= 10; --i) {
+                            fragments.remove(i);
+                        }
+                    }
+                    for (int i = 0; i < fragments.size(); ++i) {
+                        fragments.get(i).setPageNumber((i+1)+"/"+fragments.size());
+                    }
+                    mExerciseListAdapter.set(fragments);
+                }
                 binding.progressCircular.setVisibility(View.GONE);
             }
         }

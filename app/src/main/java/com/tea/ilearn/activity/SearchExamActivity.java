@@ -24,6 +24,10 @@ public class SearchExamActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivitySearchExamBinding.inflate(getLayoutInflater());
         View root = binding.getRoot();
+        
+        binding.hide.setOnClickListener($ -> {
+            finish();
+        });
 
         map = new HashMap<>();
 
@@ -32,6 +36,10 @@ public class SearchExamActivity extends AppCompatActivity {
             if (name.isEmpty()) {
                 Toast.makeText(root.getContext(), "知识点不能为空", Toast.LENGTH_SHORT).show();
             } else {
+                if (map.size() >= 5) {
+                    Toast.makeText(root.getContext(), "至多选择5个知识点", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (map.get(name) != null) {
                     Toast.makeText(root.getContext(), "知识点不能重复", Toast.LENGTH_SHORT).show();
                     return;
