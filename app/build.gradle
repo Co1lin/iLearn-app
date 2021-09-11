@@ -97,4 +97,7 @@ dependencies {
 
     // share support by weibo
     implementation 'io.github.sinaweibosdk:core:11.8.1@aar'
+
+    // load image from url
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }
