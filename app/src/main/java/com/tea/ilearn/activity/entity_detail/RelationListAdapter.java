@@ -2,6 +2,7 @@ package com.tea.ilearn.activity.entity_detail;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -68,6 +69,8 @@ public class RelationListAdapter extends RecyclerView.Adapter {
 
     public void add(Relation relation) {
         mRelationList.add(relation);
+        Log.d("MYDEBUG", String.valueOf(mRelationList.size()));
+        notifyDataSetChanged();
         notifyItemInserted(mRelationList.size() - 1);
     }
 
