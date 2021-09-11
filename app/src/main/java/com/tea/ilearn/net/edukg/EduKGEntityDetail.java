@@ -40,6 +40,7 @@ public class EduKGEntityDetail {
     ArrayList<String> categories = new ArrayList<>();
     boolean starred;
     boolean viewed;
+    long timestamp;
 
     @Override
     public int hashCode() {
@@ -109,6 +110,10 @@ public class EduKGEntityDetail {
         }
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
     public String getSubject() {
         return subject;
     }
@@ -143,6 +148,11 @@ public class EduKGEntityDetail {
 
     public boolean isViewed() {
         return viewed;
+    }
+
+    public EduKGEntityDetail setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+        return this;
     }
 
     public EduKGEntityDetail setSubject(String subject) {

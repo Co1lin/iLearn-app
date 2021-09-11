@@ -19,18 +19,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.iLearn">
         <activity
+            android:name=".activity.HistoryActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.JumpActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="share"
-                      android:scheme="ilearn" />
-                <data android:host="api.ilearn.enjoycolin.top"
+
+                <data
+                    android:host="share"
+                    android:scheme="ilearn" />
+                <data
+                    android:host="api.ilearn.enjoycolin.top"
                     android:path="/app"
                     android:scheme="http" />
-                <data android:host="api.ilearn.enjoycolin.top"
+                <data
+                    android:host="api.ilearn.enjoycolin.top"
                     android:path="/app"
                     android:scheme="https" />
             </intent-filter>

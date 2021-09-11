@@ -31,6 +31,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.gson.Gson;
 import com.tea.ilearn.R;
+import com.tea.ilearn.activity.HistoryActivity;
 import com.tea.ilearn.activity.account.SigninActivity;
 import com.tea.ilearn.databinding.FragmentMeBinding;
 import com.tea.ilearn.model.Account;
@@ -69,6 +70,7 @@ public class MeFragment extends Fragment {
                         binding.nameProfile.setText(account.getUsername());
                         // update statistics
                         Backend.getInst().getUserStatistics(new GetStatisticsHandler(getActivity(), binding, root));
+                        binding.logoutButton.setVisibility(View.VISIBLE);
                     }
                 }
         );
@@ -100,6 +102,7 @@ public class MeFragment extends Fragment {
                         binding.nameProfile.setText("登录账号");
                         loadStatistics(getActivity(), binding, root);
                         Toast.makeText(root.getContext(), "已登出！", Toast.LENGTH_SHORT).show();
+                        binding.logoutButton.setVisibility(View.GONE);
                     });
                 }
                 else {
@@ -110,8 +113,13 @@ public class MeFragment extends Fragment {
             }).start();
         });
 
+        binding.history.setOnClickListener($ -> {
+            Intent intent = new Intent(root.getContext(), HistoryActivity.class);
+            startActivity(intent);
+        });
+
         // try to login
-        Backend.getInst().login(new LoginHandler(getActivity(), binding, root));
+        fakeLogin();
 
         return root;
     }
@@ -120,6 +128,23 @@ public class MeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         loadStatistics(getActivity(), binding, root);
+    }
+
+    void fakeLogin() {
+        new Thread(() -> {
+            Box<Account> accountBox = ObjectBox.get().boxFor(Account.class);
+            List<Account> accountRes = accountBox.getAll();
+            if (accountRes != null && accountRes.size() > 0) {
+                Account account = accountRes.get(0);
+                if (account.getUsername().trim().length() > 0 &&
+                    account.getPassword().trim().length() > 0) {
+                    getActivity().runOnUiThread(() -> {
+                        binding.nameProfile.setText(account.getUsername());
+                        binding.logoutButton.setVisibility(View.VISIBLE);
+                    });
+                }
+            }
+        }).start();
     }
 
     static public void loadStatistics(Activity activity, FragmentMeBinding binding, View root) {
@@ -260,6 +285,7 @@ public class MeFragment extends Fragment {
                 Account account = (Account) msg.obj;
                 binding.nameProfile.setText(account.getUsername());
                 Backend.getInst().getUserStatistics(new GetStatisticsHandler(activity, binding, root));
+                binding.logoutButton.setVisibility(View.VISIBLE);
             }
             else {  // register failed
                 if (((String) msg.obj).contains("login failed")) {
