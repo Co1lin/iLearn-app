@@ -1,5 +1,6 @@
 package com.tea.ilearn.activity.exercise_list;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +31,8 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
     private ActivityExerciseListBinding binding;
     private ExerciseListAdapter mExerciseListAdapter;
     private CountDownLatch loadLatch = new CountDownLatch(0);
+    private Boolean retry;
+    private Object lock = new Object();
 
     private IWBAPI mWBAPI;
 
@@ -70,18 +73,35 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                 String name = intent.getStringExtra("name");
                 binding.name.setText(name + "相关习题");
                 loadLatch = new CountDownLatch(1);
-                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch, fragments);
+                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch, fragments, false, this);
                 EduKG.getInst().getProblems(name, handler);
                 binding.submitBtn.setVisibility(View.INVISIBLE);
             } else {
-                String title = intent.getStringExtra("category");
-                binding.name.setText("专项测试");
-                loadLatch = new CountDownLatch(names.size());
-                for (String name : names) {
-                    StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, false, loadLatch, fragments);
-                    EduKG.getInst().getProblems(name, handler);
+                boolean examMode = intent.getBooleanExtra("exam", true);
+                if (examMode) {
+                    binding.name.setText("专项测试");
+                } else {
+                    binding.name.setText("试题推荐");
                 }
-                binding.submitBtn.setVisibility(View.VISIBLE);
+                new Thread(() -> {
+                    synchronized (lock) {
+                        for (int i = 0; i < names.size(); i += 5) {
+                            int l = i * 5;
+                            int r = Math.min((i+1) * 5, names.size());
+                            loadLatch = new CountDownLatch(r-l);
+                            for (int j = l; j < r; ++j) {
+                                retry = r!=names.size();
+                                StaticHandler handler = new StaticHandler(mExerciseListAdapter, binding, mWBAPI, examMode, loadLatch, fragments, retry, this);
+                                EduKG.getInst().getProblems(names.get(i), handler);
+                            }
+                            try {
+                                lock.wait();
+                            } catch (InterruptedException e) {
+                                if (!retry) return;
+                            }
+                        }
+                    }
+                }).start();
             }
         }
     }
@@ -91,16 +111,20 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
         private ActivityExerciseListBinding binding;
         private IWBAPI mWPAPI;
         private boolean examMode;
+        private Boolean retry;
+        private Activity that;
         private CountDownLatch loadLatch;
         private List<ExerciseFragment> fragments;
 
-        StaticHandler(ExerciseListAdapter mExerciseListAdapter, ActivityExerciseListBinding binding, IWBAPI WBAPI, boolean examMode, CountDownLatch loadLatch, List<ExerciseFragment> fragments) {
+        StaticHandler(ExerciseListAdapter mExerciseListAdapter, ActivityExerciseListBinding binding, IWBAPI WBAPI, boolean examMode, CountDownLatch loadLatch, List<ExerciseFragment> fragments, boolean retry, Activity that) {
             this.mExerciseListAdapter = mExerciseListAdapter;
             this.binding = binding;
             this.mWPAPI = WBAPI;
             this.examMode = examMode;
             this.loadLatch = loadLatch;
             this.fragments = fragments;
+            this.retry = retry;
+            this.that = that;
         }
 
         @Override
@@ -131,9 +155,18 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                 }
             }
             if (loadLatch.getCount() == 0) {
-                if (fragments.size() == 0)
+                if (fragments.size() == 0) {
                     binding.notFound.setVisibility(View.VISIBLE);
+                    if (retry) {
+                        that.notify();
+                        return;
+                    }
+                }
                 else {
+                    if (retry) {
+                        retry = false;
+                        that.notify();
+                    }
                     Collections.shuffle(fragments, new Random(System.nanoTime()));
                     if (fragments.size() > 10) {
                         for (int i = fragments.size() - 1; i >= 10; --i) {
@@ -146,6 +179,8 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                     mExerciseListAdapter.set(fragments);
                 }
                 binding.progressCircular.setVisibility(View.GONE);
+                if (examMode)
+                    binding.submitBtn.setVisibility(View.VISIBLE);
             }
         }
     }

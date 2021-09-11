@@ -127,7 +127,7 @@ public class EntityListFragment extends Fragment {
                 query = Constant.EduKG.INIT_KEYS[k][j];
                 StaticHandler handler = new StaticHandler(
                         binding, mAbstractInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar,
-                        acTextView, getActivity(), getContext(), false, false);
+                        acTextView, getActivity(), getContext(), true, false);
                 EduKG.getInst().fuzzySearchEntityWithCourse(subject, query, handler);
             }
             binding.emptyHint.setText("暂无条目推荐");
@@ -206,7 +206,7 @@ public class EntityListFragment extends Fragment {
             if (this.expectedNum.getCount() == 0)
                 loadingBar.setVisibility(View.INVISIBLE);
 
-            if (msg.what == 0) {
+            if (msg.what == 0 && msg.obj != null) {
                 List<Entity> entities = (List<Entity>) msg.obj;
                 if (entities != null && entities.size() != 0) {
                     new Thread(() -> {
@@ -251,8 +251,8 @@ public class EntityListFragment extends Fragment {
                 }
             }
             else { // msg.what = 1
-                // TODO acha: no network hint
-                // TODO acha: load from database
+                if (empty_hint)
+                    binding.emptyHint.setVisibility(View.VISIBLE);
             }
         }
     }
