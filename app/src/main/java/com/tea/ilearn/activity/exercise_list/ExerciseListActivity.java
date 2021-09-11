@@ -106,9 +106,9 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            List<Problem> problems = (List<Problem>) msg.obj;
             loadLatch.countDown();
-            if (msg.what == 0) {
+            if (msg.what == 0 && msg.obj != null) {
+                List<Problem> problems = (List<Problem>) msg.obj;
                 if (problems != null && problems.size() != 0) {
                     int numValidProblem = 0;
                     for (Problem p : problems)
