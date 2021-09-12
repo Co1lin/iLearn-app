@@ -65,16 +65,18 @@ public class LinkFragment extends Fragment {
     private void doNER() {
         String text = binding.text.getText().toString();
         String subject = Constant.EduKG.SUBJECTS_EN.get(binding.courseSpinner.getSelectedIndex());
-        StaticHandler handler = new StaticHandler(binding.nerResult, text, subject);
+        StaticHandler handler = new StaticHandler(binding, binding.nerResult, text, subject);
         EduKG.getInst().getNamedEntities(subject, text, handler);
     }
 
     static class StaticHandler extends Handler {
+        private FragmentLinkBinding binding;
         private ChipGroup chipGroup;
         private String origin, subject;
 
-        public StaticHandler(ChipGroup chipGroup, String origin, String subject) {
+        public StaticHandler(FragmentLinkBinding binding, ChipGroup chipGroup, String origin, String subject) {
             super();
+            this.binding = binding;
             this.chipGroup = chipGroup;
             this.origin = origin;
             this.subject = subject;
@@ -119,7 +121,7 @@ public class LinkFragment extends Fragment {
                 }
             }
             else {
-                Toast.makeText(chipGroup.getContext(), Constant.EduKG.ERROR_MSG, Toast.LENGTH_LONG);
+                Toast.makeText(binding.getRoot().getContext(), Constant.EduKG.ERROR_MSG, Toast.LENGTH_SHORT).show();
             }
         }
     }
