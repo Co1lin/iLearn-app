@@ -119,6 +119,8 @@ public class LinkFragment extends Fragment {
                     v.setText(Character.toString(c));
                     chipGroup.addView(v);
                 }
+                if (entities.isEmpty())
+                    Toast.makeText(binding.getRoot().getContext(), "当前学科下没有匹配到实体", Toast.LENGTH_SHORT).show();
             }
             else {
                 Toast.makeText(binding.getRoot().getContext(), Constant.EduKG.ERROR_MSG, Toast.LENGTH_SHORT).show();

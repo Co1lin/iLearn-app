@@ -9,5 +9,9 @@
         <item name="customColorValue">@color/md_grey_300</item>
         <item name="colorSurface">@color/md_grey_100</item>
         <item name="android:windowLightStatusBar">true</item>
+
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/md_white_1000</item>
     </style>
 </resources>

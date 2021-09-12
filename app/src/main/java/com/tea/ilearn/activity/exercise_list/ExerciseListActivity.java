@@ -162,6 +162,8 @@ public class ExerciseListActivity extends AppCompatActivity implements WbShareCa
                     binding.notFound.setVisibility(View.GONE);
                 }
             }
+            if (msg.obj.toString().contains("no network connection"))
+                Toast.makeText(binding.getRoot().getContext(), "网络服务不可用", Toast.LENGTH_SHORT).show();
             if (loadLatch.getCount() == 0) {
                 if (fragments.size() == 0) {
                     binding.notFound.setVisibility(View.VISIBLE);
