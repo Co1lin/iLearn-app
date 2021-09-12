@@ -31,6 +31,7 @@
             </com.otaliastudios.zoom.ZoomLayout>
 
             <View
+                android:id="@+id/separate_line"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@android:color/darker_gray"
@@ -52,5 +53,15 @@
                 android:layout_height="16dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/empty_hint"
+        android:text="很抱歉，实体在知识图谱中没有找到关系"
+        android:textAppearance="?attr/textAppearanceBody2"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </TextView>
 </androidx.constraintlayout.widget.ConstraintLayout>
 
