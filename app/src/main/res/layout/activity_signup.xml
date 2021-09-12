@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             app:endIconMode="password_toggle"
             app:errorEnabled="true"
-            android:hint="6位以上密码"
+            android:hint="密码"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <com.google.android.material.textfield.TextInputEditText

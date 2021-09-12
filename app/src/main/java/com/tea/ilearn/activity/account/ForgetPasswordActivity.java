@@ -1,9 +1,14 @@
 package com.tea.ilearn.activity.account;
 
+import android.content.Context;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputLayout;
 import com.tea.ilearn.databinding.ActivityForgetPasswordBinding;
 import com.tea.ilearn.net.backend.Backend;
+import com.tea.ilearn.utils.Checker;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -49,9 +55,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
 
         binding.newPassword.setOnFocusChangeListener((view, hasFocus) -> {
             if (!hasFocus) {
-                if (binding.newPassword.getText().toString().length() < 6) {
-                    binding.newPasswordBox.setError("密码长度至少为6");
-                }
+                Checker.checkPassword(binding.newPassword, binding.newPasswordBox);
             } else {
                 binding.newPasswordBox.setError(null);
             }
@@ -59,12 +63,16 @@ public class ForgetPasswordActivity extends AppCompatActivity {
 
         binding.submit.setOnClickListener($ -> {
             // validate the verification code with backend
-            binding.progressCircular.setVisibility(View.VISIBLE);
-            String username = binding.username.getText().toString();
-            String code = binding.verifycode.getText().toString();
-            String newPassword = binding.newPassword.getText().toString();
-            Backend.getInst().resetPassword(username, code, newPassword,
-                    new ResetHandler(binding, this));
+            if (Checker.checkPassword(binding.newPassword, binding.newPasswordBox) &&
+                binding.usernameBox.getError() == null &&
+                binding.verifycodeBox.getError() == null) {
+                binding.progressCircular.setVisibility(View.VISIBLE);
+                String username = binding.username.getText().toString();
+                String code = binding.verifycode.getText().toString();
+                String newPassword = binding.newPassword.getText().toString();
+                Backend.getInst().resetPassword(username, code, newPassword,
+                        new ResetHandler(binding, this));
+            }
         });
     }
 
@@ -142,5 +150,25 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                             "重置密码失败，请检查信息填写是否正确！", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    /**
+     * Ref <a href="https://stackoverflow.com/a/28939113">EditText, clear focus on touch outside</a>
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if (v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+        }
+        return super.dispatchTouchEvent( event );
     }
 }

@@ -1,7 +1,9 @@
 package com.tea.ilearn.ui.home;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.tabs.TabLayout;
@@ -44,6 +47,11 @@ public class HomeFragment extends Fragment {
         root = binding.getRoot();
         searchBar = binding.searchBar;
         acTextView = searchBar.getEditTextView();
+
+        TypedValue typedValue = new TypedValue();
+        binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.colorSurface, typedValue, true);
+        int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
+        acTextView.setBackgroundTintList(ColorStateList.valueOf(color));
 
         searchBar.setOnRightIconClickListener(view -> search());
         // bind enter key

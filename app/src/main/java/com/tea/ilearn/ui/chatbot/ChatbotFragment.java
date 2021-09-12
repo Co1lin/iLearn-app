@@ -1,10 +1,12 @@
 package com.tea.ilearn.ui.chatbot;
 
 import android.app.Activity;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -15,11 +17,13 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.Constant;
+import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentChatbotBinding;
 import com.tea.ilearn.net.edukg.Answer;
 import com.tea.ilearn.net.edukg.EduKG;
@@ -46,6 +50,11 @@ public class ChatbotFragment extends Fragment {
         bottomSendBar = binding.sendBar;
         editText = bottomSendBar.getEditTextView();
         sendButton = bottomSendBar.getRightIconView();
+
+        TypedValue typedValue = new TypedValue();
+        binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.colorSurface, typedValue, true);
+        int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
+        editText.setBackgroundTintList(ColorStateList.valueOf(color));
 
         mMessageRecycler = binding.recyclerChat;
         mMessageAdapter = new MessageListAdapter(getContext(), new ArrayList<>());

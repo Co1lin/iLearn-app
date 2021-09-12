@@ -23,7 +23,7 @@
         android:id="@+id/card_chat_message_other"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#eef1f6"
+        app:cardBackgroundColor="?colorSurface"
         app:cardCornerRadius="12dp"
         app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"
@@ -47,7 +47,7 @@
                 android:paddingTop="8dp"
                 android:paddingRight="12dp"
                 android:textIsSelectable="true"
-                android:textColor="#000000"
+                android:textAppearance="?attr/textAppearanceBody2"
                 android:textSize="16sp" />
         </LinearLayout>
 

@@ -23,6 +23,7 @@ import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.ActivitySignupBinding;
 import com.tea.ilearn.model.Account;
 import com.tea.ilearn.net.backend.Backend;
+import com.tea.ilearn.utils.Checker;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -44,8 +45,8 @@ public class SignupActivity extends AppCompatActivity {
         });
 
         binding.signup.setOnClickListener($ -> {
-            if (binding.usernameBox.getError() != null ||
-                    binding.passwordBox.getError() != null ||
+            if (!Checker.checkPassword(binding.password, binding.passwordBox) ||
+                    binding.usernameBox.getError() != null ||
                     binding.emailBox.getError() != null) {
                 Toast.makeText(this, "请检查输入", Toast.LENGTH_SHORT).show();
                 return;
@@ -72,7 +73,10 @@ public class SignupActivity extends AppCompatActivity {
         binding.username.setOnFocusChangeListener((view, hasFocus) -> {
             if (!hasFocus) {
                 String username = binding.username.getText().toString();
-                Backend.getInst().checkUsername(username, new CheckUsernameHandler(binding.usernameBox));
+                if (username.length() == 0)
+                    binding.usernameBox.setError("用户名不能为空");
+                else
+                    Backend.getInst().checkUsername(username, new CheckUsernameHandler(binding.usernameBox));
             } else {
                 binding.usernameBox.setError(null);
             }
@@ -88,9 +92,7 @@ public class SignupActivity extends AppCompatActivity {
 
         binding.password.setOnFocusChangeListener((view, hasFocus) -> {
             if (!hasFocus) {
-                if (binding.password.getText().toString().length() < 6) {
-                    binding.passwordBox.setError("密码长度至少为6");
-                }
+                Checker.checkPassword(binding.password, binding.passwordBox);
             } else {
                 binding.passwordBox.setError(null);
             }
