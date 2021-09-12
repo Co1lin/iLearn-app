@@ -138,7 +138,7 @@ public class MeFragment extends Fragment {
         });
 
         binding.darkModeSwitch.setOnClickListener($ -> {
-            Toast.makeText(root.getContext(), "主题色的修改将在应用下次启动时生效", Toast.LENGTH_SHORT).show();
+            Toast.makeText(root.getContext(), "主题修改将在应用下次启动时生效", Toast.LENGTH_SHORT).show();
             // store to DB
             new Thread(() -> {
                 boolean isDark = binding.darkModeSwitch.isChecked();
