@@ -201,48 +201,48 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/self_sync"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        app:cardCornerRadius="0dp">
+<!--                    <com.google.android.material.card.MaterialCardView-->
+<!--                        android:id="@+id/self_sync"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="48dp"-->
+<!--                        app:cardCornerRadius="0dp">-->
 
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:paddingStart="8dp"
-                            android:paddingEnd="8dp">
+<!--                        <RelativeLayout-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_gravity="center_vertical"-->
+<!--                            android:orientation="horizontal"-->
+<!--                            android:paddingStart="8dp"-->
+<!--                            android:paddingEnd="8dp">-->
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentLeft="true"
-                                android:layout_alignParentTop="true"
-                                android:layout_alignParentBottom="true"
-                                android:gravity="center_vertical"
-                                android:text="手动同步数据"
-                                android:textAppearance="?attr/textAppearanceBody2" />
+<!--                            <TextView-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_alignParentLeft="true"-->
+<!--                                android:layout_alignParentTop="true"-->
+<!--                                android:layout_alignParentBottom="true"-->
+<!--                                android:gravity="center_vertical"-->
+<!--                                android:text="手动同步数据"-->
+<!--                                android:textAppearance="?attr/textAppearanceBody2" />-->
 
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentTop="true"
-                                android:layout_alignParentRight="true"
-                                android:layout_alignParentBottom="true"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:layout_marginEnd="8dp"
-                                android:src="@drawable/ic_refresh_24" />
-                        </RelativeLayout>
-                    </com.google.android.material.card.MaterialCardView>
+<!--                            <ImageView-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_alignParentTop="true"-->
+<!--                                android:layout_alignParentRight="true"-->
+<!--                                android:layout_alignParentBottom="true"-->
+<!--                                android:background="?attr/selectableItemBackgroundBorderless"-->
+<!--                                android:layout_marginEnd="8dp"-->
+<!--                                android:src="@drawable/ic_refresh_24" />-->
+<!--                        </RelativeLayout>-->
+<!--                    </com.google.android.material.card.MaterialCardView>-->
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="?android:colorBackground" />
+<!--                    <View-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="1dp"-->
+<!--                        android:layout_marginStart="8dp"-->
+<!--                        android:layout_marginEnd="8dp"-->
+<!--                        android:background="?android:colorBackground" />-->
 
 <!--                    <com.google.android.material.card.MaterialCardView-->
 <!--                        android:layout_width="match_parent"-->

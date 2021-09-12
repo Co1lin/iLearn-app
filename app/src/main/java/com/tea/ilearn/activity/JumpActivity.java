@@ -29,13 +29,8 @@ public class JumpActivity extends AppCompatActivity {
             uri = uri.split(pattern[0])[1];
         else if (uri.contains(pattern[1]))
             uri = uri.split(pattern[1])[1];
-        else {  // unexpected, just open it
-            Intent anotherIntent = new Intent(this, MainActivity.class);
-            startActivity(anotherIntent);
-            return;
-        }
 
-        if (uri.startsWith("entity/")){
+        if (uri.startsWith("entity/")) {
             uri = uri.split("entity/")[1];
             Intent anotherIntent = new Intent(this, EntityDetailActivity.class);
             anotherIntent.setAction(Intent.ACTION_SEARCH);
@@ -51,6 +46,11 @@ public class JumpActivity extends AppCompatActivity {
             } catch (UnsupportedEncodingException e) {
                 Log.e("JumpActivity", e.toString());
             }
+        }
+        else {
+            // unexpected, just open it
+            Intent anotherIntent = new Intent(this, MainActivity.class);
+            startActivity(anotherIntent);
         }
     }
 

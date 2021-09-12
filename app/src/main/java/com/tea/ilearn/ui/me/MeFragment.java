@@ -128,9 +128,9 @@ public class MeFragment extends Fragment {
             startActivity(intent);
         });
 
-        binding.selfSync.setOnClickListener($ -> {
-            // TODO colin
-        });
+//        binding.selfSync.setOnClickListener($ -> {
+//            // TODO colin
+//        });
 
         binding.changePassword.setOnClickListener($ -> {
             Intent intent = new Intent(root.getContext(), ChangePasswordActivity.class);

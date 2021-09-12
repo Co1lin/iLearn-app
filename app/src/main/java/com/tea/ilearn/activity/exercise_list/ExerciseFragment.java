@@ -97,8 +97,9 @@ public class ExerciseFragment extends Fragment {
     private void doWeiboShare() {
         WeiboMultiMessage message = new WeiboMultiMessage();
         TextObject textObject = new TextObject();
-        textObject.text = "#iLearn# 这题出的真好！快来看看你会做吗？\n\n" + description + "\nA." + choices[0] +
-                "\nB." + choices[1] + "\nC." + choices[2] + "\nD." + choices[3] + "\n";
+        textObject.text = "#iLearn# 这题出得真好！快来看看你会做吗？\n\n" + description + "\nA." + choices[0] +
+                "\nB." + choices[1] + "\nC." + choices[2] + "\nD." + choices[3] + "\n\n点击链接打开 App 获取为您推荐的试题： " +
+                "http://api.ilearn.enjoycolin.top/app/exercise/";
         message.textObject = textObject;
         mWBAPI.shareMessage(message, true);
     }
