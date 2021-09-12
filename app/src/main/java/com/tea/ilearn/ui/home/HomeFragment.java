@@ -83,9 +83,7 @@ public class HomeFragment extends Fragment {
                 itemView.setTag(data);
 
                 ((TextView) itemView.findViewById(R.id.text)).setText(Constant.EduKG.EN_ZH.get(data));
-                itemView.findViewById(R.id.iv_close).setVisibility(
-                        dragState != DragFlowLayout.DRAG_STATE_IDLE ? View.VISIBLE : View.INVISIBLE
-                );
+                itemView.findViewById(R.id.iv_close).setVisibility(View.VISIBLE);
             }
 
             @NonNull @Override
@@ -98,6 +96,7 @@ public class HomeFragment extends Fragment {
             @Override
             protected void onDeleteSuccess(DragFlowLayout dfl, View child, Object data) {
                 binding.flowLayout.getDragItemManager().addItem(data);
+                binding.flowLayout.beginDrag();
             }
         });
 
@@ -213,26 +212,27 @@ public class HomeFragment extends Fragment {
                 binding.editPanel.setVisibility(View.INVISIBLE);
 
                 List<String> newSubjects = binding.flowLayout.getDragItemManager().getItems();
-                pagerAdapter.change(newSubjects);
+                if (!pagerAdapter.getSubjects().equals(newSubjects)) {
+                    pagerAdapter.change(newSubjects);
+                    search();
+
+                    new Thread(() -> {
+                        // store the preference into DB
+                        Preference preference;
+                        List<Preference> res = preferenceBox.getAll();
+                        if (res != null && res.size() > 0)
+                            preference = res.get(0);
+                        else
+                            preference = new Preference();
+                        preference.setSubjects(new ArrayList<>(newSubjects));
+                        preferenceBox.put(preference);
+                        // upload
+                        Backend.getInst().uploadPreferences(preference, null);
+                    }).start();
+                }
 
                 binding.flowLayout.getDragItemManager().clearItems();
                 binding.unused.getDragItemManager().clearItems();
-
-                search();
-
-                new Thread(() -> {
-                    // store the preference into DB
-                    Preference preference;
-                    List<Preference> res = preferenceBox.getAll();
-                    if (res != null && res.size() > 0)
-                        preference = res.get(0);
-                    else
-                        preference = new Preference();
-                    preference.setSubjects(new ArrayList<>(newSubjects));
-                    preferenceBox.put(preference);
-                    // upload
-                    Backend.getInst().uploadPreferences(preference, null);
-                }).start();
             }
         });
 

@@ -93,40 +93,53 @@
         app:layout_constraintTop_toBottomOf="@id/tab_bar"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/edit_panel"
-        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/tab_bar"
-        android:background="@drawable/bottom_corner"
+        android:visibility="gone"
         android:orientation="vertical"
         android:paddingBottom="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <com.heaven7.android.dragflowlayout.DragFlowLayout
-            android:layout_marginStart="8dp"
-            android:id="@+id/flow_layout"
+        <LinearLayout
+            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/panel_main"
+            android:orientation="vertical"
+            android:background="@drawable/bottom_corner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+            <com.heaven7.android.dragflowlayout.DragFlowLayout
+                android:layout_marginStart="8dp"
+                android:id="@+id/flow_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="8dp"
+                android:background="?android:colorBackground" />
+
+            <TextView
+                android:layout_marginStart="16dp"
+                android:text="热门学科"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <com.heaven7.android.dragflowlayout.DragFlowLayout
+                android:id="@+id/unused"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
         <View
+            app:layout_constraintTop_toBottomOf="@id/panel_main"
+            android:alpha="1"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="8dp"
-            android:background="?android:colorBackground" />
-
-        <TextView
-            android:layout_marginStart="16dp"
-            android:text="热门学科"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <com.heaven7.android.dragflowlayout.DragFlowLayout
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="8dp"
-            android:id="@+id/unused"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="match_parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
