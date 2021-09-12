@@ -36,6 +36,7 @@ public class EduKGEntityDetail {
     String label;
     String subject;
     String category = "";
+    @SerializedName(value = "categories", alternate = "category_list")
     @Convert(converter = StringArrayConverter.class, dbType = String.class)
     ArrayList<String> categories = new ArrayList<>();
     boolean starred;

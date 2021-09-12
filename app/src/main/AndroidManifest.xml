@@ -41,11 +41,11 @@
                     android:scheme="ilearn" />
                 <data
                     android:host="api.ilearn.enjoycolin.top"
-                    android:path="/app"
+                    android:pathPrefix="/app"
                     android:scheme="http" />
                 <data
                     android:host="api.ilearn.enjoycolin.top"
-                    android:path="/app"
+                    android:pathPrefix="/app"
                     android:scheme="https" />
             </intent-filter>
         </activity>
