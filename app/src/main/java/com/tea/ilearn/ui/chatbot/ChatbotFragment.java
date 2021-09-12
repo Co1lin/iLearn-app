@@ -1,10 +1,12 @@
 package com.tea.ilearn.ui.chatbot;
 
 import android.app.Activity;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -15,11 +17,13 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tea.ilearn.Constant;
+import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentChatbotBinding;
 import com.tea.ilearn.net.edukg.Answer;
 import com.tea.ilearn.net.edukg.EduKG;
@@ -47,6 +51,11 @@ public class ChatbotFragment extends Fragment {
         editText = bottomSendBar.getEditTextView();
         sendButton = bottomSendBar.getRightIconView();
 
+        TypedValue typedValue = new TypedValue();
+        binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.colorSurface, typedValue, true);
+        int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
+        editText.setBackgroundTintList(ColorStateList.valueOf(color));
+
         mMessageRecycler = binding.recyclerChat;
         mMessageAdapter = new MessageListAdapter(getContext(), new ArrayList<>());
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -64,32 +73,35 @@ public class ChatbotFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mMessageAdapter.getItemCount() == 0)
+            mMessageAdapter.add(new ChatMessage("由于目前知识库的请求频率限制，暂不支持直接提问。请先输入学科的中文名称再输入问题，否则暂时无法得到答案。示例：\n语文，李白是谁？", 1));
+    }
+
     private void sendMessage(View view) {
         String msg = editText.getText().toString().trim();
-        if (msg.length() == 0) {
-            Toast toast = Toast.makeText(getContext(), "请输入后再发送", Toast.LENGTH_SHORT);
+        if (msg.length() <= 3 ||
+            !(msg.charAt(2) == '，' || msg.charAt(2) == ',') ||
+            !Constant.EduKG.SUBJECTS_ZH.contains(msg.substring(0,2)) ||
+            msg.substring(3).trim().isEmpty())
+        {
+            Toast toast = Toast.makeText(getContext(), "请按照提示正确输入问题", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
         }
         else {
-            mMessageAdapter.add(new ChatMessage(msg, 0));   // user sends a msg
-            if (msg.length() >= 4 &&
-                    (msg.substring(0, 1).equals("[") && msg.substring(3, 4).equals("]") ||
-                            msg.substring(0, 1).equals("【") && msg.substring(3, 4).equals("】")) &&
-                    Constant.EduKG.SUBJECTS.contains(msg.substring(1, 3))) {
-                // QA with the specific subject when matches [**]
-                EduKG.getInst().qAWithSubject(msg.substring(1, 3), msg.substring(4),
-                        new StaticHandler(mMessageAdapter, 1, mMessageRecycler));
-            }
-            else {
-                EduKG.getInst().qAWithAllSubjects(msg,
-                        new StaticHandler(mMessageAdapter, Constant.EduKG.SUBJECTS.size(), mMessageRecycler));
-            }
+            mMessageAdapter.add(new ChatMessage(msg, 0));
+            String subject = Constant.EduKG.ZH_EN.get(msg.substring(0,2));
+            String question = msg.substring(3).trim();
+            EduKG.getInst().qAWithSubject(subject, question, new StaticHandler(mMessageAdapter, 1, mMessageRecycler));
             editText.setText("");
             mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        //EduKG.getInst().qAWithAllSubjects(msg, new StaticHandler(mMessageAdapter, Constant.EduKG.SUBJECTS_EN.size(), mMessageRecycler));
     }
 
     static class StaticHandler extends Handler {
@@ -129,18 +141,15 @@ public class ChatbotFragment extends Fragment {
                     }
                     else if (answerReceived == expectedNum - errorReceived)
                         mMessageAdapter.add(new ChatMessage("小艾还在上幼儿园，这个问题还不会 ;(T_T);", 1));
-                    mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
                 }
             }
             else {
                 errorReceived++;
                 if (errorReceived == expectedNum) {
                     mMessageAdapter.add(new ChatMessage(Constant.EduKG.ERROR_MSG, 1));
-                    mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
                 }
             }
+            mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
         }
     }
 }
-// TODO colin: adjust color
-// TODO colin: adjust height of bars

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <com.otaliastudios.zoom.ZoomLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                app:hasClickableChildren="true"
+                android:id="@+id/zoom_layout" >
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/graph_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </com.otaliastudios.zoom.ZoomLayout>
+
+            <View
+                android:id="@+id/separate_line"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/relation_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="?android:attr/textColorSecondary" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/empty_hint"
+        android:text="很抱歉，实体在知识图谱中没有找到关系"
+        android:textAppearance="?attr/textAppearanceBody2"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </TextView>
+</androidx.constraintlayout.widget.ConstraintLayout>
+

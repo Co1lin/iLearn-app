@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/chip"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:strokeWidth="1dp"
+    app:strokeColor="?colorSecondary"
+    app:cardBackgroundColor="?android:colorBackground"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="0dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true" >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/all"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:id="@+id/text"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:layout_gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="This is a Message"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/iv_open"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/ic_baseline_add_24"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:scaleType="fitXY" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

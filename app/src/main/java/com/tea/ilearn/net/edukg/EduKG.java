@@ -7,6 +7,8 @@ import com.tea.ilearn.net.APIRequest;
 
 import java.util.HashMap;
 
+import rxhttp.wrapper.param.RxHttp;
+
 /**
  * Network communication to EduKG
  */
@@ -21,8 +23,10 @@ public class EduKG extends APIRequest {
                     put("password", "abc123456");
                 }},
                 "id",
+                RxHttp.postForm("http://open.edukg.cn/opedukg/api/typeAuth/user/login"),
+                false,
                 "请先登录",
-                LoginResponse.class
+                p -> p.asClass(LoginResponse.class)
         );
     }
     private static EduKG instance = new EduKG();
@@ -53,7 +57,7 @@ public class EduKG extends APIRequest {
     }
 
     public void fuzzySearchEntityWithAllCourse(String searchKey, Handler handler) {
-        for (String subject: Constant.EduKG.SUBJECTS) {
+        for (String subject: Constant.EduKG.SUBJECTS_EN) {
             fuzzySearchEntityWithCourse(subject, searchKey, handler);
         }
     }
@@ -64,7 +68,7 @@ public class EduKG extends APIRequest {
                 put("course", course);
                 put("name", entityName);
             }},
-            p -> p.asEduKGResponse(EntityDetail.class),
+            p -> p.asEduKGResponse(EduKGEntityDetail.class),
             handler
         );
     }
@@ -80,7 +84,7 @@ public class EduKG extends APIRequest {
     }
 
     public void qAWithSubject(String course, String question, Handler handler) {
-        POST("/inputQuestion",
+        POSTForm("/inputQuestion",
                 new HashMap<String, Object>() {{
                     put("course", course);
                     put("inputQuestion", question);
@@ -91,13 +95,13 @@ public class EduKG extends APIRequest {
     }
 
     public void qAWithAllSubjects(String question, Handler handler) {
-        for (String subject: Constant.EduKG.SUBJECTS) {
+        for (String subject: Constant.EduKG.SUBJECTS_EN) {
             qAWithSubject(subject, question, handler);
         }
     }
 
     public void getNamedEntities(String course, String queryString, Handler handler) {
-        POST("/linkInstance",
+        POSTForm("/linkInstance",
             new HashMap<String, Object>(){{
                 put("course", course);
                 put("context", queryString);

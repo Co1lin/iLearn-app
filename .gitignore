@@ -1,4 +1,8 @@
 **/.DS_Store
+
+# objectbox database files
+app/objectbox-models/
+
 # Built application files
 *.apk
 *.aar

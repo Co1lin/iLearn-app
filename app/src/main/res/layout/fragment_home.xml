@@ -23,106 +23,124 @@
         app:abs_rightIconColor="?colorPrimary"
         app:abs_rightIconRes="@mipmap/search"
         app:abs_titleBgRes="@drawable/search_bar_title_et_bg"
-        app:abs_titleHintColor="?android:colorBackground"
+        app:abs_titleHintColor="?android:textColorHint"
         app:abs_titleHintText="搜索词条"
         app:abs_titleMarginVertical="0dp"
         app:abs_titlePaddingHorizontal="16dp"
         app:abs_titleTextColor="?colorOnSecondary"
         app:abs_titleTextSize="15sp"
         app:layout_constraintTop_toTopOf="parent"
+
         tools:layout_editor_absoluteX="0dp" />
 
-    <View
-        android:id="@+id/separate_bar"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
         app:layout_constraintTop_toBottomOf="@id/search_bar"
-        android:background="?colorSurface" />
-
-    <LinearLayout
-        android:id="@+id/sort_filter"
-        app:layout_constraintTop_toBottomOf="@id/separate_bar"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/tab_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <LinearLayout
-            android:id="@+id/sort_name"
-            android:layout_gravity="center"
-            android:layout_marginStart="12dp"
+        <View
+            android:id="@+id/placeholder"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="?colorSurface"
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
+        <CheckBox
+            android:id="@+id/edit_menu"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-            <TextView
-                android:id="@+id/sort_name_text"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:gravity="center_vertical"
-                android:textSize="16dp"
-                android:text="实体名" />
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-                <ImageView
-                    android:id="@+id/sort_name_up"
-                    android:layout_width="12dp"
-                    android:layout_height="16dp"
-                    android:translationY="5dp"
-                    android:background="@drawable/ic_baseline_arrow_drop_up_24" />
-                <ImageView
-                    android:id="@+id/sort_name_down"
-                    android:layout_width="12dp"
-                    android:layout_height="16dp"
-                    android:translationY="-5dp"
-                    android:background="@drawable/ic_baseline_arrow_drop_down_24" />
-            </LinearLayout>
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:background="?colorSurface"
+            android:buttonTint="?colorSecondary"
+            android:button="@drawable/ic_baseline_menu_24"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/placeholder" />
 
-        <LinearLayout
-            android:id="@+id/sort_category"
-            android:layout_gravity="center"
-            android:layout_marginStart="12dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-            <TextView
-                android:id="@+id/sort_category_text"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:gravity="center_vertical"
-                android:textSize="16dp"
-                android:text="知识点" />
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-                <ImageView
-                    android:id="@+id/sort_category_up"
-                    android:layout_width="12dp"
-                    android:layout_height="16dp"
-                    android:translationY="5dp"
-                    android:background="@drawable/ic_baseline_arrow_drop_up_24" />
-                <ImageView
-                    android:id="@+id/sort_category_down"
-                    android:layout_width="12dp"
-                    android:layout_height="16dp"
-                    android:translationY="-5dp"
-                    android:background="@drawable/ic_baseline_arrow_drop_down_24" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
+        <com.google.android.material.tabs.TabLayout
+            app:tabPadding="0dp"
+            app:tabMinWidth="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/edit_menu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:tabMode="scrollable"
+            android:id="@+id/subject_tabs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/info_recycler"
-        app:layout_constraintTop_toBottomOf="@id/sort_filter"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        <TextView
+            android:id="@+id/cover"
+            android:visibility="gone"
+            android:background="?colorSurface"
+            android:gravity="center_vertical"
+            android:text="编辑：选择您喜欢的学科"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:paddingStart="16dp"
+            app:layout_constraintTop_toTopOf="@id/subject_tabs"
+            app:layout_constraintBottom_toBottomOf="@id/subject_tabs"
+            app:layout_constraintStart_toStartOf="@id/subject_tabs"
+            app:layout_constraintEnd_toEndOf="@id/subject_tabs"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-    </androidx.recyclerview.widget.RecyclerView>
+        app:layout_constraintTop_toBottomOf="@id/tab_bar"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/edit_panel"
+        app:layout_constraintTop_toBottomOf="@id/tab_bar"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:paddingBottom="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/panel_main"
+            android:orientation="vertical"
+            android:background="@drawable/bottom_corner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.heaven7.android.dragflowlayout.DragFlowLayout
+                android:layout_marginStart="8dp"
+                android:id="@+id/flow_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="8dp"
+                android:background="?android:colorBackground" />
+
+            <TextView
+                android:layout_marginStart="16dp"
+                android:text="热门学科"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <com.heaven7.android.dragflowlayout.DragFlowLayout
+                android:id="@+id/unused"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <View
+            app:layout_constraintTop_toBottomOf="@id/panel_main"
+            android:alpha="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

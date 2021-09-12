@@ -1,54 +1,57 @@
 package com.tea.ilearn.ui.home;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.tabs.TabLayout;
+import com.heaven7.android.dragflowlayout.ClickToDeleteItemListenerImpl;
+import com.heaven7.android.dragflowlayout.DragAdapter;
+import com.heaven7.android.dragflowlayout.DragFlowLayout;
 import com.tea.ilearn.Constant;
 import com.tea.ilearn.R;
 import com.tea.ilearn.databinding.FragmentHomeBinding;
-import com.tea.ilearn.net.edukg.EduKG;
-import com.tea.ilearn.net.edukg.Entity;
-import com.tea.ilearn.utils.ACAdapter;
-import com.tea.ilearn.utils.RandChinese;
+import com.tea.ilearn.model.Preference;
+import com.tea.ilearn.net.backend.Backend;
+import com.tea.ilearn.utils.DB_utils;
+import com.tea.ilearn.utils.ObjectBox;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
+import io.objectbox.Box;
 import per.goweii.actionbarex.common.ActionBarSearch;
 import per.goweii.actionbarex.common.AutoComplTextView;
 
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private ActionBarSearch searchBar;
-    private AutoComplTextView acTextView;
-    private View loadingBar;
     private View root;
-
-    private RecyclerView mInfoRecycler;
-    private InfoListAdapter mInfoAdapter;
-
-    private CountDownLatch searchSubjectNum = new CountDownLatch(0);
+    private AutoComplTextView acTextView;
+    private SubjectListAdapter pagerAdapter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         root = binding.getRoot();
         searchBar = binding.searchBar;
-        loadingBar = searchBar.getForegroundLayer();
         acTextView = searchBar.getEditTextView();
+
+        TypedValue typedValue = new TypedValue();
+        binding.getRoot().getContext().getTheme().resolveAttribute(R.attr.colorSurface, typedValue, true);
+        int color = ContextCompat.getColor(binding.getRoot().getContext(), typedValue.resourceId);
+        acTextView.setBackgroundTintList(ColorStateList.valueOf(color));
 
         searchBar.setOnRightIconClickListener(view -> search());
         // bind enter key
@@ -59,133 +62,202 @@ public class HomeFragment extends Fragment {
             }
             return false;
         });
+
         // auto completion
-        ArrayList<String> COUNTRIES = new ArrayList<>(Arrays.asList("Belgium", "France", "Italy", "Germany", "Spain", "Sp11", "Sp22"));
-        ACAdapter<String> historyAdapter = new ACAdapter<>(
-                getContext(), R.layout.autocompletion_item,
-                R.id.ac_text, R.id.image_button_del, COUNTRIES,
-                acTextView);
-        acTextView.setAdapter(historyAdapter);
         acTextView.setDropDownAnchor(searchBar.getId());
         acTextView.setThreshold(1); // default 2, minimum 1
         acTextView.setOnFocusChangeListener((view, hasFocus) -> {
-            AutoComplTextView acTView = (AutoComplTextView) view;
             if (hasFocus)
-                acTView.showDropDown();
+                acTextView.showDropDown();
+        });
+        DB_utils.updateACAdapter(getActivity(), getContext(), acTextView);
+
+        binding.flowLayout.setOnItemClickListener(new ClickToDeleteItemListenerImpl(R.id.all){
+            @Override
+            protected void onDeleteSuccess(DragFlowLayout dfl, View child, Object data) {
+                binding.unused.getDragItemManager().addItem(data);
+                binding.unused.beginDrag();
+            }
         });
 
-        // ================================================================================
+        binding.flowLayout.setDragAdapter(new DragAdapter<String>() {
+            @Override
+            public int getItemLayoutId() {
+                return R.layout.used_chip;
+            }
 
-        binding.sortName.setOnClickListener(view -> {
-            binding.sortCategoryUp.setVisibility(View.VISIBLE);
-            binding.sortCategoryDown.setVisibility(View.VISIBLE);
-            if (binding.sortNameUp.getVisibility() == View.VISIBLE && binding.sortNameDown.getVisibility() == View.INVISIBLE) {
-                binding.sortNameUp.setVisibility(View.INVISIBLE);
-                binding.sortNameDown.setVisibility(View.VISIBLE);
-                mInfoAdapter.applySortAndFilter(Info::getName, true);
+            @Override
+            public void onBindData(View itemView, int dragState, String data) {
+                itemView.setTag(data);
+
+                ((TextView) itemView.findViewById(R.id.text)).setText(Constant.EduKG.EN_ZH.get(data));
+                itemView.findViewById(R.id.iv_close).setVisibility(View.VISIBLE);
             }
-            else {
-                binding.sortNameUp.setVisibility(View.VISIBLE);
-                binding.sortNameDown.setVisibility(View.INVISIBLE);
-                mInfoAdapter.applySortAndFilter(Info::getName, false);
+
+            @NonNull @Override
+            public String getData(View itemView) {
+                return (String) itemView.getTag();
             }
-            mInfoRecycler.scrollToPosition(0);
         });
 
-        binding.sortCategory.setOnClickListener(view -> {
-            binding.sortNameUp.setVisibility(View.VISIBLE);
-            binding.sortNameDown.setVisibility(View.VISIBLE);
-            if (binding.sortCategoryUp.getVisibility() == View.VISIBLE && binding.sortCategoryDown.getVisibility() == View.INVISIBLE) {
-                binding.sortCategoryUp.setVisibility(View.INVISIBLE);
-                binding.sortCategoryDown.setVisibility(View.VISIBLE);
-                mInfoAdapter.applySortAndFilter(Info::getCategory, true);
+        binding.unused.setOnItemClickListener(new ClickToDeleteItemListenerImpl(R.id.all){
+            @Override
+            protected void onDeleteSuccess(DragFlowLayout dfl, View child, Object data) {
+                binding.flowLayout.getDragItemManager().addItem(data);
+                binding.flowLayout.beginDrag();
             }
-            else {
-                binding.sortCategoryUp.setVisibility(View.VISIBLE);
-                binding.sortCategoryDown.setVisibility(View.INVISIBLE);
-                mInfoAdapter.applySortAndFilter(Info::getCategory, false);
-            }
-            mInfoRecycler.scrollToPosition(0);
         });
 
-        mInfoRecycler = binding.infoRecycler;
-        mInfoAdapter = new InfoListAdapter(root.getContext(), new ArrayList<Info>());
-        mInfoRecycler.setLayoutManager(new LinearLayoutManager(root.getContext()));
-        mInfoRecycler.setAdapter(mInfoAdapter);
+        binding.unused.setDragAdapter(new DragAdapter<String>() {
+            @Override
+            public int getItemLayoutId() {
+                return R.layout.unused_chip;
+            }
 
-        initList();
+            @Override
+            public void onBindData(View itemView, int dragState, String data) {
+                itemView.setTag(data);
+
+                ((TextView) itemView.findViewById(R.id.text)).setText(Constant.EduKG.EN_ZH.get(data));
+                itemView.findViewById(R.id.iv_open).setVisibility(View.VISIBLE);
+            }
+
+            @NonNull @Override
+            public String getData(View itemView) {
+                return (String) itemView.getTag();
+            }
+        });
+
+        initTabs();
 
         return root;
     }
 
-    private void initList() {
-        int initNum = 5; // TODO 0 for EDUKG FUCK
-        List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
-        searchSubjectNum = new CountDownLatch(subjects.size() * initNum);
-        for (int i = 0; i < initNum; ++i) {
-            char c = RandChinese.gen();
-            for (String sub : subjects) {
-                StaticHandler handler = new StaticHandler(mInfoAdapter, sub, searchSubjectNum, loadingBar);
-                EduKG.getInst().fuzzySearchEntityWithCourse(sub, String.valueOf(c), handler);
+    @Override
+    public void onResume() {
+        super.onResume();
+        reloadTabs();
+        DB_utils.updateACAdapter(getActivity(), getContext(), acTextView);
+    }
+
+    private void reloadTabs() {
+        if (pagerAdapter != null) { new Thread(() -> {
+            Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
+            // load subject preference from DB
+            List<String> subjects;
+            List<Preference> res = preferenceBox.getAll();
+            if (res != null && res.size() > 0 &&
+                    res.get(0).getSubjects() != null && res.get(0).getSubjects().size() > 0) {
+                subjects = res.get(0).getSubjects();
+            } else {
+                preferenceBox.removeAll();
+                Preference preference = new Preference();
+                subjects = preference.getSubjects();
+                preferenceBox.put(preference);
             }
-        }
+            // set to UI
+            if (!subjects.equals(pagerAdapter.getSubjects()))
+                getActivity().runOnUiThread(() -> pagerAdapter.change(subjects));
+        }).start();}
+    }
+
+    private void initTabs() {
+        new Thread(() -> {
+            Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
+            // load subject preference from DB
+            List<String> subjects;
+            List<Preference> res = preferenceBox.getAll();
+            if (res != null && res.size() > 0 &&
+                    res.get(0).getSubjects() != null && res.get(0).getSubjects().size() > 0) {
+                subjects = res.get(0).getSubjects();
+            }
+            else {
+                preferenceBox.removeAll();
+                Preference preference = new Preference();
+                subjects = preference.getSubjects();
+                preferenceBox.put(preference);
+            }
+            // set to UI
+            getActivity().runOnUiThread(() -> {
+                pagerAdapter = new SubjectListAdapter(getChildFragmentManager(), subjects);
+                binding.viewPager.setOffscreenPageLimit(Constant.EduKG.SUBJECTS_EN.size());
+                binding.viewPager.setAdapter(pagerAdapter);
+                binding.subjectTabs.setupWithViewPager(binding.viewPager);
+                ((EntityListFragment) pagerAdapter.getItem(0)).waitForBinding("", acTextView);
+            });
+        }).start();
+
+        Box<Preference> preferenceBox = ObjectBox.get().boxFor(Preference.class);
+
+        binding.editPanel.setOnTouchListener((view, event) -> true);
+
+        binding.editMenu.setOnCheckedChangeListener((btn, checked) -> {
+            if (checked) {
+                binding.editPanel.setVisibility(View.VISIBLE);
+                binding.cover.setVisibility(View.VISIBLE);
+
+                List<String> subs = new ArrayList<>();
+                for (int i = 0; i < binding.subjectTabs.getTabCount(); ++i) {
+                    subs.add(Constant.EduKG.ZH_EN.get(binding.subjectTabs.getTabAt(i).getText().toString()));
+                }
+                binding.flowLayout.getDragItemManager().addItems(subs);
+                for (String subject : Constant.EduKG.SUBJECTS_EN) {
+                    if (!subs.contains(subject))
+                        binding.unused.getDragItemManager().addItems(subject);
+                }
+
+                binding.unused.beginDrag();
+                binding.flowLayout.beginDrag();
+            } else {
+                if (binding.flowLayout.getDragItemManager().getItems().size() == 0) {
+                    binding.editMenu.setChecked(true);
+                    Toast.makeText(binding.getRoot().getContext(), "请至少保留一门学科", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                binding.flowLayout.finishDrag();
+                binding.flowLayout.finishDrag();
+                binding.cover.setVisibility(View.INVISIBLE);
+                binding.editPanel.setVisibility(View.INVISIBLE);
+
+                List<String> newSubjects = binding.flowLayout.getDragItemManager().getItems();
+                if (!pagerAdapter.getSubjects().equals(newSubjects)) {
+                    pagerAdapter.change(newSubjects);
+                    search();
+
+                    new Thread(() -> {
+                        // store the preference into DB
+                        Preference preference;
+                        List<Preference> res = preferenceBox.getAll();
+                        if (res != null && res.size() > 0)
+                            preference = res.get(0);
+                        else
+                            preference = new Preference();
+                        preference.setSubjects(new ArrayList<>(newSubjects));
+                        preferenceBox.put(preference);
+                        // upload
+                        Backend.getInst().uploadPreferences(preference, null);
+                    }).start();
+                }
+
+                binding.flowLayout.getDragItemManager().clearItems();
+                binding.unused.getDragItemManager().clearItems();
+            }
+        });
+
+        binding.subjectTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override public void onTabSelected(TabLayout.Tab tab) { search(); }
+            @Override public void onTabUnselected(TabLayout.Tab tab) { }
+            @Override public void onTabReselected(TabLayout.Tab tab) { }
+        });
+    }
+
+    private String getQuery() {
+        return binding.searchBar.getEditTextView().getText().toString();
     }
 
     private void search() {
-        if (searchSubjectNum.getCount() == 0) {
-            String query = searchBar.getEditTextView().getText().toString();
-            loadingBar.setVisibility(View.VISIBLE);
-            mInfoAdapter.clear();
-            binding.sortCategoryUp.setVisibility(View.VISIBLE);
-            binding.sortCategoryDown.setVisibility(View.VISIBLE);
-            binding.sortNameUp.setVisibility(View.VISIBLE);
-            binding.sortNameDown.setVisibility(View.VISIBLE);
-            List<String> subjects = Constant.EduKG.SUBJECTS; // TODO change to tablayout items
-            searchSubjectNum = new CountDownLatch(subjects.size());
-            for (String sub : subjects) {
-                StaticHandler handler = new StaticHandler(mInfoAdapter, sub, searchSubjectNum, loadingBar);
-                EduKG.getInst().fuzzySearchEntityWithCourse(sub, query, handler);
-            }
-        }
-    }
-
-    static class StaticHandler extends Handler {
-        private InfoListAdapter mInfoAdapter;
-        private View loadingBar;
-        private String subject;
-        private CountDownLatch expectedNum;
-
-        StaticHandler(InfoListAdapter mInfoAdapter, String subject,
-                      CountDownLatch _latch, View _loadingBar) {
-            this.mInfoAdapter = mInfoAdapter;
-            this.subject = subject;
-            this.expectedNum = _latch;
-            this.loadingBar = _loadingBar;
-        }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Log.i("HomeFragment/handleMessage", "msg.what: " + msg.what);
-            this.expectedNum.countDown();
-            if (this.expectedNum.getCount() == 0)
-                loadingBar.setVisibility(View.INVISIBLE);
-            List<Entity> entities = (List<Entity>) msg.obj;
-            if (entities != null) {
-                for (Entity e : entities) {
-                    mInfoAdapter.add(new Info(
-                            0,
-                            e.getLabel(),
-                            subject,
-                            false, // TODO from database
-                            false, // TODO from database
-                            e.getCategory(),
-                            e.getUri()
-                    ));
-                }
-            } else {
-                // TODO empty hint (may be a new type of viewholder)
-            }
-        }
+        int pos = binding.subjectTabs.getSelectedTabPosition();
+        Log.d("MYDEBUG", pos + " " +pagerAdapter.getCount());
+        ((EntityListFragment)pagerAdapter.getItem(pos)).search(getQuery(), acTextView);
     }
 }
