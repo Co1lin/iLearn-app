@@ -7,9 +7,11 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import com.tea.ilearn.MainActivity;
 import com.tea.ilearn.activity.entity_detail.EntityDetailActivity;
 
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -35,7 +37,9 @@ public class JumpActivity extends AppCompatActivity {
             Intent anotherIntent = new Intent(this, EntityDetailActivity.class);
             anotherIntent.setAction(Intent.ACTION_SEARCH);
             try {
-                JumpEntity info = (new Gson()).fromJson(URLDecoder.decode(uri, StandardCharsets.UTF_8.name()), JumpEntity.class);
+                JsonReader reader = new JsonReader(new StringReader(URLDecoder.decode(uri, StandardCharsets.UTF_8.name())));
+                reader.setLenient(true);
+                JumpEntity info = (new Gson()).fromJson(reader, JumpEntity.class);
                 anotherIntent.putExtra("name", info.name);
                 anotherIntent.putExtra("category", info.category);
                 anotherIntent.putExtra("subject", info.subject);
