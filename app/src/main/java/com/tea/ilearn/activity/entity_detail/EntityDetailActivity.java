@@ -171,12 +171,8 @@ public class EntityDetailActivity extends AppCompatActivity implements WbShareCa
             }
             // ==== fill in ui ====
 
-            if (properties != null && properties.size() > 0) {
-                ((PropertyListFragment)pagerAdapter.getItem(0)).set(properties);
-            }
-            if (relations != null && relations.size() > 0) {
-                ((RelationListFragment)pagerAdapter.getItem(1)).set(relations);
-            }
+            ((PropertyListFragment)pagerAdapter.getItem(0)).set(properties);
+            ((RelationListFragment)pagerAdapter.getItem(1)).set(relations);
         }
     }
 

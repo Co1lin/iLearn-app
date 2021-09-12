@@ -130,26 +130,31 @@ public class RelationListFragment extends Fragment {
     }
 
     void set(ArrayList<EduKGRelation> relations) {
-        Graph graph = new Graph();
-        Node center = new Node(new EntityInfo(name, category, subject, uri));
-        int num_in = 0, num_out = 0;
-        for (EduKGRelation r : relations) {
-            Node other = new Node(new EntityInfo(r.getObjectLabel(), category, subject, r.getObject()));
-            if (!r.getObjectLabel().equals(name)) {
-                if (r.getDirection() == 1 && num_out < 5) {
-                    num_out += 1;
-                    graph.addEdge(center, other);
+        if (relations == null || relations.size() == 0) {
+            binding.separateLine.setVisibility(View.GONE);
+            binding.emptyHint.setVisibility(View.VISIBLE);
+        } else {
+            Graph graph = new Graph();
+            Node center = new Node(new EntityInfo(name, category, subject, uri));
+            int num_in = 0, num_out = 0;
+            for (EduKGRelation r : relations) {
+                Node other = new Node(new EntityInfo(r.getObjectLabel(), category, subject, r.getObject()));
+                if (!r.getObjectLabel().equals(name)) {
+                    if (r.getDirection() == 1 && num_out < 5) {
+                        num_out += 1;
+                        graph.addEdge(center, other);
+                    }
+                    else if (r.getDirection() == 0 && num_in < 5) {
+                        num_in += 1;
+                        graph.addEdge(other, center);
+                    }
                 }
-                else if (r.getDirection() == 0 && num_in < 5) {
-                    num_in += 1;
-                    graph.addEdge(other, center);
-                }
+                mRelationAdapter.add(new Relation(
+                        r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(),
+                        subject, category, categories, r.getObject()));
             }
-            mRelationAdapter.add(new Relation(
-                    r.getPredicateLabel(), r.getObjectLabel(), r.getDirection(),
-                    subject, category, categories, r.getObject()));
+            graphAdapter.submitGraph(graph);
+            graphAdapter.notifyDataSetChanged();
         }
-        graphAdapter.submitGraph(graph);
-        graphAdapter.notifyDataSetChanged();
     }
 }

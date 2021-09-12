@@ -59,6 +59,8 @@ public class HistoryActivity extends AppCompatActivity {
                     abstractInfo.setStar(entity.isStarred());
                     runOnUiThread(() -> mAbstractInfoAdapter.add(abstractInfo));
                 });
+            } else {
+                binding.emptyHint.setVisibility(View.VISIBLE);
             }
         }).start();
     }
