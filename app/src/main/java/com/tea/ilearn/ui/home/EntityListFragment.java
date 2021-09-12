@@ -117,9 +117,15 @@ public class EntityListFragment extends Fragment {
     }
 
     public void search(String query, AutoComplTextView acTextView) {
+        binding.loadingBar.setVisibility(View.VISIBLE);
+        mAbstractInfoAdapter.clear();
+        binding.emptyHint.setVisibility(View.GONE);
+        binding.sortCategoryUp.setVisibility(View.VISIBLE);
+        binding.sortCategoryDown.setVisibility(View.VISIBLE);
+        binding.sortNameUp.setVisibility(View.VISIBLE);
+        binding.sortNameDown.setVisibility(View.VISIBLE);
         if (query.isEmpty()) {
-            int initNum = 2;
-            binding.loadingBar.setVisibility(View.VISIBLE);
+            int initNum = 1;
             searchSubjectNum = new CountDownLatch(initNum);
             for (int i = 0; i < initNum; ++i) {
                 int j = (new Random()).nextInt(12);
@@ -134,13 +140,6 @@ public class EntityListFragment extends Fragment {
             return;
         }
         if (searchSubjectNum.getCount() == 0) {
-            binding.loadingBar.setVisibility(View.VISIBLE);
-            mAbstractInfoAdapter.clear();
-            binding.emptyHint.setVisibility(View.GONE);
-            binding.sortCategoryUp.setVisibility(View.VISIBLE);
-            binding.sortCategoryDown.setVisibility(View.VISIBLE);
-            binding.sortNameUp.setVisibility(View.VISIBLE);
-            binding.sortNameDown.setVisibility(View.VISIBLE);
             searchSubjectNum = new CountDownLatch(1);
             StaticHandler handler = new StaticHandler(
                     binding, mAbstractInfoAdapter, subject, query, searchSubjectNum, binding.loadingBar,
