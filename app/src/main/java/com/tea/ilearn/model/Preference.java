@@ -20,7 +20,7 @@ public class Preference {
 
     @Convert(converter = StringListConverter.class, dbType = String.class)
     ArrayList<String> subjects = new ArrayList<>(Arrays.asList(
-            Constant.EduKG.CHINESE, Constant.EduKG.MATH
+            Constant.EduKG.CHINESE, Constant.EduKG.BIOLOGY, Constant.EduKG.GEO
     ));
 
     boolean dark = true;
