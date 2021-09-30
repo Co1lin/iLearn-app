@@ -19,7 +19,7 @@ public class EduKG extends APIRequest {
                 "/typeAuth/user/login",
                 "/typeOpen/open",
                 new HashMap<String, Object>(){{
-                    put("phone", "15311155173"); // 13717683859
+                    put("phone", "153111551");
                     put("password", "abc123456");
                 }},
                 "id",
